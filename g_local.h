@@ -791,19 +791,12 @@ extern byte    maxImpulses;
 
 extern qboolean   displayimpulses;
 
-//r1ch 2005-01-26 disable hugely buggy commands BEGIN
-/*extern qboolean   play_team_enable;
-extern qboolean   play_all_enable;
-extern qboolean   play_person_enable;*/
-//r1ch 2005-01-26 disable hugely buggy commands END
-
 extern qboolean   printmessageonplaycmds;
 extern qboolean   say_person_enable;
 extern qboolean   say_group_enable;
 extern qboolean   extendedsay_enable;
 extern qboolean   spawnentities_enable;
 extern qboolean   spawnentities_internal_enable;
-extern qboolean   consolechat_disable;
 extern qboolean   gamemaptomap;
 extern qboolean   banOnConnect;
 extern qboolean   lockDownServer;
@@ -861,7 +854,6 @@ extern qboolean   zbc_enable;
 
 extern int    logfilecheckcount;
 
-extern qboolean   disablecmds_enable;
 extern qboolean   checkvarcmds_enable;
 extern qboolean   swap_attack_use;
 extern qboolean   timescaledetect;
@@ -1100,16 +1092,6 @@ void  unlinkentity_internal(edict_t *ent);
 // zb_zbotcheck.c
 qboolean zbc_ZbotCheck(int client, usercmd_t *ucmd);
 
-// zb_disable.c
-void  freeDisableLists(void);
-void  readDisableLists(void);
-void  reloadDisableFileRun(int startarg, edict_t *ent, int client);
-void  listdisablesRun(int startarg, edict_t *ent, int client);
-void  displayNextDisable(edict_t *ent, int client, long floodcmd);
-void  disablecmdRun(int startarg, edict_t *ent, int client);
-void  disableDelRun(int startarg, edict_t *ent, int client);
-qboolean checkDisabledCommand(char *cmd);
-
 // zb_checkvar.c
 void  readCheckVarLists(void);
 void  reloadCheckVarFileRun(int startarg, edict_t *ent, int client);
@@ -1162,19 +1144,6 @@ admin_type;
 #define Q2A_MOD_KICK_MSG "Failed the pmodified check on this map.\n"
 #define Q2A_PRV_KICK_MSG "Failed the private commands check.\n"
 #define FRKQ2_KICK_MSG "Failed the client authentication.\n"
-
-extern admin_type admin_pass[MAX_ADMINS];
-extern admin_type q2a_bypass_pass[MAX_ADMINS];
-extern int num_admins;
-extern int num_q2a_admins;
-
-void Read_Admin_cfg(void);
-void List_Admin_Commands(edict_t *ent,int client);
-int get_admin_level(char *givenpass,char *givenname);
-int get_bypass_level(char *givenpass,char *givenname);
-
-void ADMIN_dumpuser(edict_t *ent,int client,int user,qboolean check);
-int  ADMIN_process_command(edict_t *ent,int client);
 
 extern int   client_map_cfg;
 extern qboolean  do_franck_check;

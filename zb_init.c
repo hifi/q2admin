@@ -83,23 +83,13 @@ char moddir[256];
 
 qboolean displayimpulses = FALSE;
 
-//r1ch 2005-01-26 disable hugely buggy commands BEGIN
-/*qboolean play_team_enable = FALSE;
-qboolean play_all_enable = FALSE;
-qboolean play_person_enable = FALSE;*/
-//r1ch 2005-01-26 disable hugely buggy commands END
-
 qboolean say_person_enable = FALSE;
 qboolean say_group_enable = FALSE;
 qboolean extendedsay_enable = FALSE;
 qboolean spawnentities_enable = FALSE;
 qboolean spawnentities_internal_enable = FALSE;
 
-qboolean consolechat_disable = FALSE;
-
-
 qboolean gamemaptomap = FALSE;
-
 
 qboolean lockDownServer = FALSE;
 
@@ -429,7 +419,6 @@ void InitGame (void)
 		}
 
 //*** UPDATE START ***
-	Read_Admin_cfg();
 
 	//whois shit
 	if (whois_active)
@@ -524,7 +513,6 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 		}
 		
 	proxyinfo[-1].inuse = 1;
-	freeDisableLists();
 
 	motd[0] = 0;
 	if(zbotmotd[0])
@@ -606,12 +594,6 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 							if (com_tok[0] == '}') // {
 								break;
 								
-							if(!Q_stricmp("classname", keyname) && checkDisabledEntities(com_tok))
-								{
-									classnamepos[0] = '_';  // change the 'classname' entry to '_lassname', this makes the q2 code ingore it.
-									
-									// side-effect: it may cause error messages on the console screen depending on the mod...
-								}
 						}
 				}
 				
@@ -624,9 +606,8 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 	
 	copyDllInfo();
 	
-	readDisableLists();
-	readCheckVarLists();
-	
+	/* disabled until rewritten */
+	//readCheckVarLists();
 	
 	// exec the map cfg file...
 	q2a_strcpy(gmapname, mapname);	//UPDATE
@@ -1717,13 +1698,6 @@ void ClientBegin (edict_t *ent)
 	proxyinfo[client].impulsesgenerated = 0;
 	proxyinfo[client].checked_hacked_exe = 0;
 
-//*** UPDATE START ***
-	if (num_q2a_admins)
-	{
-		addCmdQueue(client, QCMD_SPAMBYPASS, 60 + (10*random()), 0, 0);
-	}
-//*** UPDATE END ***
-	
 	if(proxyinfo[client].clientcommand & CCMD_RECONNECT)
 		{
 			addCmdQueue(client, QCMD_RECONNECT, 1, 0, NULL);
@@ -1741,20 +1715,6 @@ void ClientBegin (edict_t *ent)
 		{
 			addCmdQueue(client, QCMD_STARTUP, 0, 0, 0);
 			
-			if(adminpassword[0] && !proxyinfo[client].admin)
-			{
-				addCmdQueue(client, QCMD_TESTADMIN, 0, 0, 0);
-			}
-//*** UPDATE START ***
-			if(num_admins && !proxyinfo[client].q2a_admin)
-			{
-				addCmdQueue(client, QCMD_TESTADMIN2, 0, 0, 0);
-			}
-			if(num_q2a_admins && !proxyinfo[client].q2a_bypass)
-			{
-				addCmdQueue(client, QCMD_TESTADMIN3, 0, 0, 0);
-			}
-//*** UPDATE END ***
 			if(customClientCmdConnect[0] || customServerCmdConnect[0])
 				{
 					addCmdQueue(client, QCMD_CONNECTCMD, 0, 0, 0);
@@ -1775,7 +1735,8 @@ void ClientBegin (edict_t *ent)
 					gi.centerprintf(ent, motd);
 				}
 				
-			addCmdQueue(client, QCMD_CHECKVARTESTS, (float)checkvar_poll_time, 0, 0);
+			/* disabled until rewritten */
+			//addCmdQueue(client, QCMD_CHECKVARTESTS, (float)checkvar_poll_time, 0, 0);
 			
 			sprintf(buffer, "%s/qconsole.log", moddir);
 			q2logfile = fopen(buffer, "rt");
