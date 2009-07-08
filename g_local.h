@@ -489,7 +489,6 @@ typedef struct
 		char   buffer[256]; // log buffer
 		char   ipaddress[40];
 		byte   ipaddressBinary[4];
-		byte   impulse;
 		byte   inuse;
 		char   name[16];
 		char   skin[40];  // skin/model information.
@@ -505,7 +504,6 @@ typedef struct
 		int    chatcount;
 		char   userinfo[MAX_INFO_STRING + 45];
 		FILE   *stuffFile;
-		int    impulsesgenerated;
 		char   lastcmd[8192];
 		short   zbc_angles[2][2];
 		int    zbc_tog;
@@ -518,7 +516,6 @@ typedef struct
 		char   hack_teststring1[RANDOM_STRING_LENGTH+1];
 		char   hack_teststring2[RANDOM_STRING_LENGTH+1];
 		char   hack_teststring3[RANDOM_STRING_LENGTH+1];
-		char   hack_timescale[RANDOM_STRING_LENGTH+1];
 		int    hacked_disconnect;
 		byte   hacked_disconnect_ip[4];
 		int    checked_hacked_exe;
@@ -546,7 +543,6 @@ typedef struct
 		int    userinfo_changed_count;
 		int    userinfo_changed_start;
 		int    private_command;
-		int    timescale;
 		qboolean  show_fps;
 		qboolean  vid_restart;
 		qboolean  private_command_got[PRIVATE_COMMANDS];
@@ -765,7 +761,6 @@ extern cvar_t   *rcon_password, *gamedir, *maxclients, *logfile, *rconpassword, 
 
 extern char    dllname[256];
 extern char    zbotuserdisplay[256];
-extern char    timescaleuserdisplay[256];
 extern char    hackuserdisplay[256];
 extern char    skincrashmsg[256];
 extern char    defaultreconnectmessage[256];
@@ -774,27 +769,16 @@ extern char    moddir[256];
 extern qboolean   soloadlazy;
 extern qboolean   dllloaded;
 extern qboolean   quake2dirsupport;
-extern qboolean   zbotdetect;
 extern qboolean   displayzbotuser;
 extern qboolean   displaynamechange;
 extern qboolean   dopversion;
-extern qboolean   disconnectuserimpulse;
 extern qboolean   disconnectuser;
 extern qboolean   mapcfgexec;
 extern qboolean   checkClientIpAddress;
 
 extern int    numofdisplays;
-extern int    maximpulses;
-
-extern byte    impulsesToKickOn[MAXIMPULSESTOTEST];
-extern byte    maxImpulses;
-
-extern qboolean   displayimpulses;
 
 extern qboolean   printmessageonplaycmds;
-extern qboolean   say_person_enable;
-extern qboolean   say_group_enable;
-extern qboolean   extendedsay_enable;
 extern qboolean   spawnentities_enable;
 extern qboolean   spawnentities_internal_enable;
 extern qboolean   gamemaptomap;
@@ -856,7 +840,6 @@ extern int    logfilecheckcount;
 
 extern qboolean   checkvarcmds_enable;
 extern qboolean   swap_attack_use;
-extern qboolean   timescaledetect;
 
 extern proxyinfo_t   *proxyinfo;
 extern proxyinfo_t   *proxyinfoBase;
@@ -864,12 +847,10 @@ extern proxyreconnectinfo_t *reconnectproxyinfo;
 extern zbotcmd_t   zbotCommands[];
 
 extern int    clientsidetimeout;
-extern int    zbotdetectactivetimeout;
 extern int    lframenum;
 
 extern float   ltime;
 
-extern char    *impulsemessages[];
 extern char    cl_pitchspeed_kickmsg[256];
 extern char    cl_anglespeedkey_kickmsg[256];
 
@@ -1181,25 +1162,6 @@ typedef struct
 	}
 	
 user_details;
-
-extern int   WHOIS_COUNT;
-extern int   whois_active;
-extern user_details* whois_details;
-extern qboolean  timers_active;
-extern int   timers_min_seconds;
-extern int   timers_max_seconds;
-qboolean   can_do_new_cmds(int client);
-void    whois_write_file(void);
-void    whois_read_file(void);
-void    whois_getid(int client,edict_t *ent);
-void    whois(int client,edict_t *ent);
-void    whois_adduser(int client,edict_t *ent);
-void    whois_newname(int client,edict_t *ent);
-void    whois_update_seen(int client,edict_t *ent);
-void    whois_dumpdetails(int client,edict_t *ent,int userid);
-void    timer_action(int client,edict_t *ent);
-void    timer_stop(int client,edict_t *ent);
-void    timer_start(int client,edict_t *ent);
 
 typedef struct
 	{

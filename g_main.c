@@ -77,14 +77,6 @@ void ShutdownGame (void)
 	
 	if(!dllloaded) return;
 
-//*** UPDATE START ***
-	if (whois_active)
-	{
-		whois_write_file();
-		gi.TagFree (whois_details);
-	}
-//*** UPDATE END ***
-
 	if(q2adminrunmode)
 		{
 			STARTPERFORMANCE(1);
@@ -183,7 +175,6 @@ game_export_t *GetGameAPI(game_import_t *import)
 	q2a_strcpy(client_msg,DEFAULTQ2AMSG);
 //*** UPDATE END ***
 	q2a_strcpy(zbotuserdisplay, DEFAULTUSERDISPLAY);
-	q2a_strcpy(timescaleuserdisplay, DEFAULTTSDISPLAY);
 	q2a_strcpy(hackuserdisplay, DEFAULTHACKDISPLAY);
 	q2a_strcpy(skincrashmsg, DEFAULTSKINCRASHMSG);
 	q2a_strcpy(defaultreconnectmessage, DEFAULTRECONNECTMSG);
@@ -191,7 +182,6 @@ game_export_t *GetGameAPI(game_import_t *import)
 	q2a_strcpy(cl_anglespeedkey_kickmsg, DEFAULTCL_ANGLESPEEDKEY_KICKMSG);
 	q2a_strcpy(lockoutmsg, DEFAULTLOCKOUTMSG);
 	
-	adminpassword[0] = 0;
 	customServerCmd[0] = 0;
 	customClientCmd[0] = 0;
 	customClientCmdConnect[0] = 0;
@@ -204,16 +194,6 @@ game_export_t *GetGameAPI(game_import_t *import)
 			loadLogList();
 		}
 		
-	// setup zbot test strings
-	srand( (unsigned)time( NULL ) );
-	random(); random(); random(); random();
-	zbot_teststring1[7] = zbot_teststring_test1[7] = '0' + (int)(9.9 * random());
-	zbot_teststring1[8] = zbot_teststring_test1[8] = '0' + (int)(9.9 * random());
-	zbot_teststring_test2[3] = '0' + (int)(9.9 * random());
-	zbot_teststring_test2[4] = '0' + (int)(9.9 * random());
-	zbot_testchar1 = '0' + (int)(9.9 * random());
-	zbot_testchar2 = '0' + (int)(9.9 * random());
-	
 #ifdef __GNUC__
 	loadtype = soloadlazy ? RTLD_LAZY : RTLD_NOW;
 	sprintf(dllname, "%s/%s", moddir, DLLNAME);

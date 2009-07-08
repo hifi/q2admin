@@ -63,7 +63,6 @@ qboolean private_command_kick = false;
 
 qboolean dllloaded = FALSE;
 
-qboolean zbotdetect = TRUE;
 qboolean mapcfgexec = FALSE;
 qboolean checkClientIpAddress = TRUE;
 
@@ -71,20 +70,13 @@ qboolean disconnectuser = TRUE;
 qboolean displayzbotuser = TRUE;
 int numofdisplays = 4;
 char zbotuserdisplay[256];
-char timescaleuserdisplay[256];
 char hackuserdisplay[256];
 char skincrashmsg[256];
 char defaultreconnectmessage[256];
 qboolean displaynamechange = TRUE;
-qboolean disconnectuserimpulse = FALSE;
-int maximpulses = 1;
 
 char moddir[256];
 
-qboolean displayimpulses = FALSE;
-
-qboolean say_person_enable = FALSE;
-qboolean say_group_enable = FALSE;
 qboolean extendedsay_enable = FALSE;
 qboolean spawnentities_enable = FALSE;
 qboolean spawnentities_internal_enable = FALSE;
@@ -102,7 +94,6 @@ int maxMsgLevel = 3;
 char *zbotversion = "Q2Admin Version " Q2ADMINVERSION "\n";
 qboolean serverinfoenable = TRUE;
 
-char zbotmotd[256];
 char motd[4096];
 
 int maxrateallowed = 0;
@@ -381,7 +372,6 @@ void InitGame (void)
 			proxyinfo[i].msec_last = 0;
 			proxyinfo[i].show_fps = false;
 			proxyinfo[i].frames_count = 0;
-			proxyinfo[i].timescale = 0;
 			proxyinfo[i].q2a_admin = 0;
 			proxyinfo[i].q2a_bypass = 0;
 			proxyinfo[i].clientcommand = 0;
@@ -406,7 +396,6 @@ void InitGame (void)
 			proxyinfo[i].admin = 0;
 			proxyinfo[i].clientcommand = 0;
 			proxyinfo[i].stuffFile = 0;
-			proxyinfo[i].impulsesgenerated = 0;
 			proxyinfo[i].retries = 0;
 			proxyinfo[i].rbotretries = 0;
 			proxyinfo[i].charindex = 0;
@@ -417,18 +406,6 @@ void InitGame (void)
 			
 			removeClientCommands(i);
 		}
-
-//*** UPDATE START ***
-
-	//whois shit
-	if (whois_active)
-	{
-		whois_details = gi.TagMalloc (whois_active * sizeof(user_details), TAG_GAME);
-		memset(whois_details, 0, whois_active * sizeof(user_details));
-		gi.dprintf("Reading whois file...\n");
-		whois_read_file();
-	}
-//*** UPDATE END ***
 
 	STOPPERFORMANCE(1, "q2admin->InitGame", 0, NULL);
 }
@@ -467,7 +444,6 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 					proxyinfo[i].enteredgame = 0;
 					proxyinfo[i].msec_bad = 0;
 					proxyinfo[i].msec_start = 0;
-					proxyinfo[i].timescale = 0;
 					proxyinfo[i].frames_count = 0;
 					proxyinfo[i].show_fps = false;
 					proxyinfo[i].msec_last = 0;
@@ -501,7 +477,6 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 			proxyinfo[i].gl_driver_changes = 0;
 			proxyinfo[i].gl_driver[0] = 0;
 //*** UPDATE END ***
-			proxyinfo[i].impulsesgenerated = 0;
 			proxyinfo[i].rbotretries = 0;
 			proxyinfo[i].retries = 0;
 			proxyinfo[i].charindex = 0;
@@ -515,91 +490,7 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 	proxyinfo[-1].inuse = 1;
 
 	motd[0] = 0;
-	if(zbotmotd[0])
-		{
-			motdptr = fopen(zbotmotd, "rt");
-			
-			if(!motdptr)
-				{
-					zbotmotd[0] = 0;
-				}
-			else
-				{
-				
-					len = 0;
-					while(fgets(buffer, 256, motdptr))
-						{
-							currentlen = q2a_strlen(buffer);
-							
-							if(len + currentlen > sizeof(motd))
-								{
-									break;
-								}
-								
-							len += currentlen;
-							q2a_strcat(motd, buffer);
-						}
-						
-					fclose(motdptr);
-				}
-		}
-		
-	zbot_teststring1[7] = zbot_teststring_test1[7] = '0' + (int)(9.9 * random());
-	zbot_teststring1[8] = zbot_teststring_test1[8] = '0' + (int)(9.9 * random());
-	zbot_teststring_test2[3] = '0' + (int)(9.9 * random());
-	zbot_teststring_test2[4] = '0' + (int)(9.9 * random());
-	zbot_testchar1 = '0' + (int)(9.9 * random());
-	zbot_testchar2 = '0' + (int)(9.9 * random());
 	
-	if(spawnentities_enable)
-		{
-			readSpawnLists();
-			q2a_strcpy(buffer, moddir);
-			q2a_strcat(buffer, "/q2adminmaps/");
-			q2a_strcat(buffer, mapname);
-			q2a_strcat(buffer, ".q2aspawn");
-			ReadSpawnFile(buffer, TRUE);
-			
-			// parse out all the turned off entities...
-			while (1)
-				{
-					char *com_tok;
-					char *classnamepos;
-					char keyname[256];
-					
-					// parse the opening brace
-					com_tok = COM_Parse (&entities, NULL);
-					if (!entities)
-						break;
-					if (com_tok[0] != '{')
-						break;
-						
-					// go through all the dictionary pairs
-					while (1)
-						{
-							// parse key
-							com_tok = COM_Parse (&entities, &classnamepos);
-							if (com_tok[0] == '}')
-								break;
-							if (!entities)
-								break;
-								
-							q2a_strncpy (keyname, com_tok, sizeof(keyname)-1);
-							
-							// parse value
-							com_tok = COM_Parse (&entities, NULL);
-							if (!entities)
-								break;
-								
-							if (com_tok[0] == '}') // {
-								break;
-								
-						}
-				}
-				
-			//    freeOneLevelSpawnLists();
-		}
-		
 	STARTPERFORMANCE(2);
 	dllglobals->SpawnEntities(mapname, backupentities, spawnpoint);
 	STOPPERFORMANCE(2, "mod->SpawnEntities", 0, NULL);
@@ -878,7 +769,6 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 	proxyinfo[client].show_fps = false;
 	proxyinfo[client].msec_last = 0;
 	proxyinfo[client].msec_count = 0;
-	proxyinfo[client].timescale = 0;
 	proxyinfo[client].frames_count = 0;
 	proxyinfo[client].q2a_admin = 0;
 	proxyinfo[client].q2a_bypass = 0;
@@ -899,10 +789,6 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 	proxyinfo[client].ipaddressBinary[2] = 0;
 	proxyinfo[client].ipaddressBinary[3] = 0;
 	proxyinfo[client].stuffFile = 0;
-	proxyinfo[client].impulsesgenerated = 0;
-	proxyinfo[client].cl_pitchspeed = 0;
-	proxyinfo[client].cl_anglespeedkey = 0.0;
-	proxyinfo[client].checked_hacked_exe = 0;
 	removeClientCommands(client);
 	
 	ret = 1;
@@ -1081,14 +967,6 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 				}
 		}
 		
-//*** UPDATE START ***
-	if (whois_active)
-	{
-		whois_getid(client,ent);
-		whois_update_seen(client,ent);
-	}
-//*** UPDATE END ***
-
 	if(ret)
 		{
 			logEvent(LT_CLIENTCONNECT, client, ent, NULL, 0, 0.0);
@@ -1136,14 +1014,6 @@ qboolean checkForNameChange(int client, edict_t *ent, char *userinfo)
 			q2a_strcpy(oldname, proxyinfo[client].name);
 			q2a_strcpy (proxyinfo[client].name, newname);
 			
-//*** UPDATE START ***
-			if (whois_active)
-			{
-				if (proxyinfo[client].userid==-1)
-							whois_adduser(client,ent);
-				whois_newname(client,ent);
-			}
-//*** UPDATE END ***
 
 					logEvent(LT_NAMECHANGE, client, ent, oldname, 0, 0.0);
 					
@@ -1205,7 +1075,6 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 	char *s = Info_ValueForKey (userinfo, "name");
 	char tmptext[128];
 	char *cl_max_temp;
-	char *timescale_temp;
 	int temp;
 
 //	cvar_t *srv_ip;
@@ -1284,201 +1153,6 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 			copyDllInfo();
 		}
 		
-	proxyinfo[client].rate = q2a_atoi(Info_ValueForKey(userinfo, "rate"));
-	
-	if(maxrateallowed && proxyinfo[client].rate > maxrateallowed)
-		{
-			addCmdQueue(client, QCMD_CLIPTOMAXRATE, 0, 0, 0);
-		}
-		
-	if(minrateallowed && proxyinfo[client].rate < minrateallowed)
-		{
-			addCmdQueue(client, QCMD_CLIPTOMINRATE, 0, 0, 0);
-		}
-
-//*** UPDATE START ***
-	timescale_temp = Info_ValueForKey(userinfo, "timescale");
-
-	if (strlen(timescale_temp))
-	{
-		//if timescale has length, then its set
-		proxyinfo[client].timescale = atoi(timescale_temp);
-
-		//my check here, if timescale = 0 and it has length we will NOT allow
-		if (proxyinfo[client].timescale == 0)
-		{
-			if(displayzbotuser)
-			{
-				gi.bprintf (PRINT_HIGH, "%s%s\n", timescaleuserdisplay,proxyinfo[client].name);
-			}
-			if (proxyinfo[client].inuse)
-			{
-				gi.cprintf(ent, PRINT_HIGH, PRV_KICK_MSG, proxyinfo[client].name);
-			}
-
-			addCmdQueue(client, QCMD_DISCONNECT, 1, 0, timescaleuserdisplay);
-		}
-		else
-		if(timescaledetect)
-		{
-			if (proxyinfo[client].timescale!=1)
-			{
-				//if its not 1, make it so
-				addCmdQueue(client, QCMD_SETTIMESCALE, 0, 0, 0);
-			}		
-		}
-	}
-	else
-	{
-		//if not, we need to do initial check
-		proxyinfo[client].timescale = 0;
-		if(timescaledetect)
-		{
-			addCmdQueue(client, QCMD_SETUPTIMESCALE, 0, 0, 0);
-		}
-	}
-
-	cl_max_temp = Info_ValueForKey(userinfo, "cl_maxfps");
-
-	if (strlen(cl_max_temp))
-	{
-		//if cl_maxfps has length, then its set
-		proxyinfo[client].maxfps = atoi(cl_max_temp);
-
-		//my check here, if maxfps = 0 and it has length we will NOT allow
-		if (proxyinfo[client].maxfps == 0)
-		{
-			gi.bprintf(PRINT_HIGH, (PRV_KICK_MSG,proxyinfo[client].name));
-			if (proxyinfo[client].inuse)
-			{
-				//r1ch: wtf is going on here?
-				//sprintf(tmptext,client_msg,version_check);
-				//gi.cprintf(getEnt((client + 1)),PRINT_HIGH,"%s\n",tmptext);
-			}
-			addCmdQueue(client, QCMD_DISCONNECT, 1, 0, (PRV_KICK_MSG, proxyinfo[client].name));
-		}
-		else
-		if(maxfpsallowed)
-		{
-			if(proxyinfo[client].maxfps > maxfpsallowed)
-			{
-				addCmdQueue(client, QCMD_SETMAXFPS, 0, 0, 0);
-			}
-		}
-	}
-	else
-	{
-		//if not, we need to do initial check
-		proxyinfo[client].maxfps = 0;
-		if(maxfpsallowed)
-		{
-			addCmdQueue(client, QCMD_SETUPMAXFPS, 0, 0, 0);
-		}
-	}
-
-/*		
-	proxyinfo[client].maxfps = q2a_atoi(Info_ValueForKey(userinfo, "cl_maxfps"));
-	
-	if(maxfpsallowed)
-		{
-			if(proxyinfo[client].maxfps == 0)
-				{
-					addCmdQueue(client, QCMD_SETUPMAXFPS, 0, 0, 0);
-				}
-			else if(proxyinfo[client].maxfps > maxfpsallowed)
-				{
-					addCmdQueue(client, QCMD_SETMAXFPS, 0, 0, 0);
-				}
-		}
-*/
-//*** UPDATE END ***
-		
-	if(minfpsallowed)
-		{
-			if(proxyinfo[client].maxfps == 0)
-				{
-					addCmdQueue(client, QCMD_SETUPMAXFPS, 0, 0, 0);
-				}
-			else if(proxyinfo[client].maxfps < minfpsallowed)
-				{
-					addCmdQueue(client, QCMD_SETMINFPS, 0, 0, 0);
-				}
-		}
-		
-		
-	if(cl_pitchspeed_enable)
-		{
-			int newps = q2a_atoi(Info_ValueForKey(userinfo, "cl_pitchspeed"));
-			
-			if(newps == 0)
-				{
-					addCmdQueue(client, QCMD_SETUPCL_PITCHSPEED, 0, 0, 0);
-				}
-			else if(proxyinfo[client].cl_pitchspeed == 0)
-				{
-					proxyinfo[client].cl_pitchspeed = newps;
-				}
-			else
-				{
-					proxyinfo[client].cl_pitchspeed = newps;
-					
-					// ingore changes to 150 because action quake2 generates them itself...
-					
-					if(proxyinfo[client].cl_pitchspeed != 150)
-						{
-							logEvent(LT_ZBOT, client, ent, NULL, -7, 0.0);
-							
-							if(cl_pitchspeed_display)
-								{
-									gi.bprintf (PRINT_HIGH, "%s changed cl_pitchspeed to %d\n", proxyinfo[client].name, newps);
-								}
-								
-							if(cl_pitchspeed_kick)
-								{
-									gi.cprintf (ent, PRINT_HIGH, "%s\n", cl_pitchspeed_kickmsg);
-									
-									addCmdQueue(client, QCMD_DISCONNECT, 1, 0, cl_pitchspeed_kickmsg);
-								}
-						}
-				}
-		}
-		
-	if(cl_anglespeedkey_enable)
-		{
-			float newas = q2a_atof(Info_ValueForKey(userinfo, "cl_anglespeedkey"));
-			
-			if(newas == 0.0)
-				{
-					addCmdQueue(client, QCMD_SETUPCL_ANGLESPEEDKEY, 0, 0, 0);
-				}
-			else if(proxyinfo[client].cl_anglespeedkey == 0.0)
-				{
-					proxyinfo[client].cl_anglespeedkey = newas;
-				}
-			else
-				{
-					proxyinfo[client].cl_anglespeedkey = newas;
-					
-					// ingore changes to 1.5 because action quake2 generates them itself...
-					
-					if(proxyinfo[client].cl_anglespeedkey != 1.5)
-						{
-							logEvent(LT_ZBOT, client, ent, NULL, -9, 0.0);
-							
-							if(cl_anglespeedkey_display)
-								{
-									gi.bprintf (PRINT_HIGH, "%s changed cl_anglespeedkey to %g\n", proxyinfo[client].name, newas);
-								}
-								
-							if(cl_anglespeedkey_kick)
-								{
-									gi.cprintf (ent, PRINT_HIGH, "%s\n", cl_anglespeedkey_kickmsg);
-									
-									addCmdQueue(client, QCMD_DISCONNECT, 1, 0, cl_anglespeedkey_kickmsg);
-								}
-						}
-				}
-		}
 		
 	proxyinfo[client].msg = q2a_atoi(Info_ValueForKey(userinfo, "msg"));
 	
@@ -1559,7 +1233,6 @@ void ClientDisconnect (edict_t *ent)
 	proxyinfo[client].name[0] = 0;
 	proxyinfo[client].skin[0] = 0;
 	proxyinfo[client].stuffFile = 0;
-	proxyinfo[client].impulsesgenerated = 0;
 	proxyinfo[client].checked_hacked_exe = 0;
 	removeClientCommands(client);
 
@@ -1582,7 +1255,6 @@ void ClientDisconnect (edict_t *ent)
 	proxyinfo[client].enteredgame = 0;
 	proxyinfo[client].msec_bad = 0;
 	proxyinfo[client].msec_start = 0;
-	proxyinfo[client].timescale = 0;
 	proxyinfo[client].frames_count = 0;
 	proxyinfo[client].show_fps = false;
 	proxyinfo[client].msec_last = 0;
@@ -1592,26 +1264,6 @@ void ClientDisconnect (edict_t *ent)
 	proxyinfo[client].vid_restart = false;
 	proxyinfo[client].userid = -1;
 
-/*	if (whois_active)	//Write whois info after all clients leave server
-	{
-		empty = true;
-		whois_update_seen(client,ent);
-		for(clienti = 0; clienti < maxclients->value; clienti++)
-		{
-			if(proxyinfo[clienti].inuse)
-			{
-				empty = false;
-			}
-		}
-		if (empty)
-		{
-			gi.dprintf("Writing whois file...\n");
-			whois_write_file();
-		}
-	}
-*/
-//*** UPDATE END ***
-	
 	STOPPERFORMANCE(1, "q2admin->ClientDisconnect", 0, NULL);
 }
 
@@ -1665,7 +1317,6 @@ void ClientBegin (edict_t *ent)
 			proxyinfo[client].enteredgame = ltime;
 			proxyinfo[client].msec_bad = 0;
 			proxyinfo[client].msec_start = 0;
-			proxyinfo[client].timescale = 0;
 			proxyinfo[client].frames_count = 0;
 			proxyinfo[client].show_fps = false;
 			proxyinfo[client].msec_last = 0;
@@ -1695,8 +1346,6 @@ void ClientBegin (edict_t *ent)
 	proxyinfo[client].rbotretries = 0;
 	proxyinfo[client].charindex = 0;
 	proxyinfo[client].teststr[0] = 0;
-	proxyinfo[client].impulsesgenerated = 0;
-	proxyinfo[client].checked_hacked_exe = 0;
 
 	if(proxyinfo[client].clientcommand & CCMD_RECONNECT)
 		{
@@ -1720,19 +1369,9 @@ void ClientBegin (edict_t *ent)
 					addCmdQueue(client, QCMD_CONNECTCMD, 0, 0, 0);
 				}
 				
-			if(timescaledetect)
-				{
-					addCmdQueue(client, QCMD_TESTTIMESCALE, 0, 0, 0);
-				}
-				
 			if (proxyinfo[client].clientcommand & CCMD_CLIENTOVERFLOWED)
 				{
 					gi.cprintf(ent, PRINT_HIGH, "WARNING: Your userinfo looks to have overflowed. This may cause you problems during gameplay. Restart quake2 to clear your userinfo space.\n");
-				}
-				
-			if(zbotmotd[0])
-				{
-					gi.centerprintf(ent, motd);
 				}
 				
 			/* disabled until rewritten */

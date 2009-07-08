@@ -8,7 +8,7 @@ LDFLAGS =
 ORIGDIR=src
 CC=gcc
 
-OBJS = g_main.o zb_clib.o zb_cmd.o zb_init.o zb_log.o zb_msgqueue.o zb_util.o zb_zbot.o zb_zbotcheck.o
+OBJS = g_main.o zb_clib.o zb_cmd.o zb_init.o zb_log.o zb_msgqueue.o zb_util.o zb_zbot.o
 
 gamei386.so: $(OBJS)
 	$(CC) -shared -o $@ $(OBJS) $(LDFLAGS)
