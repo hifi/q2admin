@@ -606,15 +606,7 @@ enum _commands
 	QCMD_CLEAR,
 	QCMD_DISCONNECT,
 	QCMD_CUSTOM,
-	QCMD_ZPROXYCHECK1,
-	QCMD_ZPROXYCHECK2,
-	QCMD_DISPLOGFILE,
-	QCMD_DISPLOGFILELIST,
-	QCMD_DISPLOGEVENTLIST,
 	QCMD_CONNECTCMD,
-	QCMD_LOGTOFILE1,
-	QCMD_LOGTOFILE2,
-	QCMD_LOGTOFILE3,
 	QCMD_GETIPALT,
 	QCMD_RESTART,
 	QCMD_CLIPTOMAXRATE,
@@ -634,9 +626,6 @@ enum _commands
 	QCMD_BAN,
 	QCMD_DISPCHATBANS,
 	QCMD_STUFFCLIENT,
-	QCMD_TESTADMIN,
-	QCMD_TESTADMIN2,  // UPDATE
-	QCMD_TESTADMIN3,  // UPDATE
 	QCMD_RUNVOTECMD,
 	QCMD_TESTRATBOT,
 	QCMD_TESTRATBOT2,
@@ -654,60 +643,12 @@ enum _commands
 	QCMD_RECONNECT,
 	QCMD_KICK,
 	QCMD_MSGDISCONNECT,
-	QCMD_DISPCHECKVAR,
-	QCMD_CHECKVARTESTS,
-	//*** UPDATE START ***
-	QCMD_AUTH,
-	QCMD_PMODVERTIMEOUT,
-	QCMD_PMODVERTIMEOUT_INGAME,
-	QCMD_SHOWMOTD,
-	QCMD_EXECMAPCFG,
-	QCMD_PRIVATECOMMAND,
-	QCMD_GL_CHECK,
-	QCMD_SETUPTIMESCALE,
-	QCMD_SETTIMESCALE,
-	QCMD_SPAMBYPASS,
-	QCMD_GETCMDQUEUE,
-	QCMD_TESTCMDQUEUE
-	//*** UPDATE END ***
-};
-
-enum zb_logtypesenum
-{
-	LT_ZBOT,
-	LT_ZBOTIMPULSES,
-	LT_IMPULSES,
-	LT_NAMECHANGE,
-	LT_SKINCHANGE,
-	LT_CHATBAN,
-	LT_CLIENTCONNECT,
-	LT_CLIENTBEGIN,
-	LT_CLIENTDISCONNECT,
-	LT_CLIENTKICK,
-	LT_CLIENTCMDS,
-	LT_CLIENTLRCON,
-	LT_BAN,
-	LT_CHAT,
-	LT_SERVERSTART,
-	LT_SERVERINIT,
-	LT_SERVEREND,
-	LT_INTERNALWARN,
-	LT_PERFORMANCEMONITOR,
-	LT_DISABLECMD,
-	LT_ENTITYCREATE,
-	LT_ENTITYDELETE,
-	LT_INVALIDIP,
-	LT_ADMINLOG,  // UPDATE
-	LT_CLIENTUSERINFO, // UPDATE
-	LT_PRIVATELOG,  // UPDATE
 };
 
 #define IW_UNEXCEPTEDCMD  1
 #define IW_UNKNOWNCMD   2
-#define IW_ZBOTDETECT   3
 #define IW_STARTUP    4
 #define IW_STARTUPTEST   5
-#define IW_ZBOTTEST    6
 #define IW_OVERFLOWDETECT  7
 #define IW_STARTUPFAIL   8
 #define IW_Q2ADMINCFGLOAD  9
@@ -717,7 +658,6 @@ enum zb_logtypesenum
 #define IW_FLOODSETUPLOAD  13
 #define IW_SPAWNSETUPLOAD  14
 #define IW_VOTESETUPLOAD  15
-#define IW_ZBCHECK    16
 #define IW_DISABLESETUPLOAD  17
 #define IW_CHECKVARSETUPLOAD 18
 #define IW_INVALIDIPADDRESS  19
@@ -790,35 +730,9 @@ extern int    randomwaitreporttime;
 extern int    proxy_bwproxy;
 extern int    proxy_nitro2;
 extern int    q2adminrunmode;
-extern int    maxMsgLevel;
 
 extern char    *zbotversion;
-extern char    zbotmotd[256];
-extern char    motd[4096];
 
-extern int    maxrateallowed;
-extern int    minrateallowed;
-extern int    maxfpsallowed;
-extern int    minfpsallowed;
-extern int    zbc_jittermax;
-extern int    zbc_jittertime;
-extern int    zbc_jittermove;
-
-#define ZBOT_TESTSTRING1   "q2startxx\n"
-
-#define ZBOT_TESTSTRING_TEST1  "q2startxx"
-#define ZBOT_TESTSTRING_TEST2  "q2exx"
-#define ZBOT_TESTSTRING_TEST3  ".please.disconnect.all.bots"
-
-#define ZBOT_TESTSTRING_TEST1_OLD "q2start"
-#define ZBOT_TESTSTRING_TEST2_OLD "q2e"
-
-extern char    zbot_teststring1[];
-extern char    zbot_teststring_test1[];
-extern char    zbot_teststring_test2[];
-extern char    zbot_teststring_test3[];
-extern char    zbot_testchar1;
-extern char    zbot_testchar2;
 extern char    testchars[];
 
 extern int    testcharslength;
@@ -828,7 +742,6 @@ extern int    framesperprocess;
 
 extern char    buffer[0x10000];
 extern char    buffer2[256];
-extern char    adminpassword[256];
 extern char    customServerCmd[256];
 extern char    customClientCmd[256];
 extern char    customClientCmdConnect[256];
@@ -906,49 +819,7 @@ str++; \
 } \
 }
 
-#define RATBOT_CHANGENAMETEST "pwsnskle"
-#define BOTDETECT_CHAR1   'F'
-#define BOTDETECT_CHAR2   'U'
-
 #define itoa(x, y, z)   itoaNotAUnixFunction(z, y, z)
-
-#define INITPERFORMANCE(instance) unsigned long performancetimer##instance
-#define INITPERFORMANCE_2(instance) \
-unsigned long performancetimer##instance; \
-static unsigned long totalperformancetimer##instance = 0; \
-static int countperformancetimer##instance = 0
-
-#define STARTPERFORMANCE(instance) \
-if(isLogEvent(LT_PERFORMANCEMONITOR)) \
-{ \
-performancetimer##instance = clock(); \
-}
-
-#define STOPPERFORMANCE(instance, function, client, ent) \
-if(isLogEvent(LT_PERFORMANCEMONITOR)) \
-{ \
-performancetimer##instance = clock() - performancetimer##instance; \
-if(performancetimer##instance) \
-{ \
-logEvent(LT_PERFORMANCEMONITOR, client, ent, function, 0, (double)performancetimer##instance / CLOCKS_PER_SEC); \
-} \
-}
-
-#define STOPPERFORMANCE_2(instance, function, client, ent) \
-if(isLogEvent(LT_PERFORMANCEMONITOR)) \
-{ \
-totalperformancetimer##instance += clock() - performancetimer##instance; \
-countperformancetimer##instance++; \
-if(countperformancetimer##instance >= 100) \
-{ \
-if(totalperformancetimer##instance) \
-{ \
-logEvent(LT_PERFORMANCEMONITOR, client, ent, function, 0, (double)totalperformancetimer##instance / (100.0 * CLOCKS_PER_SEC)); \
-} \
-totalperformancetimer##instance = 0; \
-countperformancetimer##instance = 0; \
-} \
-}
 
 // zb_clib.c
 #ifdef Q2ADMINCLIB
@@ -1044,49 +915,6 @@ qboolean getCommandFromQueue(int client, byte *command, unsigned long *data, cha
 void  removeClientCommand(int client, byte command);
 void  removeClientCommands(int client);
 
-// zb_log.c
-void  loadLogList(void);
-qboolean isLogEvent(enum zb_logtypesenum ltype);
-void  logEvent(enum zb_logtypesenum ltype, int client, edict_t *ent, char *message, int number, float number2);
-void  displaylogfileRun(int startarg, edict_t *ent, int client);
-void  displayLogFileCont(edict_t *ent, int client, long logfilereadpos);
-void  clearlogfileRun(int startarg, edict_t *ent, int client);
-void  logfileRun(int startarg, edict_t *ent, int client);
-void  displayLogFileListCont(edict_t *ent, int client, long logfilenum);
-void  logeventRun(int startarg, edict_t *ent, int client);
-void  displayLogEventListCont(edict_t *ent, int client, long logevent, qboolean onetimeonly);
-
-// zb_spawn.c
-qboolean ReadSpawnFile(char *spawnname, qboolean onelevelflag);
-qboolean checkDisabledEntities(char *classname);
-void  freeSpawnLists(void);
-void  freeOneLevelSpawnLists(void);
-void  readSpawnLists(void);
-void  reloadSpawnFileRun(int startarg, edict_t *ent, int client);
-void  listspawnsRun(int startarg, edict_t *ent, int client);
-void  displayNextSpawn(edict_t *ent, int client, long floodcmd);
-void  spawncmdRun(int startarg, edict_t *ent, int client);
-void  spawnDelRun(int startarg, edict_t *ent, int client);
-void  linkentity_internal(edict_t *ent);
-void  unlinkentity_internal(edict_t *ent);
-
-// zb_zbotcheck.c
-qboolean zbc_ZbotCheck(int client, usercmd_t *ucmd);
-
-// zb_checkvar.c
-void  readCheckVarLists(void);
-void  reloadCheckVarFileRun(int startarg, edict_t *ent, int client);
-void  listcheckvarsRun(int startarg, edict_t *ent, int client);
-void  displayNextCheckvar(edict_t *ent, int client, long checkvarcmd);
-void  checkvarcmdRun(int startarg, edict_t *ent, int client);
-void  checkvarDelRun(int startarg, edict_t *ent, int client);
-void  checkVariableTest(edict_t *ent, int client, int idx);
-void  checkVariableValid(edict_t *ent, int client, char *value);
-
-//*** UPDATE START ***
-// md4.c
-unsigned Com_BlockChecksum (void *buffer, int length);
-
 // Pooy's shit
 extern char  client_msg[256];
 extern qboolean private_command_kick;
@@ -1107,24 +935,6 @@ typedef struct
 admin_type;
 
 #define Q2ADMINVERSION   "1.17.52"
-#define DEFAULTQ2AVER   "1.0"
-#define DEFAULTQ2AMSG   "\nThis server requires %s anti cheat client.\n"
-#define MAX_ADMINS    128
-#define ADMIN_AUTH_LEVEL  1
-#define MAX_BLOCK_MODELS  26
-
-#define VIRUS_KICK_MSG "%s has not provided adequate authentication, this may be due to a virus.\n"
-#define NOMATCH_KICK_MSG "%s has not provided adequate authentication.\n"
-#define OUTOFTIME_KICK_MSG "%s failed to authenticate.\n"
-#define MOD_KICK_MSG "%s failed the pmodified check on this map, error %d.\n"
-#define PRV_KICK_MSG "%s is using a modified client.\n"
-
-#define Q2A_VIRUS_KICK_MSG "Inadequate authentication, may be a virus.\n"
-#define Q2A_NOMATCH_KICK_MSG "Inadequate authentication.\n"
-#define Q2A_OUTOFTIME_KICK_MSG "Failed to respond.\n"
-#define Q2A_MOD_KICK_MSG "Failed the pmodified check on this map.\n"
-#define Q2A_PRV_KICK_MSG "Failed the private commands check.\n"
-#define FRKQ2_KICK_MSG "Failed the client authentication.\n"
 
 extern int   client_map_cfg;
 extern qboolean  do_franck_check;
@@ -1162,13 +972,3 @@ typedef struct
 	}
 	
 user_details;
-
-typedef struct
-	{
-		char   *model_name;
-	}
-	
-block_model;
-
-extern block_model block_models[MAX_BLOCK_MODELS];
-//*** UPDATE END ***

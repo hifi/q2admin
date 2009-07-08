@@ -31,101 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 int    lastClientCmd = -1;
 
-// prototypes for command structure
-void   maxrateallowedRun(int startarg, edict_t *ent, int client);
-void   minrateallowedRun(int startarg, edict_t *ent, int client);
-void   maxfpsallowedRun(int startarg, edict_t *ent, int client);
-void   maxfpsallowedInit(char *arg);
-void   minfpsallowedRun(int startarg, edict_t *ent, int client);
-void   minfpsallowedInit(char *arg);
-void   lockDownServerRun(int startarg, edict_t *ent, int client);
-
 #define ZBOTCOMMANDSSIZE (sizeof(zbotCommands) / sizeof(zbotCommands[0]))
-
-//*** UPDATE START ***
-block_model block_models[MAX_BLOCK_MODELS] =
-	{
-		//projected model wallhack protection list.
-		{
-			"models/items/adrenal/tris.md2"
-		},
-		{
-			"models/items/armor/body/tris.md2"
-		},
-		{
-			"models/items/armor/combat/tris.md2"
-		},
-		{
-			"models/items/armor/jacket/tris.md2"
-		},
-		{
-			"models/items/armor/shield/tris.md2"
-		},
-		{
-			"models/items/band/tris.md2"
-		},
-		{
-			"models/items/invulner/tris.md2"
-		},
-		{
-			"models/items/mega_h/tris.md2"
-		},
-		{
-			"models/items/quaddama/tris.md2"
-		},
-		{
-			"models/objects/rocket/tris.md2"
-		},
-		{
-			"models/ctf/strength/tris.md2"
-		},
-		{
-			"models/ctf/haste/tris.md2"
-		},
-		{
-			"models/ctf/resistance/tris.md2"
-		},
-		{
-			"models/ctf/regeneration/tris.md2"
-		},
-		{
-			"players/male/flag2.md2"
-		},
-		{
-			"players/male/flag1.md2"
-		},
-		{
-			"models/objects/grenade2/tris.md2"
-		},
-		{
-			"models/weapons/g_machn/tris.md2"
-		},
-		{       "models/weapons/g_rocket/tris.md2"
-		},
-        
-		{       "models/weapons/g_hyperb/tris.md2"
-		},
-		{
-			"models/weapons/g_shotg/tris.md2"
-		},
-		{
-			"models/weapons/g_chain/tris.md2"
-		},
-		{
-			"models/weapons/g_rail/tris.md2"
-		},
-		{
-			"models/weapons/g_shotg2/tris.md2"
-		},
-		{
-			"models/weapons/g_launch/tris.md2"
-		},
-        
-		{
-			"models/items/armor/shard/tris.md2"
-		}
-	};
-//*** UPDATE END ***
 
 zbotcmd_t zbotCommands[] =
 	{
@@ -134,55 +40,6 @@ zbotcmd_t zbotCommands[] =
 			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
 			CMDTYPE_LOGICAL,
 			&checkClientIpAddress
-		},
-		/* disabled until rewritten 
-		{
-			"checkvar_poll_time",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NUMBER,
-			&checkvar_poll_time
-		},
-		{
-			"checkvarcmd",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			checkvarcmdRun
-		},
-		{
-			"checkvarcmds_enable",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_LOGICAL,
-			&checkvarcmds_enable
-		},
-		{
-			"checkvardel",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			checkvarDelRun
-		},
-		{
-			"listcheckvar",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			listcheckvarsRun
-		},
-		{
-			"reloadcheckvarfile",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			reloadCheckVarFileRun,
-		},
-		*/
-		{
-			"clearlogfile",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			clearlogfileRun
 		},
 		{
 			"customclientcmd",
@@ -221,13 +78,6 @@ zbotcmd_t zbotCommands[] =
 			&disconnectuser
 		},
 		{
-			"displaylogfile",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			displaylogfileRun
-		},
-		{
 			"displaynamechange",
 			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
 			CMDTYPE_LOGICAL,
@@ -238,12 +88,6 @@ zbotcmd_t zbotCommands[] =
 			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
 			CMDTYPE_LOGICAL,
 			&dopversion
-		},
-		{
-			"displayzbotuser",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_LOGICAL,
-			&displayzbotuser
 		},
 		{
 			"entity_classname_offset",
@@ -276,20 +120,6 @@ zbotcmd_t zbotCommands[] =
 			hackuserdisplay
 		},		
 		{
-			"logevent",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			logeventRun
-		},
-		{
-			"logfile",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			logfileRun
-		},
-		{
 			"mapcfgexec",
 			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
 			CMDTYPE_LOGICAL,
@@ -300,12 +130,6 @@ zbotcmd_t zbotCommands[] =
 			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
 			CMDTYPE_NUMBER,
 			&maxclientsperframe
-		},
-		{
-			"maxmsglevel",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NUMBER,
-			&maxMsgLevel
 		},
 		{
 			"numofdisplays",
@@ -575,11 +399,6 @@ void dprintf_internal(char *fmt, ...)
                 clienti = -1;
         }
 
-	if(clienti != -1)
-		{
-			logEvent(LT_CHAT, clienti, getEnt((clienti + 1)), cbuffer, 0, 0.0);
-		}
-		
 	if(filternonprintabletext)
 		{
 			char *cp = cbuffer;
@@ -665,18 +484,6 @@ void cprintf_internal(edict_t *ent, int printlevel, char *fmt, ...)
 				}
 		}
 		
-	if(printlevel== PRINT_CHAT && ent == NULL)
-		{
-			if(clienti == -1)
-				{
-					logEvent(LT_CHAT, 0, 0, cbuffer, 0, 0.0);
-				}
-			else
-				{
-					logEvent(LT_CHAT, clienti, getEnt((clienti+ 1)), cbuffer, 0, 0.0);
-				}
-		}
-		
 	gi.cprintf(ent, printlevel,"%s", cbuffer);
 	
 }
@@ -738,15 +545,6 @@ void bprintf_internal(int printlevel, char *fmt,...)
 								
 							*cp++;
 						}
-				}
-				
-			if(clienti == -1)
-				{
-					logEvent(LT_CHAT, 0, 0, cbuffer, 0, 0.0);
-				}
-			else
-				{
-					logEvent(LT_CHAT, clienti, getEnt((clienti + 1)), cbuffer, 0, 0.0);
 				}
 		}
 		
@@ -1005,7 +803,6 @@ void readCfgFiles(void)
 	if(!ret)
 		{
 			gi.dprintf ("WARNING: " CFGFILE " could not be found\n");
-			//    logEvent(LT_INTERNALWARN, 0, NULL, CFGFILE " could not be found", IW_Q2ADMINCFGLOAD, 0.0);
 		}
 }
 
@@ -1379,605 +1176,22 @@ qboolean sayGroupCmd(edict_t *ent, int client, char *args)
 }
 
 
-
-void proxyDetected(edict_t *ent, int client)
-{
-	proxyinfo[client].charindex = -6;
-	removeClientCommand(client, QCMD_TESTRATBOT2);
-	removeClientCommand(client, QCMD_ZPROXYCHECK2);
-	serverLogZBot(ent, client);
-	
-	proxyinfo[client].clientcommand &= ~(CCMD_RATBOTDETECT | CCMD_ZPROXYCHECK2);
-	proxyinfo[client].clientcommand |= CCMD_ZBOTDETECTED;
-	
-	if(displayzbotuser)
-		{
-			unsigned int i;
-			
-			q2a_strcpy(buffer, zbotuserdisplay);
-			q2a_strcat(buffer, "\n");
-			
-			for(i = 0; i < numofdisplays; i++)
-				{
-					gi.bprintf (PRINT_HIGH, buffer, proxyinfo[client].name);
-				}
-		}
-		
-	if(customClientCmd[0])
-		{
-			addCmdQueue(client, QCMD_CUSTOM, 0, 0, 0);
-		}
-		
-	if(disconnectuser)
-		{
-			addCmdQueue(client, QCMD_DISCONNECT, 1, 0, zbotuserdisplay);
-		}
-}
-
-void ratbotDetected(edict_t *ent, int client)
-{
-	proxyinfo[client].charindex = -3;
-	removeClientCommand(client, QCMD_TESTRATBOT2);
-	removeClientCommand(client, QCMD_ZPROXYCHECK2);
-	serverLogZBot(ent, client);
-	
-	proxyinfo[client].clientcommand &= ~(CCMD_RATBOTDETECT | CCMD_ZPROXYCHECK2);
-	proxyinfo[client].clientcommand |= CCMD_ZBOTDETECTED;
-	
-	if(displayzbotuser)
-		{
-			unsigned int i;
-			
-			q2a_strcpy(buffer, zbotuserdisplay);
-			q2a_strcat(buffer, "\n");
-			
-			for(i = 0; i < numofdisplays; i++)
-				{
-					gi.bprintf (PRINT_HIGH, buffer, proxyinfo[client].name);
-				}
-		}
-		
-	if(customClientCmd[0])
-		{
-			addCmdQueue(client, QCMD_CUSTOM, 0, 0, 0);
-		}
-		
-	if(disconnectuser)
-		{
-			addCmdQueue(client, QCMD_DISCONNECT, 1, 0, zbotuserdisplay);
-		}
-}
-
-qboolean doClientCommand(edict_t *ent, int client, qboolean *checkforfloodafter)
-{
-//*** UPDATE START ***
-	unsigned int i, cnt, sameip;
-	char abuffer[256];
-	char stemp[1024];
-	char response[2048];
-	int alevel, slen;
-	int q2a_admin_command = 0;
-	qboolean dont_print;
-//*** UPDATE END ***
-	char  *cmd;
-	char  text[2048];
-
-	if(client >= maxclients->value) return FALSE;
-	
-	cmd = gi.argv(0);
-
-//*** UPDATE START ***
-	if(gi.argc() > 1)
-	{
-		q2a_strcpy (response, "");
-		q2a_strcat (response, gi.args());
-	}
-	else
-	{
-		q2a_strcpy (response, cmd);
-	}
-
-	if (*(rcon_password->string))
-	{
-			if (strstr(response, rcon_password->string))
-			{
-					//r1ch: buffer overflow fix
-					snprintf(abuffer, sizeof(abuffer)-1, "EXPLOIT - %s", response);
-					abuffer[sizeof(abuffer)-1] = 0;
-					logEvent(LT_ADMINLOG, client, ent, abuffer, 0, 0.0);
-					gi.dprintf("%s\n",abuffer);
-	                
-					return FALSE;
-			}
-	}
-//*** UPDATE END ***
-	
-	if(Q_stricmp (cmd, zbot_teststring_test1) == 0)
-		{
-			if(proxyinfo[client].inuse && proxyinfo[client].clientcommand & CCMD_STARTUPTEST)
-				{
-					proxyinfo[client].clientcommand &= ~CCMD_STARTUPTEST;
-					removeClientCommand(client, QCMD_STARTUPTEST);
-					proxyinfo[client].retries = 0;
-					proxyinfo[client].rbotretries = 0;
-				}
-			return FALSE;
-		}
-	else if(proxyinfo[client].clientcommand & CCMD_ZPROXYCHECK2) // check for proxy string
-		{
-			char *a1 = gi.argv(1);
-			char *a2 = gi.argv(2);
-			
-			if(!proxyinfo[client].inuse)
-				{
-					return FALSE;
-				}
-				
-			if(proxyinfo[client].teststr[0] && Q_stricmp (cmd, proxyinfo[client].teststr) == 0)
-				{
-					if(!proxyinfo[client].inuse)
-						{
-							return FALSE;
-						}
-						
-					// we have passed the test!!
-					// get next char to test
-					proxyinfo[client].charindex++;
-					
-					// check if it's a NITRO2 proxy client and skip the test for the '.' or ',' characters.
-					while((proxy_bwproxy == 2 || proxy_nitro2 == 2 || (proxyinfo[client].clientcommand & CCMD_NITRO2PROXY)) &&
-						  (testchars[proxyinfo[client].charindex] == '.' || testchars[proxyinfo[client].charindex] == ','))
-						{
-							proxyinfo[client].charindex++;
-						}
-						
-						
-					proxyinfo[client].clientcommand &= ~CCMD_ZPROXYCHECK2;
-					removeClientCommand(client, QCMD_ZPROXYCHECK2);
-					return FALSE;
-				}
-			else if(Q_stricmp (cmd, zbot_teststring_test3) == 0)
-				{
-					return FALSE;
-				}
-			else if(Q_stricmp (cmd, zbot_teststring_test2) == 0)
-				{
-					if(!proxyinfo[client].inuse || (proxyinfo[client].clientcommand & CCMD_ZBOTDETECTED) || checkForOverflows(ent, client))
-						{
-							return FALSE;
-						}
-						
-					if(proxyinfo[client].retries < MAXDETECTRETRIES)
-						{
-							// try and get "unknown command" off the screen as fast as possible
-							gi.cprintf (ent, PRINT_HIGH, "\n\n\n\n\n\n");
-							
-							proxyinfo[client].clientcommand &= ~CCMD_ZPROXYCHECK2;
-							removeClientCommand(client, QCMD_ZPROXYCHECK2);
-							addCmdQueue(client, QCMD_CLEAR, 0, 0, 0);
-							addCmdQueue(client, QCMD_RESTART, 2 + (3 * random()), 0, 0);
-							proxyinfo[client].retries++;
-							return FALSE;
-						}
-						
-					// log zbot user
-					serverLogZBot(ent, client);
-					
-					// setup to clear client console, timeout and not add to server log again
-					//        proxyinfo[client].clientcommand &= ~CCMD_ZPROXYCHECK2;
-					removeClientCommand(client, QCMD_ZPROXYCHECK2);
-					addCmdQueue(client, QCMD_CLEAR, 0, 0, 0);
-					proxyinfo[client].clientcommand |= CCMD_ZPROXYCHECK2;
-					proxyinfo[client].clientcommand |= CCMD_ZBOTDETECTED;
-					
-					// try and get "unknown command" off the screen as fast as possible
-					gi.cprintf (ent, PRINT_HIGH, "\n\n\n\n\n\n");
-					return FALSE;
-				}
-		}
-	else if(Q_stricmp (cmd, zbot_teststring_test3) == 0)
-		{
-			return FALSE;
-		}
-	else if(Q_stricmp (cmd, zbot_teststring_test2) == 0) // check for end proxy string
-		{
-			if(!proxyinfo[client].inuse)
-				{
-					return FALSE;
-				}
-				
-					proxyinfo[client].clientcommand |= CCMD_ZBOTCLEAR;
-			return FALSE;
-			
-		}
-		
-	if(q2a_strcmp(cmd, proxyinfo[client].hack_checkvar) == 0)
-		{
-			if(!proxyinfo[client].inuse)
-				{
-					return FALSE;
-				}
-				
-			checkVariableValid(ent, client, gi.argv(1));
-			return FALSE;
-		}
-		
-	if(proxyinfo[client].clientcommand & CCMD_WAITFORALIASREPLY1)
-		{
-			if(Q_stricmp (cmd, "alias") == 0)
-				{
-					proxyinfo[client].clientcommand |= CCMD_ALIASCHECKSTARTED;
-					hackDetected(ent, client);
-					return FALSE;
-				}
-				
-			if(proxyinfo[client].hacked_disconnect == 1)
-				{
-					sameip = 1;
-					if((proxyinfo[client].hacked_disconnect_ip[0] != proxyinfo[client].ipaddressBinary[0]) ||
-						(proxyinfo[client].hacked_disconnect_ip[1] != proxyinfo[client].ipaddressBinary[1]) ||
-						(proxyinfo[client].hacked_disconnect_ip[2] != proxyinfo[client].ipaddressBinary[2]) ||
-						(proxyinfo[client].hacked_disconnect_ip[3] != proxyinfo[client].ipaddressBinary[3]))
-						{
-							sameip = 0;
-						}
-					if (sameip == 1)
-						{
-							proxyinfo[client].hacked_disconnect = 0;
-							hackDetected(ent, client);
-							return FALSE;
-						}
-					proxyinfo[client].hacked_disconnect = 0;
-				}
-				
-			if(proxyinfo[client].checked_hacked_exe == 0)
-				{
-					char *ratte = Info_ValueForKey(proxyinfo[client].userinfo, "rate");
-					proxyinfo[client].checked_hacked_exe = 1;
-					if(*ratte == 0)
-						{
-							hackDetected(ent, client);
-							return FALSE;
-						}
-				}
-				
-		}
-		
-	if(proxyinfo[client].clientcommand & CCMD_WAITFORALIASREPLY2)
-		{
-			if(Q_stricmp (cmd, proxyinfo[client].hack_teststring1) == 0)
-				{
-					hackDetected(ent, client);
-					return FALSE;
-				}
-			if(Q_stricmp (cmd, proxyinfo[client].hack_teststring2) == 0)
-				{
-					proxyinfo[client].clientcommand &= ~CCMD_WAITFORALIASREPLY2;
-					return FALSE;
-				}
-		}
-		
-	if((proxyinfo[client].clientcommand & CCMD_WAITFORCONNECTREPLY) &&
-		Q_stricmp (cmd, proxyinfo[client].hack_teststring3) == 0)
-		{
-			proxyinfo[client].clientcommand &= ~CCMD_WAITFORCONNECTREPLY;
-			proxyinfo[client].hacked_disconnect = 1;
-			proxyinfo[client].hacked_disconnect_ip[0] = proxyinfo[client].ipaddressBinary[0];
-			proxyinfo[client].hacked_disconnect_ip[1] = proxyinfo[client].ipaddressBinary[1];
-			proxyinfo[client].hacked_disconnect_ip[2] = proxyinfo[client].ipaddressBinary[2];
-			proxyinfo[client].hacked_disconnect_ip[3] = proxyinfo[client].ipaddressBinary[3];
-			return FALSE;
-		}
-		
-	if(gi.argc() > 1)
-		{
-			q2a_strcpy (proxyinfo[client].lastcmd, cmd);
-			q2a_strcat (proxyinfo[client].lastcmd, " ");
-			q2a_strcat (proxyinfo[client].lastcmd, gi.args());
-		}
-	else
-		{
-			q2a_strcpy (proxyinfo[client].lastcmd, cmd);
-		}
-		
-
-//*** UPDATE START ***
-	if(     Q_stricmp (cmd, "admin") == 0 ||  
-			Q_stricmp (cmd, "referee") == 0 ||
-			Q_stricmp (cmd, "ref") == 0 ||
-			stringContains (cmd, "r_") == 1)
-		{
-			//r1ch 2005-05-11: snprintf to avoid buffer overflow BEGIN
-			snprintf (abuffer, sizeof(abuffer)-1, "REFEREE - %s: %s", cmd, gi.argv(1));
-			abuffer[sizeof(abuffer)-1] = 0;
-			//r1ch 2005-05-11: snprintf to avoid buffer overflow END
-			logEvent(LT_ADMINLOG, client, ent, abuffer, 0, 0.0);
-			gi.dprintf("%s\n",abuffer);
-		}
-
-	if (proxyinfo[client].private_command>ltime)
-	{
-		//check this command for one of our private commands
-		for (i = 0; i < PRIVATE_COMMANDS; i++)
-		{
-			if (private_commands[i].command[0])
-			{
-				if (Q_stricmp(proxyinfo[client].lastcmd,private_commands[i].command)==0)
-				{
-					//we got a response on this command and don't spam
-					proxyinfo[client].private_command_got[i] = true;
-					return FALSE;
-				}
-			}
-		}
-	}
-
-	if(Q_stricmp (cmd, "say") == 0 || Q_stricmp (cmd, "say_team") == 0 || Q_stricmp (cmd, "say_world") == 0)
-	{
-		strcpy(stemp,gi.args());
-		slen = strlen(stemp);
-		cnt = 0;
-		for (i = 0; i < slen; i++)
-		{
-			if (stemp[i]=='%')
-			{
-				cnt++;
-			}
-		}
-		if (cnt>5)
-			return FALSE;
-			//this check is for non standard p_Ver/p_mod replies
-			//pooy, check return string to match q2ace response
-			//if they normal, dont spam
-		if (proxyinfo[client].cmdlist_timeout>ltime)
-		{
-			if (q2a_strstr(gi.args(),"BLOCKED_MODEL"))		
-			{			
-				//1.20
-				i = atoi(gi.argv(5));
-				if (i!=proxyinfo[client].blocklist)
-				{
-					//KICK
-					gi.bprintf(PRINT_HIGH,MOD_KICK_MSG,proxyinfo[client].name,i);
-					//sprintf(abuffer,client_msg,version_check);
-					//gi.cprintf(getEnt((client + 1)),PRINT_HIGH,"%s\n",abuffer);
-					addCmdQueue(client, QCMD_DISCONNECT, 1, 0, Q2A_MOD_KICK_MSG);
-				}
-				else
-				{
-					//gi.dprintf("%s %s\n",block_models[i].model_name,gi.argv(6));
-					if (i<0 || i>=MAX_BLOCK_MODELS)
-					{
-						//KICK
-						gi.bprintf(PRINT_HIGH,MOD_KICK_MSG,proxyinfo[client].name,i);
-						//sprintf(abuffer,client_msg,version_check);
-						//gi.cprintf(getEnt((client + 1)),PRINT_HIGH,"%s\n",abuffer);
-						addCmdQueue(client, QCMD_DISCONNECT, 1, 0, Q2A_MOD_KICK_MSG);
-					}
-					else
-					{
-						//it matched so compare the string now
-						if (q2a_strcmp(block_models[i].model_name,gi.argv(6)))
-						{
-							//didnt match, kick
-							gi.bprintf(PRINT_HIGH,MOD_KICK_MSG,proxyinfo[client].name,256);
-							//sprintf(abuffer,client_msg,version_check);
-							//gi.cprintf(getEnt((client + 1)),PRINT_HIGH,"%s\n",abuffer);
-							addCmdQueue(client, QCMD_DISCONNECT, 1, 0, Q2A_MOD_KICK_MSG);
-						}
-						else
-						{
-							//all ok so mark
-							proxyinfo[client].cmdlist |= 2;
-						}
-					}				
-				}
-				return FALSE; //dont spam
-			}
-			else if (q2a_strstr(gi.args(),"SERVERIP"))
-			{
-				//gi.dprintf("pooy test : %s , %s\n",proxyinfo[client].serverip,gi.args());
-				//1.20
-				if (!*serverip)
-				{
-					proxyinfo[client].cmdlist |= 4;
-					return FALSE;
-				}
-				//compare random char with what we gave them
-				if (strcmp(gi.argv(5),proxyinfo[client].serverip)==0)
-				{
-					//k its not been tampered with, now check the ip
-					if (strcmp(gi.argv(6),serverip)==0)
-					{
-						//ip correct
-						proxyinfo[client].cmdlist |= 4;
-					}
-					else
-					{
-						gi.bprintf(PRINT_HIGH,MOD_KICK_MSG,proxyinfo[client].name,1);
-						//sprintf(abuffer,client_msg,version_check);
-						//gi.cprintf(getEnt((client + 1)),PRINT_HIGH,"%s\n",abuffer);
-						addCmdQueue(client, QCMD_DISCONNECT, 1, 0, Q2A_MOD_KICK_MSG);
-					}
-				}
-				else
-				{
-					gi.bprintf(PRINT_HIGH,MOD_KICK_MSG,proxyinfo[client].name,proxyinfo[client].pmod);
-					//sprintf(abuffer,client_msg,version_check);
-					//gi.cprintf(getEnt((client + 1)),PRINT_HIGH,"%s\n",abuffer);
-					addCmdQueue(client, QCMD_DISCONNECT, 1, 0, Q2A_MOD_KICK_MSG);
-				}
-				return FALSE;
-			}
-		}
-		
-			if (proxyinfo[client].pmodver>ltime)
-			{
-				if (gl_driver_check & 1)
-				{
-					if (q2a_strstr(gi.args(),"Q2ADMIN_GL_DRIVER_CHECK"))
-					{
-						dont_print = true;
-						//got gl_driver response
-						if (strlen(proxyinfo[client].gl_driver))
-						{
-							//we have a response
-							if (strcmp(proxyinfo[client].gl_driver,gi.args())==0)
-							{
-								//if they match ignore
-							}
-							else
-							{
-								//if they dont
-								strcpy(proxyinfo[client].gl_driver,gi.args());
-								proxyinfo[client].gl_driver_changes++;
-								dont_print = false;
-								if (gl_driver_check & 4)
-				  					gi.dprintf ("%s %s.\n", proxyinfo[client].name,gi.args());
-							}
-						}
-						else
-						{
-							strcpy(proxyinfo[client].gl_driver,gi.args());
-							proxyinfo[client].gl_driver_changes++;
-							dont_print = false;
-							if (gl_driver_check & 4)
-					  			gi.dprintf ("%s %s.\n", proxyinfo[client].name,gi.args());
-						}
-
-						if (gl_driver_max_changes)
-						{
-							if (proxyinfo[client].gl_driver_changes>gl_driver_max_changes)
-							{
-								//sprintf(abuffer,client_msg,version_check);
-								//gi.cprintf(getEnt((client + 1)),PRINT_HIGH,"%s\n",abuffer);
-								addCmdQueue(client, QCMD_DISCONNECT, 1, 0, "Too many gl_driver changes.");
-							}
-						}
-						if (gl_driver_check & 2)
-						{
-							if (dont_print)
-								return FALSE; //dont spam
-						}
-						else
-						{
-							//dont print ever
-							return FALSE;
-						}
-					}
-				}
-			}
-			//r1ch: removed NC 2.34 client forcing
-		}
-//*** UPDATE END ***
-
-	if(Q_stricmp (cmd, "say") == 0 || Q_stricmp (cmd, "say_team") == 0)
-		{
-			if(strcmp(gi.argv(1), "XANIA") == 0 || strcmp(gi.argv(1), "Nitro2") ==  0)
-				{
-					if(proxy_nitro2)
-						{
-							proxyinfo[client].clientcommand  |= CCMD_NITRO2PROXY;
-						}
-					else
-						{
-							proxyDetected(ent, client);
-							return FALSE;
-						}
-				}
-				
-		}
-		
-		
-//	if(adminpassword[0] && proxyinfo[client].admin && cmd[0] == '!')
-//		{
-//*** UPDATE START ***
-	if(cmd[0] == '!')
-	{
-		if(!proxyinfo[client].admin)
-		{
-			if(Q_stricmp (cmd, "!version") == 0)
-			{
-				gi.cprintf (ent, PRINT_HIGH, zbotversion);
-				return FALSE;
-			}
-		}
-	}
-
-	logEvent(LT_CLIENTCMDS, client, ent, proxyinfo[client].lastcmd, 0, 0.0);
-	
-	return TRUE;
-}
-
 void ClientCommand (edict_t *ent)
 {
 	int client = getEntOffset(ent) - 1;
-	qboolean checkforfloodafter = FALSE;
-	char stemp[1024];	//UPDATE
-	
-	INITPERFORMANCE(1);
-	INITPERFORMANCE(2);
 	
 	if(!dllloaded) return;
 	
 	
-	if(q2adminrunmode == 0)
-		{
-			dllglobals->ClientCommand(ent);
-			copyDllInfo();
-			return;
-		}
-		
-	STARTPERFORMANCE(1);
-
-//*** UPDATE START ***
-	q2a_strcpy (stemp, "");
-	q2a_strcat (stemp, gi.args());
-//*** UPDATE END ***
-	
-	lastClientCmd = client;
-	if(doClientCommand(ent, client, &checkforfloodafter))
-		{
-			if(!(proxyinfo[client].clientcommand & BANCHECK))
-				{
-					STARTPERFORMANCE(2);
-					dllglobals->ClientCommand(ent);
-					STOPPERFORMANCE(2, "mod->ClientCommand", 0, NULL);
-					
-					copyDllInfo();
-				}
-		}
-		
-	lastClientCmd = -1;
-	
-	STOPPERFORMANCE(1, "q2admin->ClientCommand", 0, NULL);
+	dllglobals->ClientCommand(ent);
+	copyDllInfo();
 }
 
 
 void ServerCommand (void)
 {
-	INITPERFORMANCE(1);
-	INITPERFORMANCE(2);
-	
 	if(!dllloaded) return;
-	
-	if(q2adminrunmode == 0)
-		{
-			dllglobals->ServerCommand();
-			copyDllInfo();
-			return;
-		}
 		
-	STARTPERFORMANCE(1);
-	
-	if(doServerCommand())
-		{
-			STARTPERFORMANCE(2);
-			dllglobals->ServerCommand();
-			STOPPERFORMANCE(2, "mod->ServerCommand", 0, NULL);
-			
-			copyDllInfo();
-		}
-		
-	STOPPERFORMANCE(1, "q2admin->ServerCommand", 0, NULL);
+	dllglobals->ServerCommand();
+	copyDllInfo();
 }

@@ -312,9 +312,6 @@ void InitGame (void)
 {
 	int i;
 	
-	INITPERFORMANCE(1);
-	INITPERFORMANCE(2);
-	
 	proxyinfo = NULL; //UPDATE - Harven fix
 	gi.dprintf (zbotversion);
 	
@@ -332,10 +329,7 @@ void InitGame (void)
 			return;
 		}
 		
-	STARTPERFORMANCE(1);
-	STARTPERFORMANCE(2);
 	dllglobals->Init(); //be carefull with all functions called from this one (like dprintf_internal) to not use proxyinfo pointer because it's not initialized yet. -Harven
-	STOPPERFORMANCE(2, "mod->InitGame", 0, NULL);
 	
 	copyDllInfo();
 	
@@ -356,8 +350,6 @@ void InitGame (void)
 	
 	retrylist = (retrylist_info *)gi.TagMalloc (maxclients->value * sizeof(retrylist_info), TAG_GAME);
 	maxretryList = 0;
-	
-	logEvent(LT_SERVERINIT, 0, NULL, NULL, 0, 0.0);
 	
 	motd[0] = 0;
 	
@@ -407,7 +399,6 @@ void InitGame (void)
 			removeClientCommands(i);
 		}
 
-	STOPPERFORMANCE(1, "q2admin->InitGame", 0, NULL);
 }
 
 
@@ -417,8 +408,6 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 	FILE *motdptr;
 	int i;
 	char *backupentities = entities;
-	INITPERFORMANCE(1);
-	INITPERFORMANCE(2);
 	
 	if(!dllloaded) return;
 	
@@ -430,8 +419,6 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 		}
 		
 		
-	STARTPERFORMANCE(1);
-	
 	//  q2a_memset(proxyinfoBase, 0x0, (maxclients->value + 1) * sizeof(proxyinfo_t));
 	
 	for(i = -1; i < maxclients->value; i++)
@@ -491,9 +478,7 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 
 	motd[0] = 0;
 	
-	STARTPERFORMANCE(2);
 	dllglobals->SpawnEntities(mapname, backupentities, spawnpoint);
-	STOPPERFORMANCE(2, "mod->SpawnEntities", 0, NULL);
 	
 	copyDllInfo();
 	
@@ -518,7 +503,6 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 	}
 //*** UPDATE END ***
 
-	STOPPERFORMANCE(1, "q2admin->SpawnEntities", 0, NULL);
 }
 
 
@@ -690,9 +674,6 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 	qboolean ret;
 	qboolean userInfoOverflow = FALSE;
 	
-	INITPERFORMANCE(1);
-	INITPERFORMANCE(2);
-	
 	if(!dllloaded) return FALSE;
 	
 	if(q2adminrunmode == 0)
@@ -702,8 +683,6 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 			return ret;
 		}
 		
-	STARTPERFORMANCE(1);
-	
 	// allways clearout just in case there isn't any clients (therefore runframe doesn't get called)
 	if(maxReconnectList)
 		{
@@ -848,7 +827,6 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 		{
 			char *ip = FindIpAddressInUserInfo(userinfo, 0);
 			gi.cprintf (NULL, PRINT_HIGH, "%s: %s (%s)\n", proxyinfo[client].name, "Client doesn't have a valid IP address", ip);
-			logEvent(LT_INVALIDIP, client, ent, userinfo, 0, 0.0);
 			
 					proxyinfo[client].clientcommand |= CCMD_BANNED;
 					q2a_strcpy(proxyinfo[client].buffer, "Client doesn't have a valid IP address");
@@ -959,17 +937,13 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 				
 			if(doConnect)
 				{
-					STARTPERFORMANCE(2);
 					ret = dllglobals->ClientConnect(ent, userinfo);
-					STOPPERFORMANCE(2, "mod->ClientConnect", client, ent);
-					
 					copyDllInfo();
 				}
 		}
 		
 	if(ret)
 		{
-			logEvent(LT_CLIENTCONNECT, client, ent, NULL, 0, 0.0);
 			
 			if ( userInfoOverflow )
 				{
@@ -978,7 +952,6 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 				}
 		}
 		
-	STOPPERFORMANCE(1, "q2admin->ClientConnect", client, ent);
 	return ret;
 }
 
@@ -998,24 +971,11 @@ qboolean checkForNameChange(int client, edict_t *ent, char *userinfo)
 		}
 	else if(q2a_strcmp(proxyinfo[client].name, newname) != 0)
 		{
-			// check if ratbot detect?
-			if(q2a_strcmp(newname, RATBOT_CHANGENAMETEST) == 0)
-				{
-					removeClientCommand(client, QCMD_TESTRATBOT4);
-					proxyinfo[client].clientcommand &= ~CCMD_RATBOTDETECTNAME;
-					proxyinfo[client].clientcommand |= CCMD_RBOTCLEAR;
-					
-					// ok not a ratbot.. turn off detection
-					//      addCmdQueue(client, QCMD_CHANGENAME, 0, 0, 0);
-					return FALSE;
-				}
-				
 				
 			q2a_strcpy(oldname, proxyinfo[client].name);
 			q2a_strcpy (proxyinfo[client].name, newname);
 			
 
-					logEvent(LT_NAMECHANGE, client, ent, oldname, 0, 0.0);
 					
 					if(displaynamechange)
 						{
@@ -1049,7 +1009,6 @@ qboolean checkForSkinChange(int client, edict_t *ent, char *userinfo)
 			q2a_strcpy(oldskin, proxyinfo[client].skin);
 			q2a_strcpy (proxyinfo[client].skin, newskin);
 			
-			logEvent(LT_SKINCHANGE, client, ent, oldskin, 0, 0.0);
 			
 		}
 		
@@ -1080,9 +1039,6 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 //	cvar_t *srv_ip;
 //*** UPDATE END ***
 	
-	INITPERFORMANCE(1);
-	INITPERFORMANCE(2);
-	
 	if(!dllloaded) return;
 	
 	if(q2adminrunmode == 0)
@@ -1092,37 +1048,17 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 			return;
 		}
 		
-	STARTPERFORMANCE(1);
-	
 	client = getEntOffset(ent) - 1;
 
-//*** UPDATE START ***
-/*	if (client_check > 0)
-	{
-		if (stringContains(proxyinfo[client].ipaddress, ":27901"))
-		{
-			//logEvent(LT_CLIENTUSERINFO, client, ent, userinfo, 0, 0.0); //1.32e - 1.32e1 change, frkq2 still uses default client port
-			proxyinfo[client].cmdlist = 7; //Clients having net_port 27901 get 7, others get 0
-		}
-		else
-		{
-			proxyinfo[client].cmdlist = 0;
-		}
-	}*/
 
 	if (stringContains(userinfo, "\\skon\\"))	//zgh_frk check
 	{
 		gi.bprintf(PRINT_HIGH,"%s was caught cheating!\n",proxyinfo[client].name);
 		sprintf(tmptext, "kick %d\n", client);
 		gi.AddCommandString(tmptext);
-		logEvent(LT_ZBOT, client, ent, userinfo, -14, 0.0);
 	}
 
-//	srv_ip = gi.cvar("ip", "0.0.0.0", 0);
-//	gi.bprintf (PRINT_HIGH, "DEBUG: %s\n", srv_ip->string);
-
 	proxyinfo[client].userinfo_changed_count++;
-	//gi.bprintf(PRINT_HIGH,"userinfo %d\n",proxyinfo[client].userinfo_changed_count);
 	if (proxyinfo[client].userinfo_changed_count>USERINFOCHANGE_COUNT)
 	{
 		temp = ltime - proxyinfo[client].userinfo_changed_start;
@@ -1130,13 +1066,6 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 			proxyinfo[client].userinfo_changed_count = 0;
 			proxyinfo[client].userinfo_changed_start = ltime;
 	}
-
-	// 1.32e - 1.32e1 change
-	//	if (strcmp(proxyinfo[client].userinfo, userinfo)!=0)
-	//	{
-	//  		logEvent(LT_CLIENTUSERINFO, client, ent, userinfo, 0, 0.0);
-	//	}
-//*** UPDATE END ***
 	
 	passon = checkForNameChange(client, ent, userinfo);
 	if(!checkForSkinChange(client, ent, userinfo))
@@ -1146,9 +1075,7 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 		
 	if(passon && !(proxyinfo[client].clientcommand & BANCHECK))
 		{
-			STARTPERFORMANCE(2);
 			dllglobals->ClientUserinfoChanged(ent, userinfo);
-			STOPPERFORMANCE(2, "mod->ClientUserinfoChanged", client, ent);
 			
 			copyDllInfo();
 		}
@@ -1163,7 +1090,6 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 		
 	q2a_strcpy(proxyinfo[client].userinfo, userinfo);
 	
-	STOPPERFORMANCE(1, "q2admin->ClientUserinfoChanged", client, ent);
 }
 
 void ClientDisconnect (edict_t *ent)
@@ -1172,8 +1098,6 @@ void ClientDisconnect (edict_t *ent)
 //	int clienti;	//UPDATE
 //	qboolean empty;	//UPDATE
 
-	INITPERFORMANCE(1);
-	INITPERFORMANCE(2);
 	
 	if(!dllloaded) return;
 	
@@ -1184,7 +1108,6 @@ void ClientDisconnect (edict_t *ent)
 			return;
 		}
 		
-	STARTPERFORMANCE(1);
 	
 	client = getEntOffset(ent) - 1;
 	
@@ -1192,9 +1115,7 @@ void ClientDisconnect (edict_t *ent)
 	
 	if(!(proxyinfo[client].clientcommand & BANCHECK))
 		{
-			STARTPERFORMANCE(2);
 			dllglobals->ClientDisconnect(ent);
-			STOPPERFORMANCE(2, "mod->ClientDisconnect", client, ent);
 			
 			copyDllInfo();
 			
@@ -1215,8 +1136,6 @@ void ClientDisconnect (edict_t *ent)
 				}
 		}
 		
-	logEvent(LT_CLIENTDISCONNECT, client, ent, NULL, 0, 0.0);
-	
 		
 	if(proxyinfo[client].stuffFile)
 		{
@@ -1264,7 +1183,6 @@ void ClientDisconnect (edict_t *ent)
 	proxyinfo[client].vid_restart = false;
 	proxyinfo[client].userid = -1;
 
-	STOPPERFORMANCE(1, "q2admin->ClientDisconnect", 0, NULL);
 }
 
 
@@ -1272,8 +1190,6 @@ void ClientBegin (edict_t *ent)
 {
 	int client;
 	FILE *q2logfile;
-	INITPERFORMANCE(1);
-	INITPERFORMANCE(2);
 	
 	if(!dllloaded) return;
 	
@@ -1284,16 +1200,11 @@ void ClientBegin (edict_t *ent)
 			return;
 		}
 		
-	STARTPERFORMANCE(1);
-	
 	client = getEntOffset(ent) - 1;
 	
 	if(!(proxyinfo[client].clientcommand & BANCHECK))
 		{
-			STARTPERFORMANCE(2);
 			dllglobals->ClientBegin(ent);
-			STOPPERFORMANCE(2, "mod->ClientBegin", client, ent);
-			
 			copyDllInfo();
 		}
 	else
@@ -1304,7 +1215,6 @@ void ClientBegin (edict_t *ent)
 		
 	if(client >= maxclients->value)
 		{
-			STOPPERFORMANCE(1, "q2admin->ClientBegin (client >= maxclients)", client, ent);
 			return;
 		}
 		
@@ -1387,14 +1297,10 @@ void ClientBegin (edict_t *ent)
 				}
 		}
 		
-	logEvent(LT_CLIENTBEGIN, client, ent, NULL, 0, 0.0);
-	STOPPERFORMANCE(1, "q2admin->ClientBegin", client, ent);
 }
 
 void WriteGame (char *filename, qboolean autosave)
 {
-	INITPERFORMANCE(1);
-	
 	if(!dllloaded) return;
 	
 	if(q2adminrunmode == 0)
@@ -1404,19 +1310,14 @@ void WriteGame (char *filename, qboolean autosave)
 			return;
 		}
 		
-	STARTPERFORMANCE(1);
-	
 	dllglobals->WriteGame(filename, autosave);
 	copyDllInfo();
 	
-	STOPPERFORMANCE(1, "q2admin->WriteGame", 0, NULL);
 }
 
 
 void ReadGame (char *filename)
 {
-	INITPERFORMANCE(1);
-	
 	if(!dllloaded) return;
 	
 	if(q2adminrunmode == 0)
@@ -1426,17 +1327,14 @@ void ReadGame (char *filename)
 			return;
 		}
 		
-	STARTPERFORMANCE(1);
 	
 	dllglobals->ReadGame(filename);
 	copyDllInfo();
 	
-	STOPPERFORMANCE(1, "q2admin->ReadGame", 0, NULL);
 }
 
 void WriteLevel (char *filename)
 {
-	INITPERFORMANCE(1);
 	
 	if(!dllloaded) return;
 	
@@ -1447,17 +1345,14 @@ void WriteLevel (char *filename)
 			return;
 		}
 		
-	STARTPERFORMANCE(1);
 	
 	dllglobals->WriteLevel(filename);
 	copyDllInfo();
 	
-	STOPPERFORMANCE(1, "q2admin->WriteLevel", 0, NULL);
 }
 
 void ReadLevel (char *filename)
 {
-	INITPERFORMANCE(1);
 	
 	if(!dllloaded) return;
 	
@@ -1468,11 +1363,9 @@ void ReadLevel (char *filename)
 			return;
 		}
 		
-	STARTPERFORMANCE(1);
 	
 	dllglobals->ReadLevel(filename);
 	copyDllInfo();
 	
-	STOPPERFORMANCE(1, "q2admin->ReadLevel", 0, NULL);
 }
 

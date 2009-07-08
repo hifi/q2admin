@@ -61,10 +61,6 @@ HINSTANCE hdll;
 
 typedef game_export_t  *GAMEAPI (game_import_t *import);
 
-char  zbot_teststring1[] = ZBOT_TESTSTRING1;
-char  zbot_teststring_test1[] = ZBOT_TESTSTRING_TEST1;
-char  zbot_teststring_test2[] = ZBOT_TESTSTRING_TEST2;
-char  zbot_teststring_test3[] = ZBOT_TESTSTRING_TEST3;
 char  zbot_testchar1;
 char  zbot_testchar2;
 
@@ -72,26 +68,12 @@ qboolean soloadlazy;
 
 void ShutdownGame (void)
 {
-	INITPERFORMANCE(1);
-	INITPERFORMANCE(2);
 	
 	if(!dllloaded) return;
-
-	if(q2adminrunmode)
-		{
-			STARTPERFORMANCE(1);
-			logEvent(LT_SERVEREND, 0, NULL, NULL, 0, 0.0);
-			STARTPERFORMANCE(2);
-		}
 		
 	// reset the password just in case something has gone wrong...
 	dllglobals->Shutdown();
 	
-	if(q2adminrunmode)
-		{
-			STOPPERFORMANCE(2, "mod->ShutdownGame", 0, NULL);
-		}
-		
 #ifdef __GNUC__
 	dlclose(hdll);
 #elif defined(WIN32)
@@ -99,11 +81,6 @@ void ShutdownGame (void)
 #endif
 	
 	dllloaded = FALSE;
-	
-	if(q2adminrunmode)
-		{
-			STOPPERFORMANCE(1, "q2admin->ShutdownGame", 0, NULL);
-		}
 }
 
 /*
@@ -129,9 +106,12 @@ game_export_t *GetGameAPI(game_import_t *import)
 	import->cprintf = cprintf_internal;
 	import->dprintf = dprintf_internal;
 	import->AddCommandString = AddCommandString_internal;
+
 	//import->Pmove = Pmove_internal;
-	import->linkentity = linkentity_internal;
-	import->unlinkentity = unlinkentity_internal;
+	//import->linkentity = linkentity_internal;
+	//import->unlinkentity = unlinkentity_internal;
+	//import->linkentity = linkentity;
+	//import->unlinkentity = unlinkentity;
 	
 	globals.Init = InitGame;
 	globals.Shutdown = ShutdownGame;
@@ -169,29 +149,6 @@ game_export_t *GetGameAPI(game_import_t *import)
 	for (i=0;i<PRIVATE_COMMANDS;i++)
 		{
 			private_commands[i].command[0] = 0;
-		}
-		
-//*** UPDATE START ***
-	q2a_strcpy(client_msg,DEFAULTQ2AMSG);
-//*** UPDATE END ***
-	q2a_strcpy(zbotuserdisplay, DEFAULTUSERDISPLAY);
-	q2a_strcpy(hackuserdisplay, DEFAULTHACKDISPLAY);
-	q2a_strcpy(skincrashmsg, DEFAULTSKINCRASHMSG);
-	q2a_strcpy(defaultreconnectmessage, DEFAULTRECONNECTMSG);
-	q2a_strcpy(cl_pitchspeed_kickmsg, DEFAULTCL_PITCHSPEED_KICKMSG);
-	q2a_strcpy(cl_anglespeedkey_kickmsg, DEFAULTCL_ANGLESPEEDKEY_KICKMSG);
-	q2a_strcpy(lockoutmsg, DEFAULTLOCKOUTMSG);
-	
-	customServerCmd[0] = 0;
-	customClientCmd[0] = 0;
-	customClientCmdConnect[0] = 0;
-	customServerCmdConnect[0] = 0;
-	
-	readCfgFiles();
-	
-	if(q2adminrunmode)
-		{
-			loadLogList();
 		}
 		
 #ifdef __GNUC__
@@ -269,10 +226,5 @@ game_export_t *GetGameAPI(game_import_t *import)
 	copyDllInfo();
 	import->cprintf = gi.cprintf;
 	
-	if(q2adminrunmode)
-		{
-			logEvent(LT_SERVERSTART, 0, NULL, NULL, 0, 0.0);
-		}
-		
 	return &globals;
 }
