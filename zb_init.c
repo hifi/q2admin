@@ -55,9 +55,6 @@ char buffer2[256];
 
 int logfilecheckcount;
 
-proxyinfo_t *proxyinfo;
-proxyinfo_t *proxyinfoBase;
-
 int lframenum;
 float  ltime;
 
@@ -164,9 +161,6 @@ skipwhite:
 
 void InitGame (void)
 {
-	int i;
-	
-	proxyinfo = NULL; //UPDATE - Harven fix
 	gi.dprintf (zbotversion);
 	
 	if(!dllloaded) return;
@@ -215,8 +209,6 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 
 void ClientDisconnect (edict_t *ent)
 {
-	int client;
-	
 	if(!dllloaded) return;
 	
 	dllglobals->ClientDisconnect(ent);
@@ -227,9 +219,6 @@ void ClientDisconnect (edict_t *ent)
 
 void ClientBegin (edict_t *ent)
 {
-	int client;
-	FILE *q2logfile;
-	
 	if(!dllloaded) return;
 	
 	dllglobals->ClientBegin(ent);

@@ -36,17 +36,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "game.h"
 
 #include <ctype.h>
-#include "regex.h"
-
-//*** UPDATE START ***
-#define PRIVATE_COMMANDS  8
-#define ALLOWED_MAXCMDS   50
-#define ALLOWED_MAXCMDS_SAFETY 45
-#define TIMERS_MAX    4
-//*** UPDATE END ***
-
-// maximum length of random strings used to check for hacked quake2.exe
-#define RANDOM_STRING_LENGTH    20
 
 // the "gameversion" client command will print this plus compile date
 #define GAMEVERSION    "baseq2"
@@ -63,7 +52,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // view pitching times
 #define DAMAGE_TIME    0.5
 #define FALL_TIME    0.3
-
 
 // edict->spawnflags
 // these are set with checkboxes on each entity in the map editor
@@ -422,248 +410,8 @@ struct edict_s
 	
 #define RANDCHAR()      (random() < 0.3) ? '0' + (int)(9.9 * random()) : 'A' + (int)(26.9 * random())
 
-#define CFGFILE       "q2admin.txt"
-	
-#define DEFAULTRECONNECTMSG    "Please wait to be reconnected to the server - this is normal for this level of bot protection.\nThe fastest way to do this is not to change any client info e.g. your name or skin."
-	
-#define DEFAULTUSERDISPLAY    "%s is using a client side proxy."
-#define DEFAULTTSDISPLAY    "%s is using a speed cheat."
-#define DEFAULTHACKDISPLAY    "%s is using a modified client."
-#define DEFAULTSKINCRASHMSG    "%s tried to crash the server."
-#define DEFAULTFLOODMSG     "%s changed names too many times."
-#define DEFAULTCHATFLOODMSG    "%s is making too much noise."
-#define DEFAULTSKINFLOODMSG    "%s changed skin too many times."
-#define DEFAULTCL_PITCHSPEED_KICKMSG "cl_pitchspeed changes not allowed on this server."
-#define DEFAULTCL_ANGLESPEEDKEY_KICKMSG "cl_anglespeedkey changes not allowed on this server."
-#define DEFAULTBANMSG     "You are banned from this server!"
-#define DEFAULTCHABANMSG    "Message banned."
-#define DEFAULTLOCKOUTMSG    "This server is currently locked."
-	
-#define NOTUSED   0
-#define NICKALL   1
-#define NICKEQ   2
-#define NICKLIKE  3
-#define NICKRE   4
-#define NICKBLANK  5
-
-#define LT_PERM   1
-#define LT_TEMP   2
-
-#define CNOTUSED  0
-#define CHATLIKE  1
-#define CHATRE   2
-
-typedef struct
-	{
-		byte     command;
-		float     timeout;
-		unsigned long   data;
-		char     *str;
-	}
-	
-CMDQUEUE;
-
-//*** UPDATE START ***
-typedef struct
-	{
-		char   action[256];
-		int    start;
-	}
-	
-timers_t;
-//*** UPDATE END ***
-
-typedef struct
-	{
-		qboolean  admin;
-		unsigned char retries;
-		unsigned char rbotretries;
-		CMDQUEUE  cmdQueue[ALLOWED_MAXCMDS]; // command queue - UPDATE
-		int    maxCmds;
-		unsigned long clientcommand; // internal proxy commands
-		char   teststr[9];
-		int    charindex;
-		//long   logfilereadpos;
-		int    logfilenum;
-		long   logfilecheckpos;
-		char   buffer[256]; // log buffer
-		char   ipaddress[40];
-		byte   ipaddressBinary[4];
-		byte   inuse;
-		char   name[16];
-		char   skin[40];  // skin/model information.
-		int    rate;
-		int    maxfps;
-		int    cl_pitchspeed;
-		float   cl_anglespeedkey;
-		long   namechangetimeout;
-		int    namechangecount;
-		long   skinchangetimeout;
-		int    skinchangecount;
-		long   chattimeout;
-		int    chatcount;
-		char   userinfo[MAX_INFO_STRING + 45];
-		FILE   *stuffFile;
-		char   lastcmd[8192];
-		short   zbc_angles[2][2];
-		int    zbc_tog;
-		int    zbc_jitter;
-		float   zbc_jitter_time;
-		float   zbc_jitter_last;
-		int    msg;
-		
-		// used to test the alias (and connect) command with random strings
-		char   hack_teststring1[RANDOM_STRING_LENGTH+1];
-		char   hack_teststring2[RANDOM_STRING_LENGTH+1];
-		char   hack_teststring3[RANDOM_STRING_LENGTH+1];
-		int    hacked_disconnect;
-		byte   hacked_disconnect_ip[4];
-		int    checked_hacked_exe;
-		
-		// used to test the variables check list
-		char   hack_checkvar[RANDOM_STRING_LENGTH+1];
-		int    checkvar_idx;
-		
-		//*** UPDATE START ***
-		char   gl_driver[256];
-		int    gl_driver_changes;
-		int    pmodver;
-		int    pmod;
-		int    pmod_noreply_count;
-		int    pcmd_noreply_count;
-		int    pver;
-		int    q2a_admin;
-		int    q2a_bypass;
-		int    msec_count;
-		int    msec_last;
-		int    frames_count;
-		int    msec_bad;
-		float   msec_start;
-		int    done_server_and_blocklist;
-		int    userinfo_changed_count;
-		int    userinfo_changed_start;
-		int    private_command;
-		qboolean  show_fps;
-		qboolean  vid_restart;
-		qboolean  private_command_got[PRIVATE_COMMANDS];
-		char   serverip[16];
-		char   cmdlist_stored[256];
-		int    cmdlist;
-		int    cmdlist_timeout;
-		int    userid;
-		int    newcmd_timeout;
-		timers_t  timers[TIMERS_MAX];
-		int    blocklist;
-		int    speedfreeze;
-		int    enteredgame;
-		//*** UPDATE END ***
-	}
-	
-proxyinfo_t;
-
-typedef struct
-	{
-		byte   inuse;
-		char   name[16];
-	}
-	
-proxyreconnectinfo_t;
-
-#define MAXDETECTRETRIES   3
-
-#define CCMD_STARTUPTEST   0x000001
-#define CCMD_ZPROXYCHECK2   0x000002
-#define CCMD_ZBOTDETECTED   0x000004
-#define CCMD_BANNED     0x000008
-#define CCMD_NCSILENCE    0x000010
-#define CCMD_KICKED     0x000020
-#define CCMD_SELECTED    0x000040
-#define CCMD_CSILENCE    0x000080
-#define CCMD_PCSILENCE    0x000100
-#define CCMD_VOTED     0x000200
-#define CCMD_VOTEYES    0x000400
-#define CCMD_NITRO2PROXY   0x000800
-#define CCMD_RATBOTDETECT   0x001000
-#define CCMD_RATBOTDETECTNAME  0x002000
-#define CCMD_ZBOTCLEAR    0x004000
-#define CCMD_RBOTCLEAR    0x008000
-#define CCMD_SCSILENCE    0x010000
-#define CCMD_RECONNECT    0x020000
-#define CCMD_ALIASCHECKSTARTED  0x040000
-#define CCMD_WAITFORALIASREPLY1  0x080000
-#define CCMD_WAITFORALIASREPLY2  0x100000
-#define CCMD_WAITFORCONNECTREPLY 0x200000
-#define CCMD_REMEMBERHACK   0x400000
-#define CCMD_CLIENTOVERFLOWED  0x800000
-
 #define LEVELCHANGE_KEEP   (CCMD_SCSILENCE | CCMD_CSILENCE | CCMD_PCSILENCE | CCMD_ZBOTDETECTED | CCMD_KICKED | CCMD_NITRO2PROXY | CCMD_ZBOTCLEAR | CCMD_RBOTCLEAR | CCMD_BANNED | CCMD_RECONNECT | CCMD_REMEMBERHACK )
 #define BANCHECK     (CCMD_BANNED | CCMD_RECONNECT)
-
-enum _commands
-{
-	QCMD_STARTUP,
-	QCMD_STARTUPTEST,
-	QCMD_CLEAR,
-	QCMD_DISCONNECT,
-	QCMD_CUSTOM,
-	QCMD_CONNECTCMD,
-	QCMD_GETIPALT,
-	QCMD_RESTART,
-	QCMD_CLIPTOMAXRATE,
-	QCMD_CLIPTOMINRATE,
-	QCMD_SETUPMAXFPS,
-	QCMD_FORCEUDATAUPDATE,
-	QCMD_SETMAXFPS,
-	QCMD_SETMINFPS,
-	QCMD_DISPBANS,
-	QCMD_DISPLRCONS,
-	QCMD_DISPFLOOD,
-	QCMD_DISPSPAWN,
-	QCMD_DISPVOTE,
-	QCMD_DISPDISABLE,
-	QCMD_CHANGENAME,
-	QCMD_CHANGESKIN,
-	QCMD_BAN,
-	QCMD_DISPCHATBANS,
-	QCMD_STUFFCLIENT,
-	QCMD_RUNVOTECMD,
-	QCMD_TESTRATBOT,
-	QCMD_TESTRATBOT2,
-	QCMD_TESTRATBOT3,
-	QCMD_TESTRATBOT4,
-	QCMD_LETRATBOTQUIT,
-	QCMD_TESTTIMESCALE,
-	QCMD_TESTSTANDARDPROXY,
-	QCMD_TESTALIASCMD1,
-	QCMD_TESTALIASCMD2,
-	QCMD_SETUPCL_PITCHSPEED,
-	QCMD_FORCEUDATAUPDATEPS,
-	QCMD_SETUPCL_ANGLESPEEDKEY,
-	QCMD_FORCEUDATAUPDATEAS,
-	QCMD_RECONNECT,
-	QCMD_KICK,
-	QCMD_MSGDISCONNECT,
-};
-
-#define IW_UNEXCEPTEDCMD  1
-#define IW_UNKNOWNCMD   2
-#define IW_STARTUP    4
-#define IW_STARTUPTEST   5
-#define IW_OVERFLOWDETECT  7
-#define IW_STARTUPFAIL   8
-#define IW_Q2ADMINCFGLOAD  9
-#define IW_LOGSETUPLOAD   10
-#define IW_BANSETUPLOAD   11
-#define IW_LRCONSETUPLOAD  12
-#define IW_FLOODSETUPLOAD  13
-#define IW_SPAWNSETUPLOAD  14
-#define IW_VOTESETUPLOAD  15
-#define IW_DISABLESETUPLOAD  17
-#define IW_CHECKVARSETUPLOAD 18
-#define IW_INVALIDIPADDRESS  19
-
-#define MINIMUMTIMEOUT   5
-#define MAXSTARTTRY    500
 
 #define getEntOffset(ent)  (((char *)ent - (char *)globals.edicts) / globals.edict_size)
 #define getEnt(entnum)   (edict_t *)((char *)globals.edicts + (globals.edict_size * entnum))
@@ -753,11 +501,6 @@ extern int    logfilecheckcount;
 extern qboolean   checkvarcmds_enable;
 extern qboolean   swap_attack_use;
 
-extern proxyinfo_t   *proxyinfo;
-extern proxyinfo_t   *proxyinfoBase;
-extern proxyreconnectinfo_t *reconnectproxyinfo;
-extern zbotcmd_t   zbotCommands[];
-
 extern int    clientsidetimeout;
 extern int    lframenum;
 
@@ -821,26 +564,6 @@ str++; \
 #define itoa(x, y, z)   itoaNotAUnixFunction(z, y, z)
 
 // zb_clib.c
-#ifdef Q2ADMINCLIB
-
-char *q2a_strcpy( char *strDestination, const char *strSource );
-char *q2a_strncpy( char *strDest, const char *strSource, size_t count );
-char *q2a_strcat( char *strDestination, const char *strSource );
-char *q2a_strstr( const char *string, const char *strCharSet );
-char *q2a_strchr( const char *string, int c );
-int  q2a_strcmp( const char *string1, const char *string2 );
-size_t q2a_strlen( const char *string );
-
-int  q2a_atoi( const char *string );
-double q2a_atof( const char *string );
-
-int  q2a_memcmp( const void *buf1, const void *buf2, size_t count );
-void *q2a_memcpy( void *dest, const void *src, size_t count );
-void *q2a_memmove( void *dest, const void *src, size_t count );
-void *q2a_memset( void *dest, int c, size_t count );
-
-#else
-
 #define q2a_strcpy   strcpy
 #define q2a_strncpy   strncpy
 #define q2a_strcat   strcat
@@ -857,33 +580,21 @@ void *q2a_memset( void *dest, int c, size_t count );
 #define q2a_memmove   memmove
 #define q2a_memset   memset
 
-#endif
-
 // zb_cmd.c
-void  readCfgFiles(void);
 void  ClientCommand (edict_t *ent);
 void  ServerCommand (void);
 void  dprintf_internal (char *fmt, ...);
 void  cprintf_internal(edict_t *ent, int printlevel, char *fmt, ...);
 void  bprintf_internal(int printlevel, char *fmt, ...);
 void  AddCommandString_internal(char *text);
-void  stuffNextLine(edict_t *ent, int client);
 char  *getArgs(void);
-int   getClientsFromArg(int client, edict_t *ent, char *cp, char **text);
-edict_t  *getClientFromArg(int client, edict_t *ent, int *cleintret, char *cp, char **text);
 
 // zb_util.c
 void  stuffcmd(edict_t *e, char *s);
 int   Q_stricmp (char *s1, char *s2);
 char  *Info_ValueForKey (char *s, char *key);
 void  copyDllInfo(void);
-int   breakLine(char *buffer, char *buff1, char *buff2, int buff2size);
-int   startContains(char *src, char *cmp);
-int   stringContains(char *buff1, char *buff2);
-int   isBlank(char *buff1);
-char  *processstring(char *output, char *input, int max, char end);
 qboolean getLogicalValue(char *arg);
-int   getLastLine(char *buffer, FILE *dumpfile, long *fpos);
 void  q_strupr(char *c);
 
 // zb_init.c
@@ -899,75 +610,7 @@ void  WriteLevel (char *filename);
 void  ReadLevel (char *filename);
 
 // zb_zbot.c
-int   checkForOverflows(edict_t *ent, int client);
-void  serverLogZBot(edict_t *ent, int client);
 void  ClientThink (edict_t *ent, usercmd_t *ucmd);
 void  G_RunFrame (void);
-void  Pmove_internal (pmove_t *pmove);
-void  generateRandomString(char *buffer, int length);
-void  reloadWhoisFileRun(int startarg, edict_t *ent, int client);	//UPDATE
-void  reloadLoginFileRun(int startarg, edict_t *ent, int client);	//UPDATE
 
-// zb_msgqueue.c
-void  addCmdQueue(int client, byte command, float timeout, unsigned long data, char *str);
-qboolean getCommandFromQueue(int client, byte *command, unsigned long *data, char **str);
-void  removeClientCommand(int client, byte command);
-void  removeClientCommands(int client);
-
-// Pooy's shit
-extern char  client_msg[256];
-extern qboolean private_command_kick;
-extern int  msec_kick_on_bad;
-extern int  msec_max;
-extern int  speedbot_check_type;
-extern int  max_pmod_noreply;
-extern int  msec_int;
-
-typedef struct
-	{
-		char  name[256];
-		char  password[256];
-		char  ip[256];
-		int   level;
-	}
-	
-admin_type;
-
-#define Q2ADMINVERSION   "1.17.52"
-
-extern int   client_map_cfg;
-extern qboolean  do_franck_check;
-extern qboolean  q2a_command_check;
-extern qboolean  do_vid_restart;
-
-extern int   gl_driver_check;
-extern int   USERINFOCHANGE_TIME;
-extern int   USERINFOCHANGE_COUNT;
-extern int   gl_driver_max_changes;
-
-typedef struct
-	{
-		char  command[256];
-	}
-	
-priv_t;
-
-extern   priv_t private_commands[PRIVATE_COMMANDS];
-void   stuff_private_commands(int client,edict_t *ent);
-
-typedef struct
-	{
-		char  name[16];
-	}
-	
-user_dyn;
-
-typedef struct
-	{
-		int   id;
-		char  ip[22];
-		char  seen[32];
-		user_dyn dyn[10];
-	}
-	
-user_details;
+#define Q2ADMINVERSION   "1.99.99"
