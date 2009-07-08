@@ -418,27 +418,12 @@ struct edict_s
 		//================================
 	};
 	
-// zbot detector global stuff
-struct chatflood_s
-	{
-		qboolean      chatFloodProtect;
-		int           chatFloodProtectNum;
-		int           chatFloodProtectSec;
-		int           chatFloodProtectSilence;
-	};
-	
 #define MAXIMPULSESTOTEST 256
 	
 #define RANDCHAR()      (random() < 0.3) ? '0' + (int)(9.9 * random()) : 'A' + (int)(26.9 * random())
 
-#define BANLISTREMOTEFILE      "http://www.q2admin.net/server/q2adminban.txt"
-#define ANTICHEATEXCEPTIONREMOTEFILE      "http://www.q2admin.net/server/r1q2_ac.cfg"
-#define ANTICHEATEXCEPTIONLOCALFILE      "r1q2_ac.cfg"
-#define HASHLISTREMOTEDIR      "http://www.q2admin.net/server"
-#define BANLISTFILE      "q2adminban.txt"
 #define CFGFILE       "q2admin.txt"
 	
-#define DEFAULTVOTECOMMAND    "vote"
 #define DEFAULTRECONNECTMSG    "Please wait to be reconnected to the server - this is normal for this level of bot protection.\nThe fastest way to do this is not to change any client info e.g. your name or skin."
 	
 #define DEFAULTUSERDISPLAY    "%s is using a client side proxy."
@@ -454,27 +439,6 @@ struct chatflood_s
 #define DEFAULTCHABANMSG    "Message banned."
 #define DEFAULTLOCKOUTMSG    "This server is currently locked."
 	
-typedef struct banstruct
-	{
-		regex_t    *r;
-		qboolean   exclude;
-		byte    type;
-		byte    loadType;
-		byte    ip[4];
-		byte    subnetmask;
-		char    nick[80];
-		char    password[80];
-		char    *msg;
-		long    maxnumberofconnects;
-		long    numberofconnects;
-		long    bannum;
-		float    timeout;
-		struct chatflood_s floodinfo;
-		struct banstruct *next;
-	}
-	
-baninfo_t;
-
 #define NOTUSED   0
 #define NICKALL   1
 #define NICKEQ   2
@@ -484,19 +448,6 @@ baninfo_t;
 
 #define LT_PERM   1
 #define LT_TEMP   2
-
-typedef struct chatbanstruct
-	{
-		regex_t     *r;
-		byte     type;
-		byte     loadType;
-		long     bannum;
-		char     chat[256];
-		char     *msg;
-		struct chatbanstruct *next;
-	}
-	
-chatbaninfo_t;
 
 #define CNOTUSED  0
 #define CHATLIKE  1
@@ -546,7 +497,6 @@ typedef struct
 		int    maxfps;
 		int    cl_pitchspeed;
 		float   cl_anglespeedkey;
-		baninfo_t  *baninfo;
 		long   namechangetimeout;
 		int    namechangecount;
 		long   skinchangetimeout;
@@ -557,14 +507,11 @@ typedef struct
 		FILE   *stuffFile;
 		int    impulsesgenerated;
 		char   lastcmd[8192];
-		struct   chatflood_s floodinfo;
 		short   zbc_angles[2][2];
 		int    zbc_tog;
 		int    zbc_jitter;
 		float   zbc_jitter_time;
 		float   zbc_jitter_last;
-		int    votescast;
-		int    votetimeout;
 		int    msg;
 		
 		// used to test the alias (and connect) command with random strings
@@ -814,7 +761,7 @@ zbotcmd_t;
 extern game_import_t gi;
 extern game_export_t globals;
 extern game_export_t *dllglobals;
-extern cvar_t   *rcon_password, *gamedir, *maxclients, *logfile, *rconpassword, *port, *serverbindip, *q2admintxt, *q2adminbantxt , *q2adminbanremotetxt, *q2adminbanremotetxt_enable, *q2adminanticheat_enable, *q2adminanticheat_file, *q2adminhashlist_enable, *q2adminhashlist_dir; // UPDATE
+extern cvar_t   *rcon_password, *gamedir, *maxclients, *logfile, *rconpassword, *port, *serverbindip, *q2admintxt; // UPDATE
 
 extern char    dllname[256];
 extern char    zbotuserdisplay[256];
@@ -835,12 +782,7 @@ extern qboolean   disconnectuserimpulse;
 extern qboolean   disconnectuser;
 extern qboolean   mapcfgexec;
 extern qboolean   checkClientIpAddress;
-extern qboolean   votecountnovotes;
 
-extern int    votepasspercent;
-extern int    voteminclients;
-extern int    clientMaxVoteTimeout;
-extern int    clientMaxVotes;
 extern int    numofdisplays;
 extern int    maximpulses;
 
@@ -861,15 +803,12 @@ extern qboolean   say_group_enable;
 extern qboolean   extendedsay_enable;
 extern qboolean   spawnentities_enable;
 extern qboolean   spawnentities_internal_enable;
-extern qboolean   vote_enable;
 extern qboolean   consolechat_disable;
 extern qboolean   gamemaptomap;
 extern qboolean   banOnConnect;
 extern qboolean   lockDownServer;
 extern qboolean   serverinfoenable;
 
-extern int    clientVoteTimeout;
-extern int    clientRemindTimeout;
 extern int    randomwaitreporttime;
 extern int    proxy_bwproxy;
 extern int    proxy_nitro2;
@@ -879,7 +818,6 @@ extern int    maxMsgLevel;
 extern char    *zbotversion;
 extern char    zbotmotd[256];
 extern char    motd[4096];
-extern char    clientVoteCommand[256];
 
 extern int    maxrateallowed;
 extern int    minrateallowed;
@@ -919,46 +857,14 @@ extern char    customClientCmd[256];
 extern char    customClientCmdConnect[256];
 extern char    customServerCmdConnect[256];
 
-//r1ch 2005-01-27 insecure lrcon fix BEGIN
-extern qboolean	rcon_insecure;
-//r1ch 2005-01-27 insecure lrcon fix END
-
-extern qboolean   rcon_random_password;
 extern qboolean   zbc_enable;
-extern qboolean   nameChangeFloodProtect;
-extern qboolean   skinChangeFloodProtect;
 
-extern char    nameChangeFloodProtectMsg[256];
-extern char    skinChangeFloodProtectMsg[256];
-extern char    chatFloodProtectMsg[256];
-
-extern int    maxlrcon_cmds;
-extern int    lrcon_timeout;
 extern int    logfilecheckcount;
-extern int    nameChangeFloodProtectNum;
-extern int    nameChangeFloodProtectSec;
-extern int    nameChangeFloodProtectSilence;
-extern int    skinChangeFloodProtectNum;
-extern int    skinChangeFloodProtectSec;
-extern int    skinChangeFloodProtectSilence;
 
-extern struct   chatflood_s floodinfo;
-
-extern baninfo_t  *banhead;
-extern chatbaninfo_t *cbanhead;
-
-extern qboolean   IPBanning_Enable;
-extern qboolean   NickBanning_Enable;
-extern qboolean   ChatBanning_Enable;
-extern qboolean   kickOnNameChange;
 extern qboolean   disablecmds_enable;
 extern qboolean   checkvarcmds_enable;
 extern qboolean   swap_attack_use;
 extern qboolean   timescaledetect;
-
-extern char    defaultBanMsg[256];
-extern char    defaultChatBanMsg[256];
-extern char    *currentBanMsg;
 
 extern proxyinfo_t   *proxyinfo;
 extern proxyinfo_t   *proxyinfoBase;
@@ -972,7 +878,6 @@ extern int    lframenum;
 extern float   ltime;
 
 extern char    *impulsemessages[];
-extern char    cmdpassedvote[2048];
 extern char    cl_pitchspeed_kickmsg[256];
 extern char    cl_anglespeedkey_kickmsg[256];
 
@@ -1138,37 +1043,6 @@ qboolean getLogicalValue(char *arg);
 int   getLastLine(char *buffer, FILE *dumpfile, long *fpos);
 void  q_strupr(char *c);
 
-// zb_ban.c
-void  banRun(int startarg, edict_t *ent, int client);
-void  reloadbanfileRun(int startarg, edict_t *ent, int client);
-void  reloadexceptionlistRun(int startarg, edict_t *ent, int client);
-void  reloadhashlistRun(int startarg, edict_t *ent, int client);
-void  loadexceptionlist(void);
-void  loadhashlist(void);
-void  readBanLists(void);
-int   checkCheckIfBanned(edict_t *ent, int client);
-void  listbansRun(int startarg, edict_t *ent, int client);
-void  displayNextBan(edict_t *ent, int client, long bannum);
-void  delbanRun(int startarg, edict_t *ent, int client);
-void  chatbanRun(int startarg, edict_t *ent, int client);
-int   checkCheckIfChatBanned(char *txt);
-void  listchatbansRun(int startarg, edict_t *ent, int client);
-void  displayNextChatBan(edict_t *ent, int client, long chatbannum);
-void  delchatbanRun(int startarg, edict_t *ent, int client);
-void  freeBanLists(void);
-
-// zb_lrcon.c
-void  readLRconLists(void);
-void  reloadlrconfileRun(int startarg, edict_t *ent, int client);
-void  run_lrcon(edict_t *ent, int client);
-void  listlrconsRun(int startarg, edict_t *ent, int client);
-void  displayNextLRCon(edict_t *ent, int client, long lrconnum);
-void  lrconRun(int startarg, edict_t *ent, int client);
-void  lrconDelRun(int startarg, edict_t *ent, int client);
-void  freeLRconLists(void);
-void  lrcon_reset_rcon_password(int, edict_t *, int);
-void  check_lrcon_password(void);
-
 // zb_init.c
 void  InitGame (void);
 void  SpawnEntities (char *mapname, char *entities, char *spawnpoint);
@@ -1209,26 +1083,6 @@ void  displayLogFileListCont(edict_t *ent, int client, long logfilenum);
 void  logeventRun(int startarg, edict_t *ent, int client);
 void  displayLogEventListCont(edict_t *ent, int client, long logevent, qboolean onetimeonly);
 
-// zb_flood.c
-void  freeFloodLists(void);
-void  readFloodLists(void);
-void  reloadFloodFileRun(int startarg, edict_t *ent, int client);
-void  nameChangeFloodProtectInit(char *arg);
-void  nameChangeFloodProtectRun(int startarg, edict_t *ent, int client);
-void  chatFloodProtectInit(char *arg);
-void  chatFloodProtectRun(int startarg, edict_t *ent, int client);
-void  muteRun(int startarg, edict_t *ent, int client);
-void  clientchatfloodprotectRun(int startarg, edict_t *ent, int client);
-qboolean checkForMute(int client, edict_t *ent, qboolean displayMsg);
-qboolean checkForFlood(int client);
-qboolean checkforfloodcmds(char *cp);
-void  listfloodsRun(int startarg, edict_t *ent, int client);
-void  displayNextFlood(edict_t *ent, int client, long floodcmd);
-void  floodcmdRun(int startarg, edict_t *ent, int client);
-void  floodDelRun(int startarg, edict_t *ent, int client);
-void  skinChangeFloodProtectInit(char *arg);
-void  skinChangeFloodProtectRun(int startarg, edict_t *ent, int client);
-
 // zb_spawn.c
 qboolean ReadSpawnFile(char *spawnname, qboolean onelevelflag);
 qboolean checkDisabledEntities(char *classname);
@@ -1242,18 +1096,6 @@ void  spawncmdRun(int startarg, edict_t *ent, int client);
 void  spawnDelRun(int startarg, edict_t *ent, int client);
 void  linkentity_internal(edict_t *ent);
 void  unlinkentity_internal(edict_t *ent);
-
-// zb_vote.c
-void  freeVoteLists(void);
-void  readVoteLists(void);
-void  reloadVoteFileRun(int startarg, edict_t *ent, int client);
-void  listvotesRun(int startarg, edict_t *ent, int client);
-void  displayNextVote(edict_t *ent, int client, long floodcmd);
-void  votecmdRun(int startarg, edict_t *ent, int client);
-void  voteDelRun(int startarg, edict_t *ent, int client);
-qboolean checkVoteCommand(char *votecmd);
-void  run_vote(edict_t *ent, int client);
-void  checkOnVoting(void);
 
 // zb_zbotcheck.c
 qboolean zbc_ZbotCheck(int client, usercmd_t *ucmd);

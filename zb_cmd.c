@@ -151,46 +151,6 @@ zbotcmd_t zbotCommands[] =
 			adminpassword
 		},
 		{
-			"ban",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			banRun
-		},
-		{
-			"banonconnect",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_LOGICAL,
-			&banOnConnect
-		},
-		{
-			"chatban",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			chatbanRun
-		},
-		{
-			"chatbanning_enable",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_LOGICAL,
-			&ChatBanning_Enable
-		},
-		{
-			"chatfloodprotect",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			chatFloodProtectRun,
-			chatFloodProtectInit
-		},
-		{
-			"chatfloodprotectmsg",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_STRING,
-			chatFloodProtectMsg
-		},
-		{
 			"checkclientipaddress",
 			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
 			CMDTYPE_LOGICAL,
@@ -230,37 +190,12 @@ zbotcmd_t zbotCommands[] =
 			clearlogfileRun
 		},
 		{
-			"clientchatfloodprotect",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			clientchatfloodprotectRun
-		},
-		{
-			"clientremindtimeout",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NUMBER,
-			&clientRemindTimeout,
-		},
-		{
 			"clientsidetimeout",
 			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
 			CMDTYPE_NUMBER,
 			&clientsidetimeout,
 			clientsidetimeoutRun,
 			clientsidetimeoutInit,
-		},
-		{
-			"clientvotecommand",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_STRING,
-			clientVoteCommand
-		},
-		{
-			"clientvotetimeout",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NUMBER,
-			&clientVoteTimeout,
 		},
 		{
 			"cl_anglespeedkey_display",
@@ -350,36 +285,10 @@ zbotcmd_t zbotCommands[] =
 			cvarsetRun
 		},
 		{
-			"defaultbanmsg",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_STRING,
-			defaultBanMsg
-		},
-		{
-			"defaultchatbanmsg",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_STRING,
-			defaultChatBanMsg
-		},
-		{
 			"defaultreconnectmessage",
 			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
 			CMDTYPE_STRING,
 			defaultreconnectmessage
-		},
-		{
-			"delban",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			delbanRun
-		},
-		{
-			"delchatban",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			delchatbanRun
 		},
 		{
 			"disablecmd",
@@ -463,20 +372,6 @@ zbotcmd_t zbotCommands[] =
 			&filternonprintabletext
 		},
 		{
-			"floodcmd",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			floodcmdRun
-		},
-		{
-			"flooddel",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			floodDelRun
-		},
-		{
 			"framesperprocess",
 			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
 			CMDTYPE_NUMBER,
@@ -510,37 +405,11 @@ zbotcmd_t zbotCommands[] =
 			ipRun
 		},
 		{
-			"ipbanning_enable",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_LOGICAL,
-			&IPBanning_Enable
-		},
-		{
 			"kick",
 			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
 			CMDTYPE_NONE,
 			NULL,
 			kickRun
-		},
-		{
-			"kickonnamechange",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_LOGICAL,
-			&kickOnNameChange
-		},
-		{
-			"listbans",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			listbansRun
-		},
-		{
-			"listchatbans",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			listchatbansRun
 		},
 		{
 			"listcheckvar",
@@ -555,34 +424,6 @@ zbotcmd_t zbotCommands[] =
 			CMDTYPE_NONE,
 			NULL,
 			listdisablesRun
-		},
-		{
-			"listfloods",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			listfloodsRun
-		},
-		{
-			"listlrcons",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			listlrconsRun
-		},
-		{
-			"listspawns",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			listspawnsRun
-		},
-		{
-			"listvotes",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			listvotesRun
 		},
 		{
 			"lock",
@@ -610,26 +451,6 @@ zbotcmd_t zbotCommands[] =
 			CMDTYPE_NONE,
 			NULL,
 			logfileRun
-		},
-		{
-			"lrcon_timeout",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NUMBER,
-			&lrcon_timeout
-		},
-		{
-			"lrcon",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			lrconRun
-		},
-		{
-			"lrcondel",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			lrconDelRun
 		},
 		{
 			"mapcfgexec",
@@ -684,33 +505,6 @@ zbotcmd_t zbotCommands[] =
 			CMDTYPE_NUMBER,
 			&minrateallowed,
 			minrateallowedRun
-		},
-		{
-			"mute",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			muteRun
-		},
-		{
-			"namechangefloodprotect",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_STRING,
-			NULL,
-			nameChangeFloodProtectRun,
-			nameChangeFloodProtectInit
-		},
-		{
-			"namechangefloodprotectmsg",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_STRING,
-			nameChangeFloodProtectMsg
-		},
-		{
-			"nickbanning_enable",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_LOGICAL,
-			&NickBanning_Enable
 		},
 		{
 			"numofdisplays",
@@ -776,20 +570,6 @@ zbotcmd_t zbotCommands[] =
 			&randomwaitreporttime
 		},
 		{
-			"rcon_random_password",
-			CMDWHERE_CFGFILE,
-			CMDTYPE_LOGICAL,
-			&rcon_random_password
-		},
-//r1ch 2005-01-27 insecure lrcon fix BEGIN
-		{
-			"rcon_insecure",
-			CMDWHERE_CFGFILE,
-			CMDTYPE_LOGICAL,
-			&rcon_insecure
-		},
-//r1ch 2005-01-27 insecure lrcon fix END
-		{
 			"reconnect_address",
 			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
 			CMDTYPE_STRING,
@@ -808,36 +588,6 @@ zbotcmd_t zbotCommands[] =
 			&reconnect_time
 		},
 		{
-			"reloadbanfile",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			reloadbanfileRun,
-		},
-//MDVz0r 9apr2007 exceptionlist addition
-		{
-			"reloadexceptionlist",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			reloadexceptionlistRun,
-		},
-		{
-                        "reloadanticheatlist",
-                        CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-                        CMDTYPE_NONE,
-                        NULL,
-                        reloadexceptionlistRun,
-                },
-//MDVz0r 28jan2008 hashlist addition
-		{
-                        "reloadhashlist",
-                        CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-                        CMDTYPE_NONE,
-                        NULL,
-                        reloadhashlistRun,
-                },
-		{
 			"reloadcheckvarfile",
 			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
 			CMDTYPE_NONE,
@@ -850,41 +600,6 @@ zbotcmd_t zbotCommands[] =
 			CMDTYPE_NONE,
 			NULL,
 			reloadDisableFileRun,
-		},
-		{
-			"reloadfloodfile",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			reloadFloodFileRun,
-		},
-		{
-			"reloadlrconfile",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			reloadlrconfileRun,
-		},
-		{
-			"reloadspawnfile",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			reloadSpawnFileRun,
-		},
-		{
-			"reloadvotefile",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			reloadVoteFileRun,
-		},
-		{
-			"resetrcon",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			lrcon_reset_rcon_password,
 		},
 		{
 			"say_group",
@@ -933,20 +648,6 @@ zbotcmd_t zbotCommands[] =
 			zbotmotdRun,
 		},
 		{
-			"skinchangefloodprotect",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_STRING,
-			NULL,
-			skinChangeFloodProtectRun,
-			skinChangeFloodProtectInit
-		},
-		{
-			"skinchangefloodprotectmsg",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_STRING,
-			skinChangeFloodProtectMsg
-		},
-		{
 			"skincrashmsg",
 			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
 			CMDTYPE_STRING,
@@ -957,32 +658,6 @@ zbotcmd_t zbotCommands[] =
 			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
 			CMDTYPE_LOGICAL,
 			&soloadlazy
-		},
-		{
-			"spawncmd",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			spawncmdRun
-		},
-		{
-			"spawndel",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			spawnDelRun
-		},
-		{
-			"spawnentities_enable",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_LOGICAL,
-			&spawnentities_enable
-		},
-		{
-			"spawnentities_internal_enable",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_LOGICAL,
-			&spawnentities_internal_enable
 		},
 		{
 			"stuff",
@@ -1015,56 +690,6 @@ zbotcmd_t zbotCommands[] =
 			CMDTYPE_NONE,
 			NULL,
 			zbotversionRun
-		},
-		{
-			"votecmd",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			votecmdRun
-		},
-		{
-			"voteclientmaxvotes",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NUMBER,
-			&clientMaxVotes
-		},
-		{
-			"voteclientmaxvotetimeout",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NUMBER,
-			&clientMaxVoteTimeout
-		},
-		{
-			"votecountnovotes",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_LOGICAL,
-			&votecountnovotes
-		},
-		{
-			"votedel",
-			CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NONE,
-			NULL,
-			voteDelRun
-		},
-		{
-			"voteminclients",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NUMBER,
-			&voteminclients
-		},
-		{
-			"votepasspercent",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_NUMBER,
-			&votepasspercent
-		},
-		{
-			"vote_enable",
-			CMDWHERE_CFGFILE | CMDWHERE_CLIENTCONSOLE | CMDWHERE_SERVERCONSOLE,
-			CMDTYPE_LOGICAL,
-			&vote_enable
 		},
 		{
 			"zbc_enable",
@@ -1390,14 +1015,6 @@ void dprintf_internal(char *fmt, ...)
 		}
 		
 	gi.dprintf("%s", cbuffer);
-	
-	if(clienti != -1 && (floodinfo.chatFloodProtect || proxyinfo[clienti].floodinfo.chatFloodProtect))
-		{
-			if(checkForFlood(clienti))
-				{
-					return;
-				}
-		}
 }
 
 
@@ -1429,14 +1046,6 @@ void cprintf_internal(edict_t *ent, int printlevel, char *fmt, ...)
 			return;
 		}
 		
-	/*
-	// check for banned chat words
-	if(printlevel == PRINT_CHAT && checkCheckIfChatBanned(cbuffer))
-	{
-	logEvent(LT_CHATBAN, getEntOffset(ent) - 1, ent, cbuffer, 0);
-	return;
-	}
-	*/
 	
 	if(q2a_strcmp(mutedText, cbuffer)== 0)
 		{
@@ -1507,13 +1116,6 @@ void cprintf_internal(edict_t *ent, int printlevel, char *fmt, ...)
 		
 	gi.cprintf(ent, printlevel,"%s", cbuffer);
 	
-	if(printlevel== PRINT_CHAT && clienti!=-1 && ent == NULL &&(floodinfo.chatFloodProtect|| proxyinfo[clienti].floodinfo.chatFloodProtect))
-		{
-			if(checkForFlood(clienti))
-				{
-					return;
-				}
-		}
 }
 
 
@@ -1595,16 +1197,7 @@ void bprintf_internal(int printlevel, char *fmt,...)
 		
 	gi.bprintf(printlevel, "%s", cbuffer);
 	
-	if(printlevel == PRINT_CHAT && clienti != -1 && (floodinfo.chatFloodProtect || proxyinfo[clienti].floodinfo.chatFloodProtect))
-		{
-			if(checkForFlood(clienti))
-				{
-					return;
-				}
-		}
 }
-
-
 
 
 void AddCommandString_internal(char *text)
@@ -2261,15 +1854,6 @@ qboolean sayPersonCmd(edict_t *ent, int client, char *args)
 					text[2000] = 0;
 				}
 				
-			// check for banned chat words
-			if(checkCheckIfChatBanned(text))
-				{
-					gi.cprintf(NULL, PRINT_HIGH, "%s: %s\n", proxyinfo[client].name, currentBanMsg);
-					gi.cprintf(ent, PRINT_HIGH, "%s\n", currentBanMsg);
-					logEvent(LT_CHATBAN, getEntOffset(ent) - 1, ent, text, 0, 0.0);
-					return FALSE;
-				}
-				
 			sprintf(tmptext, "(%s)(private message to: %s) %s\n", proxyinfo[client].name, proxyinfo[clienti].name, text);
 			cprintf_internal(NULL, PRINT_CHAT, "%s", tmptext);
 			cprintf_internal(ent, PRINT_CHAT, "%s", tmptext);
@@ -2303,14 +1887,6 @@ qboolean sayGroupCmd(edict_t *ent, int client, char *args)
 					text[2000] = 0;
 				}
 				
-			// check for banned chat words
-			if(checkCheckIfChatBanned(text))
-				{
-					gi.cprintf(NULL, PRINT_HIGH, "%s: %s\n", proxyinfo[client].name, currentBanMsg);
-					gi.cprintf(ent, PRINT_HIGH, "%s\n", currentBanMsg);
-					logEvent(LT_CHATBAN, getEntOffset(ent) - 1, ent, text, 0, 0.0);
-					return FALSE;
-				}
 				
 			for(clienti = 0; clienti < maxclients->value; clienti++)
 				{
@@ -3162,15 +2738,6 @@ qboolean doClientCommand(edict_t *ent, int client, qboolean *checkforfloodafter)
 						//r1ch 2005-01-26 disable hugely buggy commands BEGIN
 				}
 		}
-	else if(checkforfloodcmds(cmd))
-		{
-			if(checkForMute(client, ent, TRUE))
-				{
-					return FALSE;
-				}
-				
-			*checkforfloodafter = TRUE;
-		}
 		
 		
 //	if(adminpassword[0] && proxyinfo[client].admin && cmd[0] == '!')
@@ -3403,16 +2970,6 @@ qboolean doClientCommand(edict_t *ent, int client, qboolean *checkforfloodafter)
 				
 			return FALSE;
 		}
-	else if(maxlrcon_cmds && rconpassword->string[0] && Q_stricmp(cmd, "lrcon") == 0)
-		{
-			run_lrcon(ent, client);
-			return FALSE;
-		}
-	else if(vote_enable && Q_stricmp(cmd, clientVoteCommand) == 0)
-		{
-			run_vote(ent, client);
-			return FALSE;
-		}
 
 //*** UPDATE START ***
 	else if(Q_stricmp (cmd, "showfps")==0)
@@ -3449,15 +3006,6 @@ qboolean doClientCommand(edict_t *ent, int client, qboolean *checkforfloodafter)
 	else if(zbotmotd[0] && Q_stricmp(cmd, "motd") == 0)
 		{
 			gi.centerprintf(ent, motd);
-			return FALSE;
-		}
-		
-	// check for banned chat words
-	if(checkCheckIfChatBanned(proxyinfo[client].lastcmd))
-		{
-			gi.cprintf(NULL, PRINT_HIGH, "%s: %s\n", proxyinfo[client].name, currentBanMsg);
-			gi.cprintf(ent, PRINT_HIGH, "%s\n", currentBanMsg);
-			logEvent(LT_CHATBAN, getEntOffset(ent) - 1, ent, proxyinfo[client].lastcmd, 0, 0.0);
 			return FALSE;
 		}
 		
@@ -3515,10 +3063,6 @@ void ClientCommand (edict_t *ent)
 				}
 		}
 		
-	if(checkforfloodafter)
-		{
-			checkForFlood(client);
-		}
 	lastClientCmd = -1;
 	
 	STOPPERFORMANCE(1, "q2admin->ClientCommand", 0, NULL);

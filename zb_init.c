@@ -32,7 +32,7 @@ game_import_t  gi;
 game_export_t  globals;
 game_export_t  *dllglobals;
 
-cvar_t  *rcon_password, *gamedir, *maxclients, *logfile, *rconpassword, *port, *serverbindip, *q2admintxt, *q2adminbantxt, *q2adminbanremotetxt, *q2adminbanremotetxt_enable, *q2adminanticheat_enable, *q2adminanticheat_file, *q2adminhashlist_enable, *q2adminhashlist_dir;	// UPDATE
+cvar_t  *rcon_password, *gamedir, *maxclients, *logfile, *rconpassword, *port, *serverbindip, *q2admintxt;	// UPDATE
 
 qboolean quake2dirsupport = TRUE;
 
@@ -67,26 +67,6 @@ qboolean zbotdetect = TRUE;
 qboolean mapcfgexec = FALSE;
 qboolean checkClientIpAddress = TRUE;
 
-
-qboolean nameChangeFloodProtect = FALSE;
-int nameChangeFloodProtectNum = 5;
-int nameChangeFloodProtectSec = 2;
-int nameChangeFloodProtectSilence = 10;
-char nameChangeFloodProtectMsg[256];
-
-qboolean skinChangeFloodProtect = FALSE;
-int skinChangeFloodProtectNum = 5;
-int skinChangeFloodProtectSec = 2;
-int skinChangeFloodProtectSilence = 10;
-char skinChangeFloodProtectMsg[256];
-
-struct chatflood_s  floodinfo =
-		{
-			FALSE, 5, 2, 10
-		};
-char chatFloodProtectMsg[256];
-
-
 qboolean disconnectuser = TRUE;
 qboolean displayzbotuser = TRUE;
 int numofdisplays = 4;
@@ -114,15 +94,12 @@ qboolean say_group_enable = FALSE;
 qboolean extendedsay_enable = FALSE;
 qboolean spawnentities_enable = FALSE;
 qboolean spawnentities_internal_enable = FALSE;
-qboolean vote_enable = FALSE;
 
 qboolean consolechat_disable = FALSE;
 
 
 qboolean gamemaptomap = FALSE;
 
-
-qboolean banOnConnect = TRUE;
 
 qboolean lockDownServer = FALSE;
 
@@ -152,8 +129,6 @@ char customServerCmd[256];
 char customClientCmd[256];
 char customClientCmdConnect[256];
 char customServerCmdConnect[256];
-
-char clientVoteCommand[256];
 
 char reconnect_address[256] = { 0 };
 int reconnect_time = 60;
@@ -403,7 +378,6 @@ void InitGame (void)
 	
 	logEvent(LT_SERVERINIT, 0, NULL, NULL, 0, 0.0);
 	
-	banhead = NULL;
 	motd[0] = 0;
 	
 	for(i = -1; i < maxclients->value; i++)
@@ -442,7 +416,6 @@ void InitGame (void)
 			proxyinfo[i].admin = 0;
 			proxyinfo[i].clientcommand = 0;
 			proxyinfo[i].stuffFile = 0;
-			proxyinfo[i].floodinfo.chatFloodProtect = FALSE;
 			proxyinfo[i].impulsesgenerated = 0;
 			proxyinfo[i].retries = 0;
 			proxyinfo[i].rbotretries = 0;
@@ -450,8 +423,6 @@ void InitGame (void)
 			proxyinfo[i].teststr[0] = 0;
 			proxyinfo[i].cl_pitchspeed = 0;
 			proxyinfo[i].cl_anglespeedkey = 0.0;
-			proxyinfo[i].votescast = 0;
-			proxyinfo[i].votetimeout = 0;
 			proxyinfo[i].checked_hacked_exe = 0;
 			
 			removeClientCommands(i);
@@ -518,7 +489,6 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 					//proxyinfo[i].inuse = 0;
 					proxyinfo[i].admin = 0;
 					proxyinfo[i].clientcommand = 0;
-					proxyinfo[i].floodinfo.chatFloodProtect = FALSE;
 					proxyinfo[i].stuffFile = 0;
 				}
 			else
@@ -549,17 +519,11 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 			proxyinfo[i].teststr[0] = 0;
 			proxyinfo[i].cl_pitchspeed = 0;
 			proxyinfo[i].cl_anglespeedkey = 0.0;
-			proxyinfo[i].votescast = 0;
-			proxyinfo[i].votetimeout = 0;
 			proxyinfo[i].checked_hacked_exe = 0;
 			removeClientCommands(i);
 		}
 		
 	proxyinfo[-1].inuse = 1;
-	freeBanLists();
-	freeLRconLists();
-	freeFloodLists();
-	freeVoteLists();
 	freeDisableLists();
 
 	motd[0] = 0;
@@ -660,19 +624,8 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 	
 	copyDllInfo();
 	
-	readBanLists();
-	// addition by MDVz0r 9apr2007
-	// download r1ch exception list
-	loadexceptionlist();
-	// addition by MDVz0r 28jan2008
-	loadhashlist();
-	// end of addition by MDVz0r
-	readLRconLists();
-	readFloodLists();
-	readVoteLists();
 	readDisableLists();
 	readCheckVarLists();
-
 	
 	
 	// exec the map cfg file...
@@ -921,15 +874,6 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 		
 	client = getEntOffset(ent) - 1;
 	
-	if(proxyinfo[client].baninfo)
-		{
-			if(proxyinfo[client].baninfo->numberofconnects)
-				{
-					proxyinfo[client].baninfo->numberofconnects--;
-				}
-				
-			proxyinfo[client].baninfo = NULL;
-		}
 		
 //*** UPDATE START ***
 	proxyinfo[client].private_command = 0;
@@ -975,11 +919,8 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 	proxyinfo[client].ipaddressBinary[3] = 0;
 	proxyinfo[client].stuffFile = 0;
 	proxyinfo[client].impulsesgenerated = 0;
-	proxyinfo[client].floodinfo.chatFloodProtect = FALSE;
 	proxyinfo[client].cl_pitchspeed = 0;
 	proxyinfo[client].cl_anglespeedkey = 0.0;
-	proxyinfo[client].votescast = 0;
-	proxyinfo[client].votetimeout = 0;
 	proxyinfo[client].checked_hacked_exe = 0;
 	removeClientCommands(client);
 	
@@ -990,18 +931,8 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 			if(UpdateInternalClientInfo(client, ent, userinfo, &userInfoOverflow))
 				{
 					sprintf(buffer, zbotuserdisplay, proxyinfo[client].name);
-					currentBanMsg = buffer;
-					logEvent(LT_BAN, client, ent, currentBanMsg, 0, 0.0);
 					
-					if(!banOnConnect)
-						{
-							ret = 0;
-						}
-					else
-						{
 							proxyinfo[client].clientcommand |= CCMD_BANNED;
-							q2a_strcpy(proxyinfo[client].buffer, currentBanMsg);
-						}
 				}
 		}
 		
@@ -1042,20 +973,9 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 	
 	if(lockDownServer && checkReconnectList(proxyinfo[client].name))
 		{
-			currentBanMsg = lockoutmsg;
 			
-			logEvent(LT_BAN, client, ent, currentBanMsg, 0, 0.0);
-			gi.cprintf (NULL, PRINT_HIGH, "%s: %s (IP = %s)\n", proxyinfo[client].name, currentBanMsg, proxyinfo[client].ipaddress);
 			
-			if(banOnConnect)
-				{
-					ret = 0;
-				}
-			else
-				{
 					proxyinfo[client].clientcommand |= CCMD_BANNED;
-					q2a_strcpy(proxyinfo[client].buffer, currentBanMsg);
-				}
 		}
 	else if(checkClientIpAddress && proxyinfo[client].ipaddress[0] == 0) // check for invlaid IP's and don't let them in :)
 		{
@@ -1063,30 +983,8 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 			gi.cprintf (NULL, PRINT_HIGH, "%s: %s (%s)\n", proxyinfo[client].name, "Client doesn't have a valid IP address", ip);
 			logEvent(LT_INVALIDIP, client, ent, userinfo, 0, 0.0);
 			
-			if(banOnConnect)
-				{
-					ret = 0;
-				}
-			else
-				{
 					proxyinfo[client].clientcommand |= CCMD_BANNED;
 					q2a_strcpy(proxyinfo[client].buffer, "Client doesn't have a valid IP address");
-				}
-		}
-	else if(checkCheckIfBanned(ent, client))
-		{
-			logEvent(LT_BAN, client, ent, currentBanMsg, 0, 0.0);
-			gi.cprintf (NULL, PRINT_HIGH, "%s: %s (IP = %s)\n", proxyinfo[client].name, currentBanMsg, proxyinfo[client].ipaddress);
-			
-			if(banOnConnect)
-				{
-					ret = 0;
-				}
-			else
-				{
-					proxyinfo[client].clientcommand |= CCMD_BANNED;
-					q2a_strcpy(proxyinfo[client].buffer, currentBanMsg);
-				}
 		}
 	else if(ret && !(proxyinfo[client].clientcommand & CCMD_BANNED))
 		{
@@ -1253,27 +1151,6 @@ qboolean checkForNameChange(int client, edict_t *ent, char *userinfo)
 					return FALSE;
 				}
 				
-			// check for flooding..
-			if(nameChangeFloodProtect)
-				{
-					if(proxyinfo[client].clientcommand & CCMD_NCSILENCE)
-						{
-							if(proxyinfo[client].namechangetimeout < ltime)
-								{
-									proxyinfo[client].clientcommand &= ~CCMD_NCSILENCE;
-								}
-							else
-								{
-									int secleft = (int)(proxyinfo[client].namechangetimeout - ltime) + 1;
-									
-									//          q2a_strcpy(ent->client->pers.netname, proxyinfo[client].name);
-									addCmdQueue(client, QCMD_CHANGENAME, 0, 0, 0);
-									
-									gi.cprintf (ent, PRINT_HIGH, "%d seconds of name change silence left.\n", secleft);
-									return FALSE;
-								}
-						}
-				}
 				
 			q2a_strcpy(oldname, proxyinfo[client].name);
 			q2a_strcpy (proxyinfo[client].name, newname);
@@ -1287,27 +1164,6 @@ qboolean checkForNameChange(int client, edict_t *ent, char *userinfo)
 			}
 //*** UPDATE END ***
 
-			if(checkCheckIfBanned(ent, client))
-				{
-					logEvent(LT_BAN, client, ent, currentBanMsg, 0, 0.0);
-					q2a_strcpy(proxyinfo[client].name, oldname);
-					
-					// display ban msg to user..
-					//      gi.cprintf (ent, PRINT_HIGH, "Can't change name to a banned name\n");
-					gi.cprintf (ent, PRINT_HIGH, "%s\n", currentBanMsg);
-					//      q2a_strcpy(ent->client->pers.netname, proxyinfo[client].name);
-					
-					if(kickOnNameChange)
-						{
-							addCmdQueue(client, QCMD_DISCONNECT, 1, 0, currentBanMsg);
-						}
-					else
-						{
-							addCmdQueue(client, QCMD_CHANGENAME, 0, 0, 0);
-						}
-				}
-			else
-				{
 					logEvent(LT_NAMECHANGE, client, ent, oldname, 0, 0.0);
 					
 					if(displaynamechange)
@@ -1315,37 +1171,6 @@ qboolean checkForNameChange(int client, edict_t *ent, char *userinfo)
 							gi.bprintf (PRINT_HIGH, "%s changed name to %s\n", oldname, proxyinfo[client].name);
 						}
 						
-					if(nameChangeFloodProtect)
-						{
-							if(proxyinfo[client].namechangetimeout < ltime)
-								{
-									proxyinfo[client].namechangetimeout = ltime + nameChangeFloodProtectSec;
-									proxyinfo[client].namechangecount = 0;
-								}
-							else
-								{
-									if(proxyinfo[client].namechangecount >= nameChangeFloodProtectNum)
-										{
-											//            q2a_strcpy(ent->client->pers.netname, proxyinfo[client].name);
-											sprintf(buffer, nameChangeFloodProtectMsg, proxyinfo[client].name);
-											gi.bprintf (PRINT_HIGH, "%s\n", buffer);
-											
-											if(nameChangeFloodProtectSilence == 0)
-												{
-													addCmdQueue(client, QCMD_DISCONNECT, 0, 0, nameChangeFloodProtectMsg);
-												}
-											else
-												{
-													proxyinfo[client].namechangetimeout = ltime + nameChangeFloodProtectSilence;
-													proxyinfo[client].clientcommand |= CCMD_NCSILENCE;
-												}
-											return FALSE;
-										}
-										
-									proxyinfo[client].namechangecount++;
-								}
-						}
-				}
 		}
 		
 	return TRUE;
@@ -1369,62 +1194,12 @@ qboolean checkForSkinChange(int client, edict_t *ent, char *userinfo)
 		}
 	else if(q2a_strcmp(proxyinfo[client].skin, newskin) != 0)
 		{
-			// check for flooding..
-			if(skinChangeFloodProtect)
-				{
-					if(proxyinfo[client].clientcommand & CCMD_SCSILENCE)
-						{
-							if(proxyinfo[client].skinchangetimeout < ltime)
-								{
-									proxyinfo[client].clientcommand &= ~CCMD_SCSILENCE;
-								}
-							else
-								{
-									int secleft = (int)(proxyinfo[client].skinchangetimeout - ltime) + 1;
-									
-									//          q2a_strcpy(ent->client->pers.netskin, proxyinfo[client].skin);
-									addCmdQueue(client, QCMD_CHANGESKIN, 0, 0, 0);
-									
-									gi.cprintf (ent, PRINT_HIGH, "%d seconds of skin change silence left.\n", secleft);
-									return FALSE;
-								}
-						}
-				}
 				
 			q2a_strcpy(oldskin, proxyinfo[client].skin);
 			q2a_strcpy (proxyinfo[client].skin, newskin);
 			
 			logEvent(LT_SKINCHANGE, client, ent, oldskin, 0, 0.0);
 			
-			if(skinChangeFloodProtect)
-				{
-					if(proxyinfo[client].skinchangetimeout < ltime)
-						{
-							proxyinfo[client].skinchangetimeout = ltime + skinChangeFloodProtectSec;
-							proxyinfo[client].skinchangecount = 0;
-						}
-					else
-						{
-							if(proxyinfo[client].skinchangecount >= skinChangeFloodProtectNum)
-								{
-									sprintf(buffer, skinChangeFloodProtectMsg, proxyinfo[client].name);
-									gi.bprintf (PRINT_HIGH, "%s\n", buffer);
-									
-									if(skinChangeFloodProtectSilence == 0)
-										{
-											addCmdQueue(client, QCMD_DISCONNECT, 0, 0, skinChangeFloodProtectMsg);
-										}
-									else
-										{
-											proxyinfo[client].skinchangetimeout = ltime + skinChangeFloodProtectSilence;
-											proxyinfo[client].clientcommand |= CCMD_SCSILENCE;
-										}
-									return FALSE;
-								}
-								
-							proxyinfo[client].skinchangecount++;
-						}
-				}
 		}
 		
 	skinname = Info_ValueForKey (userinfo, "skin");
@@ -1501,18 +1276,9 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 	if (proxyinfo[client].userinfo_changed_count>USERINFOCHANGE_COUNT)
 	{
 		temp = ltime - proxyinfo[client].userinfo_changed_start;
-		if (temp<USERINFOCHANGE_TIME)
-		{
-			gi.bprintf (PRINT_HIGH, "%s tried to flood the server (2)\n", proxyinfo[client].name);
-			sprintf(tmptext, "kick %d\n", client);
-			gi.AddCommandString(tmptext);
-		}
-		else
-		{
 			//enuf time passed, reset count
 			proxyinfo[client].userinfo_changed_count = 0;
 			proxyinfo[client].userinfo_changed_start = ltime;
-		}
 	}
 
 	// 1.32e - 1.32e1 change
@@ -1796,14 +1562,6 @@ void ClientDisconnect (edict_t *ent)
 		
 	logEvent(LT_CLIENTDISCONNECT, client, ent, NULL, 0, 0.0);
 	
-	if(proxyinfo[client].baninfo)
-		{
-			if(proxyinfo[client].baninfo->numberofconnects)
-				{
-					proxyinfo[client].baninfo->numberofconnects--;
-				}
-			proxyinfo[client].baninfo = NULL;
-		}
 		
 	if(proxyinfo[client].stuffFile)
 		{
@@ -1821,9 +1579,6 @@ void ClientDisconnect (edict_t *ent)
 	proxyinfo[client].skin[0] = 0;
 	proxyinfo[client].stuffFile = 0;
 	proxyinfo[client].impulsesgenerated = 0;
-	proxyinfo[client].floodinfo.chatFloodProtect = FALSE;
-	proxyinfo[client].votescast = 0;
-	proxyinfo[client].votetimeout = 0;
 	proxyinfo[client].checked_hacked_exe = 0;
 	removeClientCommands(client);
 
@@ -1960,8 +1715,6 @@ void ClientBegin (edict_t *ent)
 	proxyinfo[client].charindex = 0;
 	proxyinfo[client].teststr[0] = 0;
 	proxyinfo[client].impulsesgenerated = 0;
-	proxyinfo[client].votescast = 0;
-	proxyinfo[client].votetimeout = 0;
 	proxyinfo[client].checked_hacked_exe = 0;
 
 //*** UPDATE START ***

@@ -35,6 +35,8 @@ int num_admins = 0;
 int num_q2a_admins = 0;
 //*** UPDATE END ***
 
+int entity_classname_offset = (sizeof(struct edict_s)) + 20;  // default byte offset to the classname variable.
+
 int clientsidetimeout = 30;  // 30 seconds should be good for internet play
 int zbotdetectactivetimeout = 0;  // -1 == random
 
@@ -498,8 +500,6 @@ void G_RunFrame(void)
 			serverinfoenable = 0;
 		}
 		
-	// check if a lrcon password has timed out
-	check_lrcon_password();
 	
 	if(maxReconnectList)
 		{
@@ -1350,10 +1350,6 @@ void G_RunFrame(void)
 					}
 				}
 //*** UPDATE END ***							
-				else if(command == QCMD_RUNVOTECMD)
-				{
-					gi.AddCommandString(cmdpassedvote);
-				}
 				else if(command == QCMD_TESTTIMESCALE)
 				{
 					if(timescaledetect)
@@ -1411,8 +1407,6 @@ void G_RunFrame(void)
 	{
 		client = -1;
 	}
-
-	checkOnVoting();
 
 	STARTPERFORMANCE(2);
 	dllglobals->RunFrame();
@@ -2308,3 +2302,28 @@ void timer_action(int client,edict_t *ent)
 	}
 }
 //*** UPDATE END ***
+void linkentity_internal(edict_t *ent)
+{
+	if(spawnentities_internal_enable && spawnentities_enable)
+		{
+			if(checkDisabledEntities(*((char **)((unsigned long)ent + entity_classname_offset))))
+				{
+					char **classnameptr = ((char **)((unsigned long)ent + entity_classname_offset));
+					
+					*classnameptr = NULL;
+					ent->inuse = FALSE;
+					return;
+				}
+		}
+		
+	logEvent(LT_ENTITYCREATE, 0, NULL, *((char **)((unsigned long)ent + entity_classname_offset)), 0, 0.0);
+	
+	gi.linkentity(ent);
+}
+
+void unlinkentity_internal(edict_t *ent)
+{
+	logEvent(LT_ENTITYDELETE, 0, NULL, *((char **)((unsigned long)ent + entity_classname_offset)), 0, 0.0);
+	
+	gi.unlinkentity(ent);
+}

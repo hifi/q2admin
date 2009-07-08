@@ -93,7 +93,6 @@ void ShutdownGame (void)
 		}
 		
 	// reset the password just in case something has gone wrong...
-	lrcon_reset_rcon_password(0, 0, 0);
 	dllglobals->Shutdown();
 	
 	if(q2adminrunmode)
@@ -166,13 +165,6 @@ game_export_t *GetGameAPI(game_import_t *import)
 	port = gi.cvar("port", "", 0);
 	rcon_password = gi.cvar("rcon_password", "", 0) ; // UPDATE
 	q2admintxt = gi.cvar("q2admintxt", "", 0);
-	q2adminbantxt = gi.cvar("q2adminbantxt", "", 0);
-	q2adminbanremotetxt_enable = gi.cvar("q2adminbanremotetxt_enable", "", 0); // addition by MDVz0r 9apr2007
-	q2adminbanremotetxt = gi.cvar("q2adminbanremotetxt_file", "", 0); // addition by MDVz0r 9apr2007
-	q2adminanticheat_enable = gi.cvar("q2adminanticheat_enable", "", 0); // addition by MDVz0r 9apr2007
-	q2adminanticheat_file = gi.cvar("q2adminanticheat_file", "", 0); // addition by MDVz0r 9apr2007
-	q2adminhashlist_enable = gi.cvar("q2adminhashlist_enable", "", 0); // addition by MDVz0r 28jan2008
-	q2adminhashlist_dir = gi.cvar("q2adminhashlist_dir", "", 0); // addition by MDVz0r 28jan2008
 
 	gamedir = gi.cvar ("game", "baseq2", 0);
 	q2a_strcpy(moddir, gamedir->string);
@@ -195,12 +187,6 @@ game_export_t *GetGameAPI(game_import_t *import)
 	q2a_strcpy(hackuserdisplay, DEFAULTHACKDISPLAY);
 	q2a_strcpy(skincrashmsg, DEFAULTSKINCRASHMSG);
 	q2a_strcpy(defaultreconnectmessage, DEFAULTRECONNECTMSG);
-	q2a_strcpy(defaultBanMsg, DEFAULTBANMSG);
-	q2a_strcpy(nameChangeFloodProtectMsg, DEFAULTFLOODMSG);
-	q2a_strcpy(skinChangeFloodProtectMsg, DEFAULTSKINFLOODMSG);
-	q2a_strcpy(defaultChatBanMsg, DEFAULTCHABANMSG);
-	q2a_strcpy(chatFloodProtectMsg, DEFAULTCHATFLOODMSG);
-	q2a_strcpy(clientVoteCommand, DEFAULTVOTECOMMAND);
 	q2a_strcpy(cl_pitchspeed_kickmsg, DEFAULTCL_PITCHSPEED_KICKMSG);
 	q2a_strcpy(cl_anglespeedkey_kickmsg, DEFAULTCL_ANGLESPEEDKEY_KICKMSG);
 	q2a_strcpy(lockoutmsg, DEFAULTLOCKOUTMSG);
