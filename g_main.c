@@ -61,9 +61,6 @@ HINSTANCE hdll;
 
 typedef game_export_t  *GAMEAPI (game_import_t *import);
 
-char  zbot_testchar1;
-char  zbot_testchar2;
-
 qboolean soloadlazy;
 
 void ShutdownGame (void)
@@ -136,20 +133,15 @@ game_export_t *GetGameAPI(game_import_t *import)
 	serverbindip = gi.cvar("ip", "", 0);
 	port = gi.cvar("port", "", 0);
 	rcon_password = gi.cvar("rcon_password", "", 0) ; // UPDATE
-	q2admintxt = gi.cvar("q2admintxt", "", 0);
 
 	gamedir = gi.cvar ("game", "baseq2", 0);
 	q2a_strcpy(moddir, gamedir->string);
 	
 	if(moddir[0] == 0)
-		{
-			q2a_strcpy(moddir, "baseq2");
-		}
+		q2a_strcpy(moddir, "baseq2");
 		
 	for (i=0;i<PRIVATE_COMMANDS;i++)
-		{
-			private_commands[i].command[0] = 0;
-		}
+		private_commands[i].command[0] = 0;
 		
 #ifdef __GNUC__
 	loadtype = soloadlazy ? RTLD_LAZY : RTLD_NOW;
@@ -157,51 +149,41 @@ game_export_t *GetGameAPI(game_import_t *import)
 	hdll = dlopen(dllname, loadtype);
 #elif defined(WIN32)
 	if(quake2dirsupport)
-		{
-			sprintf(dllname, "%s/%s", moddir, DLLNAME);
-		}
+		sprintf(dllname, "%s/%s", moddir, DLLNAME);
 	else
-		{
-			sprintf(dllname, "%s/%s", moddir, DLLNAMEMODDIR);
-		}
+		sprintf(dllname, "%s/%s", moddir, DLLNAMEMODDIR);
 	
 	hdll = LoadLibrary(dllname);
 #endif
 	
 	if(hdll == NULL)
-		{
-			// try the baseq2 directory...
-			sprintf(dllname, "baseq2/%s", DLLNAME);
-			
+	{
+		// try the baseq2 directory...
+		sprintf(dllname, "baseq2/%s", DLLNAME);
+		
 #ifdef __GNUC__
-			hdll = dlopen(dllname, loadtype);
+		hdll = dlopen(dllname, loadtype);
 #elif defined(WIN32)
-			hdll = LoadLibrary(dllname);
+		hdll = LoadLibrary(dllname);
 #endif
-			
+		
 #ifdef __GNUC__
+		sprintf(dllname, "%s/%s", moddir, DLLNAME);
+#elif defined(WIN32)
+		if(quake2dirsupport)
 			sprintf(dllname, "%s/%s", moddir, DLLNAME);
-#elif defined(WIN32)
-			if(quake2dirsupport)
-				{
-					sprintf(dllname, "%s/%s", moddir, DLLNAME);
-				}
-			else
-				{
-					sprintf(dllname, "%s/%s", moddir, DLLNAMEMODDIR);
-				}
+		else
+			sprintf(dllname, "%s/%s", moddir, DLLNAMEMODDIR);
 #endif
-			
-			if(hdll == NULL)
-				{
-					gi.dprintf ("Unable to load DLL %s.\n", dllname);
-					return &globals;
-				}
-			else
-				{
-					gi.dprintf ("Unable to load DLL %s, loading baseq2 DLL.\n", dllname);
-				}
+		
+		if(hdll == NULL)
+		{
+			gi.dprintf ("Unable to load DLL %s.\n", dllname);
+			return &globals;
+		} else {
+			gi.dprintf ("Unable to load DLL %s, loading baseq2 DLL.\n", dllname);
 		}
+	}
 		
 #ifdef __GNUC__
 	getapi = (GAMEAPI *)dlsym(hdll, "GetGameAPI");
@@ -210,16 +192,16 @@ game_export_t *GetGameAPI(game_import_t *import)
 #endif
 	
 	if(getapi == NULL)
-		{
+	{
 #ifdef __GNUC__
-			dlclose(hdll);
+		dlclose(hdll);
 #elif defined(WIN32)
-			FreeLibrary(hdll);
+		FreeLibrary(hdll);
 #endif
-			
-			gi.dprintf ("No \"GetGameApi\" entry in DLL %s.\n", dllname);
-			return &globals;
-		}
+		
+		gi.dprintf ("No \"GetGameApi\" entry in DLL %s.\n", dllname);
+		return &globals;
+	}
 		
 	dllglobals = (*getapi)(import);
 	dllloaded = TRUE;

@@ -697,7 +697,7 @@ zbotcmd_t;
 extern game_import_t gi;
 extern game_export_t globals;
 extern game_export_t *dllglobals;
-extern cvar_t   *rcon_password, *gamedir, *maxclients, *logfile, *rconpassword, *port, *serverbindip, *q2admintxt; // UPDATE
+extern cvar_t   *rcon_password, *gamedir, *maxclients, *logfile, *rconpassword, *port, *serverbindip; // UPDATE
 
 extern char    dllname[256];
 extern char    zbotuserdisplay[256];
@@ -729,7 +729,6 @@ extern qboolean   serverinfoenable;
 extern int    randomwaitreporttime;
 extern int    proxy_bwproxy;
 extern int    proxy_nitro2;
-extern int    q2adminrunmode;
 
 extern char    *zbotversion;
 
