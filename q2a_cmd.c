@@ -104,8 +104,7 @@ void ClientCommand (edict_t *ent)
 	//int client = getEntOffset(ent) - 1;
 	
 	if(!dllloaded) return;
-	
-	
+
 	dllglobals->ClientCommand(ent);
 	copyDllInfo();
 }
@@ -113,7 +112,18 @@ void ClientCommand (edict_t *ent)
 
 void ServerCommand (void)
 {
+	char *cmd;
+
 	if(!dllloaded) return;
+
+	cmd = gi.argv(1);
+
+	if(q2a_strlen(cmd) > 0) {
+		if(cmd[0] == '!') {
+			gi.dprintf("Q2A: Unknown command: %s\n", cmd);
+			return;
+		}
+	}
 		
 	dllglobals->ServerCommand();
 	copyDllInfo();
