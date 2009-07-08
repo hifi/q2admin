@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // q2admin
 //
-// zb_util.c
+// q2a_util.c
 //
 // copyright 2000 Shane Powell
 //

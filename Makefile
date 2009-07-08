@@ -8,7 +8,7 @@ LDFLAGS =
 ORIGDIR=src
 CC=gcc
 
-OBJS = g_main.o zb_cmd.o zb_init.o zb_util.o zb_zbot.o
+OBJS = g_main.o q2a_cmd.o q2a_init.o q2a_util.o q2a_run.o
 
 gamei386.so: $(OBJS)
 	$(CC) -shared -o $@ $(OBJS) $(LDFLAGS)
@@ -32,7 +32,7 @@ $*.h: $(ORIGDIR)/$*.h
 # DO NOT DELETE
 
 g_main.o: g_local.h q_shared.h game.h
-zb_cmd.o: g_local.h q_shared.h game.h
-zb_init.o: g_local.h q_shared.h game.h
-zb_util.o: g_local.h q_shared.h game.h
-zb_zbot.o: g_local.h q_shared.h game.h
+q2a_cmd.o: g_local.h q_shared.h game.h
+q2a_init.o: g_local.h q_shared.h game.h
+q2a_util.o: g_local.h q_shared.h game.h
+q2a_q2aot.o: g_local.h q_shared.h game.h

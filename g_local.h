@@ -416,142 +416,31 @@ struct edict_s
 #define getEntOffset(ent)  (((char *)ent - (char *)globals.edicts) / globals.edict_size)
 #define getEnt(entnum)   (edict_t *)((char *)globals.edicts + (globals.edict_size * entnum))
 
-// where the command can't be run?
-#define CMDWHERE_CFGFILE  0x01
-#define CMDWHERE_CLIENTCONSOLE 0x02
-#define CMDWHERE_SERVERCONSOLE 0x04
-
-// type of command
-#define CMDTYPE_NONE   0
-#define CMDTYPE_LOGICAL   1
-#define CMDTYPE_NUMBER   2
-#define CMDTYPE_STRING   3
-
-typedef void     CMDRUNFUNC(int startarg, edict_t *ent, int client);
-typedef void     CMDINITFUNC(char *arg);
-
-typedef struct
-	{
-		char    *cmdname;
-		byte    cmdwhere;
-		byte    cmdtype;
-		void    *datapoint;
-		CMDRUNFUNC   *runfunc;
-		CMDINITFUNC   *initfunc;
-	}
-	
-zbotcmd_t;
-
 extern game_import_t gi;
 extern game_export_t globals;
 extern game_export_t *dllglobals;
-extern cvar_t   *rcon_password, *gamedir, *maxclients, *logfile, *rconpassword, *port, *serverbindip; // UPDATE
+extern cvar_t   *rcon_password, *gamedir, *maxclients, *port, *serverbindip;
 
 extern char    dllname[256];
-extern char    zbotuserdisplay[256];
-extern char    hackuserdisplay[256];
-extern char    skincrashmsg[256];
-extern char    defaultreconnectmessage[256];
 extern char    moddir[256];
 
 extern qboolean   soloadlazy;
 extern qboolean   dllloaded;
 extern qboolean   quake2dirsupport;
-extern qboolean   displayzbotuser;
-extern qboolean   displaynamechange;
-extern qboolean   dopversion;
-extern qboolean   disconnectuser;
-extern qboolean   mapcfgexec;
-extern qboolean   checkClientIpAddress;
 
-extern int    numofdisplays;
-
-extern qboolean   printmessageonplaycmds;
-extern qboolean   spawnentities_enable;
-extern qboolean   spawnentities_internal_enable;
-extern qboolean   gamemaptomap;
-extern qboolean   banOnConnect;
-extern qboolean   lockDownServer;
-extern qboolean   serverinfoenable;
-
-extern int    randomwaitreporttime;
-extern int    proxy_bwproxy;
-extern int    proxy_nitro2;
-
-extern char    *zbotversion;
-
-extern char    testchars[];
-
-extern int    testcharslength;
-extern int    q2adminrunmode;
-extern int    maxclientsperframe;
-extern int    framesperprocess;
+extern char    *q2a_version;
 
 extern char    buffer[0x10000];
 extern char    buffer2[256];
-extern char    customServerCmd[256];
-extern char    customClientCmd[256];
-extern char    customClientCmdConnect[256];
-extern char    customServerCmdConnect[256];
 
-extern qboolean   zbc_enable;
-
-extern int    logfilecheckcount;
-
-extern qboolean   checkvarcmds_enable;
-extern qboolean   swap_attack_use;
-
-extern int    clientsidetimeout;
 extern int    lframenum;
-
 extern float   ltime;
 
-extern char    cl_pitchspeed_kickmsg[256];
-extern char    cl_anglespeedkey_kickmsg[256];
+extern char    serverip[256];
+extern char    lanip[256];
 
-extern qboolean   cl_pitchspeed_enable;
-extern qboolean   cl_pitchspeed_kick;
-extern qboolean   cl_pitchspeed_display;
-extern qboolean   cl_anglespeedkey_enable;
-extern qboolean   cl_anglespeedkey_kick;
-extern qboolean   cl_anglespeedkey_display;
-extern qboolean   filternonprintabletext;
-
-extern char    lockoutmsg[256];
-extern char    gmapname[MAX_QPATH];
-extern char    reconnect_address[256];
-extern char    serverip[256];   // UPDATE
-extern char    lanip[256];    // UPDATE
-
-extern int    reconnect_time;
-extern int    reconnect_checklevel;
-extern int    entity_classname_offset;
-extern int    checkvar_poll_time;
-
-typedef struct
-	{
-		long    reconnecttimeout;
-		int     retrylistidx;
-		char    userinfo[MAX_INFO_STRING + 45];
-	}
-	
-reconnect_info;
-
-typedef struct
-	{
-		long    retry;
-		char    ip[MAX_INFO_STRING + 45];
-	}
-	
-retrylist_info;
-
-extern reconnect_info* reconnectlist;
-extern retrylist_info* retrylist;
-extern int    maxReconnectList;
-extern int    maxretryList;
-
-#define FALSE   0
-#define TRUE   1
+#define FALSE	0
+#define TRUE	1
 
 #define SKIPBLANK(str) \
 {\
@@ -563,7 +452,6 @@ str++; \
 
 #define itoa(x, y, z)   itoaNotAUnixFunction(z, y, z)
 
-// zb_clib.c
 #define q2a_strcpy   strcpy
 #define q2a_strncpy   strncpy
 #define q2a_strcat   strcat
@@ -580,7 +468,7 @@ str++; \
 #define q2a_memmove   memmove
 #define q2a_memset   memset
 
-// zb_cmd.c
+// q2a_cmd.c
 void  ClientCommand (edict_t *ent);
 void  ServerCommand (void);
 void  dprintf_internal (char *fmt, ...);
@@ -589,7 +477,7 @@ void  bprintf_internal(int printlevel, char *fmt, ...);
 void  AddCommandString_internal(char *text);
 char  *getArgs(void);
 
-// zb_util.c
+// q2a_util.c
 void  stuffcmd(edict_t *e, char *s);
 int   Q_stricmp (char *s1, char *s2);
 char  *Info_ValueForKey (char *s, char *key);
@@ -597,7 +485,7 @@ void  copyDllInfo(void);
 qboolean getLogicalValue(char *arg);
 void  q_strupr(char *c);
 
-// zb_init.c
+// q2a_init.c
 void  InitGame (void);
 void  SpawnEntities (char *mapname, char *entities, char *spawnpoint);
 qboolean ClientConnect (edict_t *ent, char *userinfo);
@@ -609,7 +497,7 @@ void  ReadGame (char *filename);
 void  WriteLevel (char *filename);
 void  ReadLevel (char *filename);
 
-// zb_zbot.c
+// q2a_run.c
 void  ClientThink (edict_t *ent, usercmd_t *ucmd);
 void  G_RunFrame (void);
 

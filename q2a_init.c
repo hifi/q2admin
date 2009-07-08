@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 // q2admin
 //
-// zb_init.c
+// q2a_init.c
 //
 // copyright 2000 Shane Powell
 //
@@ -32,32 +32,15 @@ game_import_t  gi;
 game_export_t  globals;
 game_export_t  *dllglobals;
 
-cvar_t  *rcon_password, *gamedir, *maxclients, *logfile, *rconpassword, *port, *serverbindip;	// UPDATE
+cvar_t  *rcon_password, *gamedir, *maxclients, *port, *serverbindip;
 
 qboolean quake2dirsupport = TRUE;
 
+char *q2a_version = "Q2Admin Version " Q2ADMINVERSION "\n";
 char dllname[256];
-char gmapname[MAX_QPATH];
-
 qboolean dllloaded = FALSE;
 
 char moddir[256];
-
-int randomwaitreporttime = 55;
-
-int maxMsgLevel = 3;
-
-char *zbotversion = "Q2Admin Version " Q2ADMINVERSION "\n";
-qboolean serverinfoenable = TRUE;
-
-char buffer[0x10000];
-char buffer2[256];
-
-int logfilecheckcount;
-
-int lframenum;
-float  ltime;
-
 char  com_token[MAX_TOKEN_CHARS];
 
 /*
@@ -161,7 +144,7 @@ skipwhite:
 
 void InitGame (void)
 {
-	gi.dprintf (zbotversion);
+	gi.dprintf (q2a_version);
 	
 	if(!dllloaded) return;
 	
