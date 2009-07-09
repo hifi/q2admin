@@ -28,21 +28,115 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "g_local.h"
 
-game_import_t  gi;
-game_export_t  globals;
-game_export_t  *dllglobals;
+void InitGame (void)
+{
+	gi.dprintf ("%s running %s\n", q2a_version, moddir);
 
-cvar_t  *rcon_password, *gamedir, *maxclients, *port, *serverbindip;
+	q2a_http_init();
 
-qboolean quake2dirsupport = TRUE;
+	if(!dllloaded) return;
+	
+	// be careful with all functions called from this one (like dprintf_internal) to not use
+	// proxyinfo pointer because it's not initialized yet. -Harven
+	dllglobals->Init();
 
-char *q2a_version = "Q2Admin Version " Q2ADMINVERSION "\n";
-char dllname[256];
-qboolean dllloaded = FALSE;
+	// load Lua library and initialize plugins here?
+	
+	copyDllInfo();
 
-char moddir[256];
+	maxclients = gi.cvar ("maxclients", "4", 0);
+}
+
+
+void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
+{
+	if(!dllloaded) return;
+
+	dllglobals->SpawnEntities(mapname, entities, spawnpoint);
+	copyDllInfo();
+}
+
+qboolean ClientConnect (edict_t *ent, char *userinfo)
+{
+	qboolean ret;
+
+	if(!dllloaded) return FALSE;
+
+	q2a_dump_client(ent);
+
+	ret = dllglobals->ClientConnect(ent, userinfo);
+	copyDllInfo();
+	return ret;
+}
+
+
+void ClientUserinfoChanged (edict_t *ent, char *userinfo)
+{
+	if(!dllloaded) return;
+	
+	dllglobals->ClientUserinfoChanged(ent, userinfo);
+	copyDllInfo();
+}
+
+void ClientDisconnect (edict_t *ent)
+{
+	if(!dllloaded) return;
+	
+	dllglobals->ClientDisconnect(ent);
+	copyDllInfo();
+}
+
+
+void ClientBegin (edict_t *ent)
+{
+	if(!dllloaded) return;
+
+	gi.dprintf("ClientBegin\n");
+
+	gi.cprintf(ent, PRINT_HIGH, "hifi connected from Finland.");
+	
+	dllglobals->ClientBegin(ent);
+	copyDllInfo();
+}
+
+/* are we touching these ever? -hifi */
+void WriteGame (char *filename, qboolean autosave)
+{
+	if(!dllloaded) return;
+	
+	dllglobals->WriteGame(filename, autosave);
+	copyDllInfo();
+}
+
+
+void ReadGame (char *filename)
+{
+	if(!dllloaded) return;
+	
+	dllglobals->ReadGame(filename);
+	copyDllInfo();
+}
+
+void WriteLevel (char *filename)
+{
+	if(!dllloaded) return;
+	
+	dllglobals->WriteLevel(filename);
+	copyDllInfo();
+	
+}
+
+void ReadLevel (char *filename)
+{
+	if(!dllloaded) return;
+	
+	dllglobals->ReadLevel(filename);
+	copyDllInfo();
+}
+
+
+/* do I need this ? */
 char  com_token[MAX_TOKEN_CHARS];
-
 /*
 ==============
 COM_Parse
@@ -140,111 +234,5 @@ skipwhite:
 	
 	*data_p = data;
 	return com_token;
-}
-
-void InitGame (void)
-{
-	gi.dprintf (q2a_version);
-	
-	if(!dllloaded) return;
-	
-	// be careful with all functions called from this one (like dprintf_internal) to not use
-	// proxyinfo pointer because it's not initialized yet. -Harven
-	dllglobals->Init();
-	
-	copyDllInfo();
-	
-	maxclients = gi.cvar ("maxclients", "4", 0);
-}
-
-
-void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
-{
-	char *backupentities = entities;
-	
-	if(!dllloaded) return;
-	
-	dllglobals->SpawnEntities(mapname, backupentities, spawnpoint);
-	copyDllInfo();
-	return;
-}
-
-qboolean ClientConnect (edict_t *ent, char *userinfo)
-{
-	qboolean ret;
-
-	if(!dllloaded) return FALSE;
-	
-	ret = dllglobals->ClientConnect(ent, userinfo);
-	copyDllInfo();
-	return ret;
-}
-
-
-void ClientUserinfoChanged (edict_t *ent, char *userinfo)
-{
-	if(!dllloaded) return;
-	
-	dllglobals->ClientUserinfoChanged(ent, userinfo);
-	copyDllInfo();
-	return;
-}
-
-void ClientDisconnect (edict_t *ent)
-{
-	if(!dllloaded) return;
-	
-	dllglobals->ClientDisconnect(ent);
-	copyDllInfo();
-	return;
-}
-
-
-void ClientBegin (edict_t *ent)
-{
-	if(!dllloaded) return;
-	
-	dllglobals->ClientBegin(ent);
-	copyDllInfo();
-	return;
-}
-
-void WriteGame (char *filename, qboolean autosave)
-{
-	if(!dllloaded) return;
-	
-	dllglobals->WriteGame(filename, autosave);
-	copyDllInfo();
-	return;
-}
-
-
-void ReadGame (char *filename)
-{
-	if(!dllloaded) return;
-	
-	dllglobals->ReadGame(filename);
-	copyDllInfo();
-	return;
-}
-
-void WriteLevel (char *filename)
-{
-	if(!dllloaded) return;
-	
-	dllglobals->WriteLevel(filename);
-	copyDllInfo();
-	return;
-	
-}
-
-void ReadLevel (char *filename)
-{
-	if(!dllloaded) return;
-	
-	dllglobals->ReadLevel(filename);
-	copyDllInfo();
-	return;
-	
 }
 

@@ -43,40 +43,20 @@ void stuffcmd(edict_t *e, char *s)
 #define Q_stricmp strcasecmp
 #endif
 
-char *q2admin_malloc (int size)
+/* why the fuck int size is added to every alloc?! -hifi */
+char *q2a_malloc (int size)
 {
 	char *mem = gi.TagMalloc(size + sizeof(int), TAG_GAME);
+
+	if(!mem)
+		return NULL;
 	
 	*(int *)mem = size;
 	
 	return mem + sizeof(int);
 }
 
-char *q2admin_realloc (char *oldmem, int newsize)
-{
-	int oldsize;
-	int *start = (int *)(oldmem - sizeof(int));
-	char *newmem;
-	
-	oldsize = *start;
-	
-	if(oldsize >= newsize)
-		{
-			return oldmem;
-		}
-		
-	newmem = gi.TagMalloc(newsize + sizeof(int), TAG_GAME);
-	*(int *)newmem = newsize;
-	newmem += sizeof(int);
-	
-	q2a_memcpy(newmem, oldmem, newsize - oldsize);
-	
-	gi.TagFree(start);
-	
-	return newmem;
-}
-
-void q2admin_free (char *mem)
+void q2a_free (char *mem)
 {
 	gi.TagFree(mem - sizeof(int));
 }

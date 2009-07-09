@@ -4,15 +4,15 @@
 
 CFLAGS = -O -g -Wall -DLINUX -fPIC
 #CFLAGS = -ffast-math -O3 -Wall -DLINUX -fPIC
-LDFLAGS = 
+LDFLAGS = -lcurl
 ORIGDIR=src
 CC=gcc
 
-OBJS = g_main.o q2a_cmd.o q2a_init.o q2a_util.o q2a_run.o
+OBJS = g_main.o q2a_cmd.o q2a_init.o q2a_util.o q2a_run.o q2a_http.o
 
 gamei386.so: $(OBJS)
 	$(CC) -shared -o $@ $(OBJS) $(LDFLAGS)
-	ldd $@
+	#ldd $@
 
 clean: 
 	/bin/rm -f $(OBJS) gamei386.so
@@ -35,4 +35,5 @@ g_main.o: g_local.h q_shared.h game.h
 q2a_cmd.o: g_local.h q_shared.h game.h
 q2a_init.o: g_local.h q_shared.h game.h
 q2a_util.o: g_local.h q_shared.h game.h
-q2a_q2aot.o: g_local.h q_shared.h game.h
+q2a_run.o: g_local.h q_shared.h game.h
+q2a_http.o: g_local.h q_shared.h game.h

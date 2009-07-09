@@ -46,8 +46,10 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 
 void G_RunFrame(void)
 {
-	if(!dllloaded) return;
+	q2a_http_tick();
 	
+	if(!dllloaded) return;
+
 	dllglobals->RunFrame();
 	copyDllInfo();
 	return;

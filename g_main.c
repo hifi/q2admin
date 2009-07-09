@@ -63,12 +63,26 @@ typedef game_export_t  *GAMEAPI (game_import_t *import);
 
 qboolean soloadlazy;
 
+game_import_t  gi;
+game_export_t  globals;
+game_export_t  *dllglobals;
+
+cvar_t *gamedir, *maxclients, *gamename;
+
+qboolean quake2dirsupport = TRUE;
+
+qboolean dllloaded = FALSE;
+
+char *q2a_version = "Q2Admin Version " Q2ADMINVERSION;
+char dllname[256];
+char moddir[256];
+
 void ShutdownGame (void)
 {
-	
+	q2a_http_shutdown();
+
 	if(!dllloaded) return;
 		
-	// reset the password just in case something has gone wrong...
 	dllglobals->Shutdown();
 	
 #ifdef __GNUC__
@@ -129,10 +143,6 @@ game_export_t *GetGameAPI(game_import_t *import)
 	
 	globals.ServerCommand = ServerCommand;
 	
-	serverbindip = gi.cvar("ip", "", 0);
-	port = gi.cvar("port", "", 0);
-	rcon_password = gi.cvar("rcon_password", "", 0) ; // UPDATE
-
 	gamedir = gi.cvar ("game", "baseq2", 0);
 	q2a_strcpy(moddir, gamedir->string);
 	
@@ -180,6 +190,8 @@ game_export_t *GetGameAPI(game_import_t *import)
 			gi.dprintf ("Unable to load DLL %s, loading baseq2 DLL.\n", dllname);
 		}
 	}
+
+	gi.dprintf("Q2A: Loaded game DLL: %s.\n", dllname);
 		
 #ifdef __GNUC__
 	getapi = (GAMEAPI *)dlsym(hdll, "GetGameAPI");

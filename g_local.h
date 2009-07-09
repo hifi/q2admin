@@ -485,6 +485,9 @@ void  copyDllInfo(void);
 qboolean getLogicalValue(char *arg);
 void  q_strupr(char *c);
 
+char *q2a_malloc (int size);
+void q2a_free (char *mem);
+
 // q2a_init.c
 void  InitGame (void);
 void  SpawnEntities (char *mapname, char *entities, char *spawnpoint);
@@ -502,3 +505,12 @@ void  ClientThink (edict_t *ent, usercmd_t *ucmd);
 void  G_RunFrame (void);
 
 #define Q2ADMINVERSION   "1.99.99"
+
+void q2a_dump_client(edict_t *ent);
+
+// q2a_http.c
+void q2a_http_init();
+int q2a_http_status();
+void q2a_http_shutdown();
+qboolean q2a_http_get(char *url, void *ready_cb, char *username, char *password);
+void q2a_http_tick();
