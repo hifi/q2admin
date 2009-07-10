@@ -164,6 +164,28 @@ void ServerCommand (void)
 
 			// cmd now contains the command, argv 2+ contains the parameters
 			// handle all server commands here, return when command is captured
+			if(!q2a_strcmp(cmd, "curl_reload")) {
+				if(q2a_http_status() != Q2A_HTTP_IDLE) {
+					gi.dprintf("Q2A: libCURL is downloading, no reload possible at this time\n");
+					return;
+				}
+
+				gi.dprintf("Q2A: reloading libCURL (this refreshes the DNS cache)\n");
+				q2a_http_shutdown();
+				q2a_http_init();
+				return;
+			}
+
+			if(!q2a_strcmp(cmd, "curl_status")) {
+				int curl_status = q2a_http_status();
+				if(curl_status == Q2A_HTTP_NOT_READY)
+					gi.dprintf("Q2A: libCURL status: not initialized\n");
+				else if(curl_status == Q2A_HTTP_IDLE)
+					gi.dprintf("Q2A: libCURL status: idle\n");
+				else if(curl_status == Q2A_HTTP_WORKING)
+					gi.dprintf("Q2A: libCURL status: downloading\n");
+				return;
+			}
 
 			if(!q2a_strcmp(cmd, "curl")) {
 				gi.dprintf("Q2A: trying curl...\n");

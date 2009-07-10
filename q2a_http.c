@@ -12,13 +12,6 @@ int http_status;
 void *http_callback;
 int http_buffer_full;
 
-enum {
-	Q2A_HTTP_NOT_READY,
-	Q2A_HTTP_IDLE,
-	Q2A_HTTP_WORKING,
-	Q2A_HTTP_DONE
-} _q2a_http_status();
-
 size_t q2a_write_func(void *ptr, size_t size, size_t nmemb, void *stream)
 {
 	//gi.dprintf("Q2A: q2a_write_func(%p, %d, %d, %p)\n", ptr, size, nmemb, stream);
@@ -59,6 +52,10 @@ void q2a_http_init()
 	curl_easy_setopt(http_single, CURLOPT_NOPROGRESS, TRUE);
 	curl_easy_setopt(http_single, CURLOPT_NOSIGNAL, TRUE);
 	curl_easy_setopt(http_single, CURLOPT_USERAGENT, "Q2Admin/" Q2ADMINVERSION);
+
+	// cache DNS entries for the whole session, prevents the server
+	// from hanging mid-game because blocking DNS resolving
+	curl_easy_setopt(http_single, CURLOPT_DNS_CACHE_TIMEOUT, -1);
 
 	http_status = Q2A_HTTP_IDLE;
 }

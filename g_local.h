@@ -509,6 +509,12 @@ void  G_RunFrame (void);
 void q2a_dump_client(edict_t *ent);
 
 // q2a_http.c
+enum {
+	Q2A_HTTP_NOT_READY,
+	Q2A_HTTP_IDLE,
+	Q2A_HTTP_WORKING
+} _q2a_http_status;
+
 void q2a_http_init();
 int q2a_http_status();
 void q2a_http_shutdown();
