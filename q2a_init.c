@@ -32,7 +32,7 @@ void InitGame (void)
 {
 	gi.dprintf ("%s running %s\n", q2a_version, moddir);
 
-	q2a_http_init();
+	//q2a_http_init();
 	q2a_lua_init();
 
 	if(!dllloaded) return;

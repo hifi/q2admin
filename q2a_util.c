@@ -48,6 +48,7 @@ char *q2a_malloc (int size)
 {
 	char *mem = gi.TagMalloc(size + sizeof(int), TAG_GAME);
 
+	/* ANSI C */
 	if(!mem)
 		return NULL;
 	
@@ -56,8 +57,39 @@ char *q2a_malloc (int size)
 	return mem + sizeof(int);
 }
 
+char *q2a_realloc (char *oldmem, int newsize)
+{
+	int oldsize;
+	int *start = (int *)(oldmem - sizeof(int));
+	char *newmem;
+
+	/* ANSI C */
+	if(oldmem == NULL)
+		return q2a_malloc(newsize);
+
+	oldsize = *start;
+
+	if(oldsize >= newsize)
+		return oldmem;
+
+	newmem = gi.TagMalloc(newsize + sizeof(int), TAG_GAME);
+	*(int *)newmem = newsize;
+	newmem += sizeof(int);
+
+	q2a_memcpy(newmem, oldmem, newsize - oldsize);
+
+	gi.TagFree(start);
+
+	return newmem;
+}
+
+
 void q2a_free (char *mem)
 {
+	/* ANSI C */
+	if(mem == NULL)
+		return;
+
 	gi.TagFree(mem - sizeof(int));
 }
 

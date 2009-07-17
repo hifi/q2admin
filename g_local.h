@@ -486,6 +486,7 @@ qboolean getLogicalValue(char *arg);
 void  q_strupr(char *c);
 
 char *q2a_malloc (int size);
+char *q2a_realloc (char *oldmem, int newsize);
 void q2a_free (char *mem);
 
 // q2a_init.c
