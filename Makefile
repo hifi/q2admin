@@ -32,7 +32,8 @@ $*.h: $(ORIGDIR)/$*.h
 	tr -d '\015' < $(ORIGDIR)/$*.h > $*.h
 
 q2a_lua_plugman.h: q2a_lua_plugman.lua
-	echo "#define LUA_CODE \"`sed 's/--.*$$//g' q2a_lua_plugman.lua | tr -s '\t' '\0' | tr '\n' ' ' | sed 's/"/\\\\"/g'`\"" > q2a_lua_plugman.h
+	@# this is not the best way to "trim" Lua, but with some care it works just fine
+	echo "#define LUA_PLUGMAN \"`sed 's/--.*$$//g' q2a_lua_plugman.lua | tr -s '\t' '\0' | tr '\n' ' ' | sed 's/\\\/\\\\\\\\\\\\\\\\/g' | sed 's/"/\\\\"/g'`\"" > q2a_lua_plugman.h
 
 # DO NOT DELETE
 
@@ -42,5 +43,5 @@ q2a_init.o: g_local.h q_shared.h game.h
 q2a_util.o: g_local.h q_shared.h game.h
 q2a_run.o: g_local.h q_shared.h game.h
 q2a_http.o: g_local.h q_shared.h game.h
-q2a_lua.o: g_local.h q_shared.h game.h
+q2a_lua.o: g_local.h q_shared.h game.h q2a_lua_plugman.h
 q2a_lua_plugman.h: q2a_lua_plugman.lua

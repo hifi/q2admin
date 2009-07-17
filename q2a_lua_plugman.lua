@@ -20,7 +20,7 @@ local function q2a_plugin_call(plugin, func, ...)
 
 	success, err = pcall(plugin.env[func], ...)
 	if not success then
-		print("Q2A Lua: failed to call '"..func.."' in '"..plugin.file.."': "..err)
+		gi.dprintf("Q2A Lua: failed to call '"..func.."' in '"..plugin.file.."': "..err.."\n")
 		if not plugin.unloading then
 			q2a_unload(plugin.file)
 		end
@@ -32,15 +32,15 @@ local globals = copy_table(_G)
 local plugins = {}
 
 function q2a_init()
-	print("Q2A Lua: Plugin Manager ready to serve!")
+	gi.dprintf("Q2A Lua: Plugin Manager ready to serve!\n")
 end
 
 function q2a_shutdown()
-	print("Q2A Lua: shutdown in progress...")
+	gi.dprintf("Q2A Lua: shutdown in progress...\n")
 	for i,plugin in pairs(plugins) do
 		q2a_unload(plugin.file)
 	end
-	print("Q2a Lua: all plugins unloaded!")
+	gi.dprintf("Q2a Lua: all plugins unloaded!\n")
 end
 
 function q2a_load(file)
@@ -52,7 +52,7 @@ function q2a_load(file)
 
 	chunk, err = loadfile(plugin.file)
 	if chunk == nil then
-		print("Q2A Lua: failed to load file "..plugin.file..": "..tostring(err))
+		gi.dprintf("Q2A Lua: failed to load file "..plugin.file..": "..tostring(err).."\n")
 		return false
 	end
 
@@ -60,11 +60,11 @@ function q2a_load(file)
 	success, err = pcall(chunk)
 
 	if not success then
-		print("Q2A Lua: failed to compile file "..plugin.file..": "..tostring(err))
+		gi.dprintf("Q2A Lua: failed to compile file "..plugin.file..": "..tostring(err).."\n")
 		return false
 	end
 
-	print("Q2A Lua: loaded plugin "..plugin.file)
+	gi.dprintf("Q2A Lua: loaded plugin "..plugin.file.."\n")
 	q2a_plugin_call(plugin, 'q2a_load')
 
 	table.insert(plugins, plugin)
@@ -74,7 +74,7 @@ end
 function q2a_unload(file)
 	for i,plugin in pairs(plugins) do
 		if plugin.file == file then
-			print("Q2A Lua: unloading "..file)
+			gi.dprintf("Q2A Lua: unloading "..file.."\n")
 			plugin.unloading = true
 			-- let the plugin know we are unloading it
 			q2a_plugin_call(plugin, 'q2a_unload')
