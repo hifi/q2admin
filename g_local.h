@@ -520,3 +520,8 @@ int q2a_http_status();
 void q2a_http_shutdown();
 qboolean q2a_http_get(char *url, void *ready_cb, char *username, char *password);
 void q2a_http_tick();
+
+// q2a_lua.c
+void q2a_lua_init(void);
+void q2a_lua_shutdown(void);
+void q2a_lua_load(const char *file);

@@ -127,6 +127,7 @@ game_export_t *GetGameAPI(game_import_t *import)
 	globals.Shutdown = ShutdownGame;
 	globals.SpawnEntities = SpawnEntities;
 	
+	// why are we catching these?
 	globals.WriteGame = WriteGame;
 	globals.ReadGame = ReadGame;
 	globals.WriteLevel = WriteLevel;
