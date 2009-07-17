@@ -109,7 +109,7 @@ game_export_t *GetGameAPI(game_import_t *import)
 #ifdef __GNUC__
 	int loadtype;
 #endif
-	
+
 	dllloaded = FALSE;
 	gi = *import;
 	
@@ -150,7 +150,7 @@ game_export_t *GetGameAPI(game_import_t *import)
 	
 	if(moddir[0] == 0)
 		q2a_strcpy(moddir, "baseq2");
-		
+
 #ifdef __GNUC__
 	loadtype = soloadlazy ? RTLD_LAZY : RTLD_NOW;
 	sprintf(dllname, "%s/%s", moddir, DLLNAME);

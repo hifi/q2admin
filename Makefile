@@ -4,7 +4,8 @@
 
 LUA_CFLAGS = $(shell pkg-config --cflags lua5.1)
 LUA_LDFLAGS = $(shell pkg-config --libs lua5.1)
-CFLAGS = -O -g -Wall -DLINUX -fPIC $(LUA_CFLAGS)
+#CFLAGS = -O -g -Wall -DLINUX -fPIC $(LUA_CFLAGS)
+CFLAGS = -DLINUX $(LUA_CFLAGS)
 #CFLAGS = -ffast-math -O3 -Wall -DLINUX -fPIC $(LUA_CFLAGS)
 LDFLAGS = -lcurl $(LUA_LDFLAGS)
 ORIGDIR=src

@@ -40,8 +40,6 @@ void InitGame (void)
 	// be careful with all functions called from this one (like dprintf_internal) to not use
 	// proxyinfo pointer because it's not initialized yet. -Harven
 	dllglobals->Init();
-
-	// load Lua library and initialize plugins here?
 	
 	copyDllInfo();
 
@@ -92,10 +90,6 @@ void ClientBegin (edict_t *ent)
 {
 	if(!dllloaded) return;
 
-	gi.dprintf("ClientBegin\n");
-
-	gi.cprintf(ent, PRINT_HIGH, "hifi connected from Finland.");
-	
 	dllglobals->ClientBegin(ent);
 	copyDllInfo();
 }

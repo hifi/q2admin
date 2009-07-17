@@ -27,12 +27,53 @@ local function q2a_plugin_call(plugin, func, ...)
 	end
 end
 
--- store a clean copy of globals table
+cfg = {}
 local globals = copy_table(_G)
 local plugins = {}
 
 function q2a_init()
-	gi.dprintf("Q2A Lua: Plugin Manager ready to serve!\n")
+	-- this is ok
+	local foo = {}
+	table.insert(foo, "bar")
+
+	-- this is not
+	foo = { "bar" }
+
+	for k,v in pairs(foo) do
+		print("foo["..tostring(k).."] = "..tostring(v).."\n")
+	end
+end
+
+function asdfasfasdf()
+
+	gi.dprintf("Q2A Lua: Plugin Manager\n")
+	gi.dprintf("Q2A Lua: Loading configuration config.lua\n");
+
+	chunk, err = loadfile("config.lua")
+	if chunk == nil then
+		gi.dprintf("Q2A Lua: failed to load configuration from config.lua (not fatal): "..tostring(err).."\n")
+		return
+	else
+		setfenv(chunk, cfg)
+		success, err = pcall(chunk)
+		if not success then
+			gi.dprintf("Q2A Lua: syntax error in config:"..tostring(err).."\n")
+			return
+		end
+	end
+end
+
+function asdf() 
+	if type(cfg.plugins) == 'table' then
+		-- FIXME: error: invalid key to 'next'
+		for k,v in pairs(cfg.plugins) do
+			gi.dprintf("key: "..tostring(k)..", value: "..tostring(v).."\n")
+			-- q2a_load("plugins/"..tostring(v)..".lua")
+		end
+	end
+end
+
+function q2a_autoload()
 end
 
 function q2a_shutdown()
@@ -40,7 +81,7 @@ function q2a_shutdown()
 	for i,plugin in pairs(plugins) do
 		q2a_unload(plugin.file)
 	end
-	gi.dprintf("Q2a Lua: all plugins unloaded!\n")
+	gi.dprintf("Q2A Lua: all plugins unloaded!\n")
 end
 
 function q2a_load(file)
@@ -48,7 +89,6 @@ function q2a_load(file)
 
 	local plugin = {}
 	plugin.file = file
-	plugin.env = copy_table(globals)
 
 	chunk, err = loadfile(plugin.file)
 	if chunk == nil then
@@ -56,6 +96,7 @@ function q2a_load(file)
 		return false
 	end
 
+	plugin.env = copy_table(globals)
 	setfenv(chunk, plugin.env)
 	success, err = pcall(chunk)
 

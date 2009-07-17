@@ -7,6 +7,11 @@
 /* include the plugin manager code */
 #include "q2a_lua_plugman.h"
 
+#define LUA_CODE_BAD \
+	"local foo = { \"bar\" }\n" \
+	"for k,v in pairs(foo) do\n" \
+	"end\n"
+
 lua_State *lua_L = NULL;
 
 static int q2a_lua_gi_dprintf(lua_State *lua_L)
@@ -24,17 +29,26 @@ void q2a_lua_init(void)
 	lua_L = lua_open();
 	luaL_openlibs(lua_L);
 
-	/* load plugin manager code */
-	if(luaL_loadstring(lua_L, LUA_PLUGMAN) != 0) {
-		gi.dprintf("q2a_lua_init: Plugin manager code load failed, disabling Lua support");
+	luaL_loadstring(lua_L, LUA_CODE_BAD);
+	if(lua_pcall(lua_L, 0, 0, 0) != 0) {
+		char *err_msg = (char *)lua_tostring(lua_L, -1);
+		gi.dprintf("q2a_lua_init: calling bad failed: %s\n", err_msg);
 		q2a_lua_shutdown();
 		return;
 	}
-	lua_call(lua_L, 0, 0);
+#if 0
 
-	/* insert output functions to global namespace */
+	gi.dprintf("q2a_lua_init: loading stored Lua code, %d bytes\n", strlen(LUA_PLUGMAN));
 
-	/* gi functions */
+	/* load plugin manager code */
+	if(luaL_loadstring(lua_L, LUA_PLUGMAN) != 0) {
+		gi.dprintf("q2a_lua_init: Plugin manager code load failed, disabling Lua support\n");
+		q2a_lua_shutdown();
+		return;
+	}
+	luaL_loadstring(lua_L, LUA_CODE_BAD);
+
+	/* register gi functions */
 	lua_newtable(lua_L);
 	lua_setglobal(lua_L, "gi");
 
@@ -44,7 +58,13 @@ void q2a_lua_init(void)
 
 	/* run the initialization Lua routine */
 	lua_getglobal(lua_L, "q2a_init");
-	lua_call(lua_L, 0, 0);
+	if(lua_pcall(lua_L, 0, 0, 0) != 0) {
+		char *err_msg = (char *)lua_tostring(lua_L, -1);
+		gi.dprintf("q2a_lua_init: calling q2a_init failed: %s\n", err_msg);
+		q2a_lua_shutdown();
+		return;
+	}
+#endif
 }
 
 void q2a_lua_shutdown(void)
