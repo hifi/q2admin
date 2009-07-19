@@ -1,3 +1,11 @@
+//
+// q2admin
+//
+// q2a_lua_import.c
+//
+// copyright 2009 Toni Spets
+//
+
 #include "g_local.h"
 #include "q2a_lua.h"
 

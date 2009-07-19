@@ -1,4 +1,12 @@
 --
+-- q2admin
+--
+-- q2a_lua_plugman.lua
+--
+-- copyright 2009 Toni Spets
+--
+
+--
 -- Q2Admin Lua plugin manager
 --
 

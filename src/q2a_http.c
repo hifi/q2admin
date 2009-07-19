@@ -1,3 +1,11 @@
+//
+// q2admin
+//
+// q2a_http.c
+//
+// copyright 2009 Toni Spets
+//
+
 #include "g_local.h"
 
 #include <curl/curl.h>

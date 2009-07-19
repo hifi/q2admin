@@ -1,3 +1,11 @@
+//
+// q2admin
+//
+// q2a_lua.h
+//
+// copyright 2009 Toni Spets
+//
+
 #ifndef Q2A_LUA_H
 
 #include <assert.h>
