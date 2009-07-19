@@ -523,13 +523,11 @@ qboolean q2a_http_get(char *url, void *ready_cb, char *username, char *password)
 void q2a_http_tick();
 
 // q2a_lua.c
+void q2a_fpu_lua (void);
+void q2a_fpu_q2 (void);
+
 void q2a_lua_init(void);
 void q2a_lua_shutdown(void);
 void q2a_lua_load(const char *file);
 
 qboolean q2a_lua_ClientConnect(int client_id);
-
-// q2a_linux.c
-unsigned short Sys_GetFPUStatus (void);
-void Sys_SetFPU (void);
-void Sys_ResetFPU (void);

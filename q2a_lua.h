@@ -1,5 +1,6 @@
 #ifndef Q2A_LUA_H
 
+#include <assert.h>
 #include <lua.h>
 #include <lauxlib.h>
 #include <lualib.h>

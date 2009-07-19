@@ -8,7 +8,7 @@ qboolean q2a_lua_ClientConnect(int client_id)
 
 	if(!lua_L) return ret;
 
-	Sys_ResetFPU();
+	q2a_fpu_lua();
 
 	/* run the shutdown Lua routine */
 	lua_getglobal(lua_L, "q2a_call_bool");
@@ -23,7 +23,7 @@ qboolean q2a_lua_ClientConnect(int client_id)
 		gi.dprintf("Lua: ClientConnect returned error: %s\n", err_msg);
 	}
 
-	Sys_SetFPU();
+	q2a_fpu_q2();
 
 	return ret;
 }

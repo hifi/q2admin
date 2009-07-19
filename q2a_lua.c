@@ -19,7 +19,7 @@ void q2a_lua_init(void)
 {
 	if(lua_L) return;
 
-	Sys_ResetFPU();
+	q2a_fpu_lua();
 
 	lua_L = lua_newstate(q2a_lua_alloc, NULL);
 	luaL_openlibs(lua_L);
@@ -56,14 +56,14 @@ void q2a_lua_init(void)
 		return;
 	}
 
-	Sys_SetFPU();
+	q2a_fpu_q2();
 }
 
 void q2a_lua_shutdown(void)
 {
 	if(!lua_L) return;
 
-	Sys_ResetFPU();
+	q2a_fpu_lua();
 
 	/* run the shutdown Lua routine */
 	lua_getglobal(lua_L, "q2a_shutdown");
@@ -72,10 +72,31 @@ void q2a_lua_shutdown(void)
 	lua_close(lua_L);
 	lua_L = NULL;
 
-	Sys_SetFPU();
+	q2a_fpu_q2();
 }
 
 void q2a_lua_load(const char *file)
 {
 	if(!lua_L) return;
+}
+
+/* x86 workaround for Lua, fsck you Carmack! */
+unsigned short q2a_fpuword = 0;
+void q2a_fpu_q2 (void)
+{
+#ifdef __i386__
+	assert(q2a_fpuword != 0);
+	__asm__ __volatile__ ("fldcw %0" : : "m" (q2a_fpuword));
+	q2a_fpuword = 0;
+#endif
+}
+
+void q2a_fpu_lua (void)
+{
+#ifdef __i386__
+	unsigned short tmp = 0x37F;
+	assert(q2a_fpuword == 0);
+	__asm__ __volatile__ ("fnstcw %0" : "=m" (q2a_fpuword));
+	__asm__ __volatile__ ("fldcw %0" : : "m" (tmp));
+#endif
 }

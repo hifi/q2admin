@@ -7,13 +7,11 @@ int q2a_lua_gi_dprintf(lua_State *lua_L)
 	char *str;
 	str = (char *)lua_tostring(lua_L, 1);
 
-	/* careful! always when the engine gets control back use SetFPU! */
-	Sys_SetFPU();
+	q2a_fpu_q2();
 
 	gi.dprintf("%s", str);
 
-	/* now Lua has the control, reset original state */
-	Sys_ResetFPU();
+	q2a_fpu_lua();
 
 	return 0;
 }
