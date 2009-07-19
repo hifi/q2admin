@@ -104,7 +104,7 @@ char cmdbuf[1024];
 void ClientCommand (edict_t *ent)
 {
 	char *cmd;
-	//int client = getEntOffset(ent) - 1;
+	int client = getEntOffset(ent) - 1;
 	
 	if(!dllloaded) return;
 
@@ -133,6 +133,9 @@ void ClientCommand (edict_t *ent)
 				gi.cprintf(ent, PRINT_HIGH, "Q2A: The admins have been informed about the cheater/abuser. No further action required.\n");
 				return;
 			}
+
+			if(q2a_lua_ClientCommand(client, cmd))
+				return;
 
 			gi.cprintf(ent, PRINT_HIGH, "Q2A: Unknown client command: %s\n", cmd);
 			return;
@@ -206,25 +209,4 @@ void ServerCommand (void)
 		
 	dllglobals->ServerCommand();
 	copyDllInfo();
-}
-
-/* dump everything we know about the client with dprintf */
-void q2a_dump_client(edict_t *ent)
-{
-	int client = getEntOffset(ent);
-
-	gi.dprintf("Dumping entity %d\n", client);
-	gi.dprintf("edict_s\n");
-	gi.dprintf("{\n");
-	gi.dprintf("\tentity_state_t s\n");
-	gi.dprintf("\t{\n");
-	gi.dprintf("\t}\n");
-	gi.dprintf("\tgclients_ *client = %p\n", ent->client);
-	if(ent->client) {
-		gi.dprintf("\t{\n");
-		gi.dprintf("\t\tping = %d\n", ent->client->ping);
-		gi.dprintf("\t}\n");
-	}
-	gi.dprintf("\tinuse = %s\n", (ent->inuse ? "yes" : "no"));
-	gi.dprintf("}\n");
 }

@@ -83,6 +83,8 @@ void ShutdownGame (void)
 	q2a_lua_shutdown();
 
 	if(!dllloaded) return;
+
+	gi.TagFree(playerinfo);
 		
 	dllglobals->Shutdown();
 	

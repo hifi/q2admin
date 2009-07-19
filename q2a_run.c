@@ -30,14 +30,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 void ClientThink (edict_t *ent, usercmd_t *ucmd)
 {
-	//int client;
+	int client = getEntOffset(ent) -1;
 	
 	if(!dllloaded) return;
 		
-	//client = getEntOffset(ent);
-	//client -= 1;
-
-	// do client think stuff here
+	q2a_lua_ClientThink(client);
 	
 	dllglobals->ClientThink(ent, ucmd);
 	
@@ -46,9 +43,11 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 
 void G_RunFrame(void)
 {
-	//q2a_http_tick();
+	q2a_http_tick();
 	
 	if(!dllloaded) return;
+
+	q2a_lua_RunFrame();
 
 	dllglobals->RunFrame();
 	copyDllInfo();

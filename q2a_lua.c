@@ -39,6 +39,16 @@ void q2a_lua_init(void)
 		return;
 	}
 
+	/* register constants */
+	lua_pushnumber(lua_L, 0);
+	lua_setglobal(lua_L, "PRINT_LOW");
+	lua_pushnumber(lua_L, 1);
+	lua_setglobal(lua_L, "PRINT_MEDIUM");
+	lua_pushnumber(lua_L, 2);
+	lua_setglobal(lua_L, "PRINT_HIGH");
+	lua_pushnumber(lua_L, 3);
+	lua_setglobal(lua_L, "PRINT_CHAT");
+
 	/* register gi functions */
 	lua_newtable(lua_L);
 	lua_setglobal(lua_L, "gi");
@@ -46,6 +56,10 @@ void q2a_lua_init(void)
 	lua_getglobal(lua_L, "gi");
 	lua_pushcfunction(lua_L, q2a_lua_gi_dprintf);
 	lua_setfield(lua_L, 1, "dprintf");
+
+	lua_getglobal(lua_L, "gi");
+	lua_pushcfunction(lua_L, q2a_lua_gi_cprintf);
+	lua_setfield(lua_L, 1, "cprintf");
 
 	/* run the initialization Lua routine */
 	lua_getglobal(lua_L, "q2a_init");

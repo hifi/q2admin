@@ -36,6 +36,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "game.h"
 
 #include <ctype.h>
+#include <stdint.h>
 
 // the "gameversion" client command will print this plus compile date
 #define GAMEVERSION    "baseq2"
@@ -507,8 +508,6 @@ void  G_RunFrame (void);
 
 #define Q2ADMINVERSION   "1.99.99"
 
-void q2a_dump_client(edict_t *ent);
-
 // q2a_http.c
 enum {
 	Q2A_HTTP_NOT_READY,
@@ -530,4 +529,20 @@ void q2a_lua_init(void);
 void q2a_lua_shutdown(void);
 void q2a_lua_load(const char *file);
 
-qboolean q2a_lua_ClientConnect(int client_id);
+qboolean q2a_lua_ClientConnect(int client);
+void q2a_lua_ClientBegin(int client);
+void q2a_lua_ClientDisconnect(int client);
+void q2a_lua_ClientThink(int client);
+void q2a_lua_RunFrame(void);
+qboolean q2a_lua_ClientCommand(int client, const char *cmd);
+
+typedef struct {
+	char		name[16];
+	char		skin[40];
+	char		ip[40];
+	uint32_t	ip_bin;
+	char		userinfo[MAX_INFO_STRING];
+	qboolean	inuse;
+} playerinfo_t;
+
+extern playerinfo_t *playerinfo;

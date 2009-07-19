@@ -130,8 +130,6 @@ function q2a_call(func, ...)
 end
 
 function q2a_call_bool(func, def, ...)
-	gi.dprintf("q2a_call_bool("..tostring(func)..", "..tostring(def)..", ...)\n");
-
 	for i,plugin in pairs(plugins) do
 		local ret = q2a_plugin_call(plugin, func, ...)
 		if ret ~= def then
