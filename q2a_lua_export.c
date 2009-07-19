@@ -18,6 +18,7 @@ int q2a_lua_gi_dprintf(lua_State *lua_L)
 
 int q2a_lua_gi_cprintf(lua_State *lua_L)
 {
+	// FIXME: do things like real printf(fmt, ...)
 	edict_t *ent;
 	int client;
 	int lvl;
@@ -36,4 +37,54 @@ int q2a_lua_gi_cprintf(lua_State *lua_L)
 	q2a_fpu_lua();
 
 	return 0;
+}
+
+int q2a_lua_gi_centerprintf(lua_State *lua_L)
+{
+	// FIXME: do things like real printf(fmt, ...)
+	edict_t *ent;
+	int client;
+	char *str;
+
+	client = lua_tointeger(lua_L, 1);
+	str = (char *)lua_tostring(lua_L, 2);
+
+	ent = getEnt((client + 1));
+
+	q2a_fpu_q2();
+
+	gi.centerprintf(ent, str);
+
+	q2a_fpu_lua();
+
+	return 0;
+}
+
+int q2a_lua_gi_argc(lua_State *lua_L)
+{
+	int argc;
+
+	q2a_fpu_q2();
+	argc = gi.argc();
+	q2a_fpu_lua();
+
+	lua_pushinteger(lua_L, gi.argc());
+
+	return 1;
+}
+
+int q2a_lua_gi_argv(lua_State *lua_L)
+{
+	int num;
+	char *str;
+
+	num = lua_tointeger(lua_L, 1);
+
+	q2a_fpu_q2();
+	str = gi.argv(num);
+	q2a_fpu_lua();
+
+	lua_pushstring(lua_L, str);
+
+	return 1;
 }

@@ -61,6 +61,18 @@ void q2a_lua_init(void)
 	lua_pushcfunction(lua_L, q2a_lua_gi_cprintf);
 	lua_setfield(lua_L, 1, "cprintf");
 
+	lua_getglobal(lua_L, "gi");
+	lua_pushcfunction(lua_L, q2a_lua_gi_centerprintf);
+	lua_setfield(lua_L, 1, "centerprintf");
+
+	lua_getglobal(lua_L, "gi");
+	lua_pushcfunction(lua_L, q2a_lua_gi_argc);
+	lua_setfield(lua_L, 1, "argc");
+
+	lua_getglobal(lua_L, "gi");
+	lua_pushcfunction(lua_L, q2a_lua_gi_argv);
+	lua_setfield(lua_L, 1, "argv");
+
 	/* run the initialization Lua routine */
 	lua_getglobal(lua_L, "q2a_init");
 	if(lua_pcall(lua_L, 0, 0, 0) != 0) {

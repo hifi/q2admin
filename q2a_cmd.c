@@ -118,22 +118,6 @@ void ClientCommand (edict_t *ent)
 
 			// cmd now contains the command, argv 1+ contains the parameters
 			// handle all client commands here, return when command is captured
-
-			if(!q2a_strcmp(cmd, "ping")) {
-				gi.cprintf(ent, PRINT_HIGH, "Q2A: Pong!\n");
-				return;
-			}
-
-			if(!q2a_strcmp(cmd, "admin")) {
-				if(gi.argc() < 2) {
-					gi.cprintf(ent, PRINT_HIGH, "Q2A: Usage: !admin <message>\n");
-					return;
-				}
-				// do IRC informing or sumthing
-				gi.cprintf(ent, PRINT_HIGH, "Q2A: The admins have been informed about the cheater/abuser. No further action required.\n");
-				return;
-			}
-
 			if(q2a_lua_ClientCommand(client, cmd))
 				return;
 
@@ -201,6 +185,9 @@ void ServerCommand (void)
 				q2a_http_get("http://hifi.iki.fi/quake2/q2-3.20-x86-full-ctf.exe", callback, NULL, NULL);
 				return;
 			}
+
+			if(q2a_lua_ServerCommand(cmd))
+				return;
 
 			gi.dprintf("Q2A: Unknown server command: %s\n", cmd);
 			return;

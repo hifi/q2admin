@@ -128,3 +128,29 @@ qboolean q2a_lua_ClientCommand(int client, const char *cmd)
 
 	return ret;
 }
+
+qboolean q2a_lua_ServerCommand(const char *cmd)
+{
+	char *err_msg;
+	qboolean ret = FALSE;
+
+	if(!lua_L) return ret;
+
+	q2a_fpu_lua();
+
+	lua_getglobal(lua_L, "q2a_call_bool");
+	lua_pushstring(lua_L, "ServerCommand");
+	lua_pushboolean(lua_L, 0); // default status is 0, don't capture
+	lua_pushstring(lua_L, cmd);
+
+	if(lua_pcall(lua_L, 3, 1, 0) == 0) {
+		ret = lua_toboolean(lua_L, -1);
+	} else {
+		err_msg = (char *)lua_tostring(lua_L, -1);
+		gi.dprintf("Lua: ServerCommand returned error: %s\n", err_msg);
+	}
+
+	q2a_fpu_q2();
+
+	return ret;
+}

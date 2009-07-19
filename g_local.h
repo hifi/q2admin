@@ -535,6 +535,7 @@ void q2a_lua_ClientDisconnect(int client);
 void q2a_lua_ClientThink(int client);
 void q2a_lua_RunFrame(void);
 qboolean q2a_lua_ClientCommand(int client, const char *cmd);
+qboolean q2a_lua_ServerCommand(const char *cmd);
 
 typedef struct {
 	char		name[16];
