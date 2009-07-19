@@ -32,20 +32,6 @@ local globals = copy_table(_G)
 local plugins = {}
 
 function q2a_init()
-	-- this is ok
-	local foo = {}
-	table.insert(foo, "bar")
-
-	-- this is not
-	foo = { "bar" }
-
-	for k,v in pairs(foo) do
-		print("foo["..tostring(k).."] = "..tostring(v).."\n")
-	end
-end
-
-function asdfasfasdf()
-
 	gi.dprintf("Q2A Lua: Plugin Manager\n")
 	gi.dprintf("Q2A Lua: Loading configuration config.lua\n");
 
@@ -61,19 +47,12 @@ function asdfasfasdf()
 			return
 		end
 	end
-end
 
-function asdf() 
 	if type(cfg.plugins) == 'table' then
-		-- FIXME: error: invalid key to 'next'
 		for k,v in pairs(cfg.plugins) do
-			gi.dprintf("key: "..tostring(k)..", value: "..tostring(v).."\n")
-			-- q2a_load("plugins/"..tostring(v)..".lua")
+			q2a_load("plugins/"..tostring(v)..".lua")
 		end
 	end
-end
-
-function q2a_autoload()
 end
 
 function q2a_shutdown()

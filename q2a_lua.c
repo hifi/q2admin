@@ -7,17 +7,6 @@
 /* include the plugin manager code */
 #include "q2a_lua_plugman.h"
 
-#define LUA_CODE_BAD \
-	"local foo = { \"bar\" }\n"  \
-	"for k,v in pairs(foo) do\n" \
-	"end\n"
-
-#define LUA_CODE_GOOD \
-	"local foo = { }\n" \
-	"table.insert(foo, \"bar\")\n" \
-	"for k,v in pairs(foo) do\n" \
-	"end\n"
-
 lua_State *lua_L = NULL;
 
 static int q2a_lua_gi_dprintf(lua_State *lua_L)
@@ -25,7 +14,15 @@ static int q2a_lua_gi_dprintf(lua_State *lua_L)
 	// FIXME: do things like real printf(fmt, ...)
 	char *str;
 	str = (char *)lua_tostring(lua_L, 1);
+
+	/* careful! always when the engine gets control back use SetFPU! */
+	Sys_SetFPU();
+
 	gi.dprintf("%s", str);
+
+	/* now Lua has the control, reset original state */
+	Sys_ResetFPU();
+
 	return 0;
 }
 
@@ -44,22 +41,11 @@ static void *q2a_lua_alloc(void *ud, void *ptr, size_t osize, size_t nsize)
 void q2a_lua_init(void)
 {
 	if(lua_L) return;
-	//lua_L = lua_open();
+
+	Sys_ResetFPU();
+
 	lua_L = lua_newstate(q2a_lua_alloc, NULL);
 	luaL_openlibs(lua_L);
-
-#if 1
-	luaL_loadstring(lua_L, LUA_CODE_BAD);
-#else
-	luaL_loadstring(lua_L, LUA_CODE_GOOD);
-#endif
-	if(lua_pcall(lua_L, 0, 0, 0) != 0) {
-		char *err_msg = (char *)lua_tostring(lua_L, -1);
-		gi.dprintf("q2a_lua_init: executing failed: %s\n", err_msg);
-		q2a_lua_shutdown();
-		return;
-	}
-#if 0
 
 	gi.dprintf("q2a_lua_init: loading stored Lua code, %d bytes\n", strlen(LUA_PLUGMAN));
 
@@ -69,7 +55,12 @@ void q2a_lua_init(void)
 		q2a_lua_shutdown();
 		return;
 	}
-	luaL_loadstring(lua_L, LUA_CODE_BAD);
+	if(lua_pcall(lua_L, 0, 0, 0) != 0) {
+		char *err_msg = (char *)lua_tostring(lua_L, -1);
+		gi.dprintf("q2a_lua_init: Plugin manager code execution failed, disabling Lua support: %s\n", err_msg);
+		q2a_lua_shutdown();
+		return;
+	}
 
 	/* register gi functions */
 	lua_newtable(lua_L);
@@ -87,19 +78,24 @@ void q2a_lua_init(void)
 		q2a_lua_shutdown();
 		return;
 	}
-#endif
+
+	Sys_SetFPU();
 }
 
 void q2a_lua_shutdown(void)
 {
 	if(!lua_L) return;
 
+	Sys_ResetFPU();
+
 	/* run the shutdown Lua routine */
 	lua_getglobal(lua_L, "q2a_shutdown");
-	lua_call(lua_L, 0, 0);
+	lua_pcall(lua_L, 0, 0, 0);
 
 	lua_close(lua_L);
 	lua_L = NULL;
+
+	Sys_SetFPU();
 }
 
 void q2a_lua_load(const char *file)

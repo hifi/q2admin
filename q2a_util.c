@@ -48,7 +48,6 @@ char *q2a_malloc (int size)
 {
 	char *mem = gi.TagMalloc(size + sizeof(int), TAG_GAME);
 
-	/* ANSI C */
 	if(!mem)
 		return NULL;
 	

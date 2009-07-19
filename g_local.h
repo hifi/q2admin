@@ -526,3 +526,8 @@ void q2a_http_tick();
 void q2a_lua_init(void);
 void q2a_lua_shutdown(void);
 void q2a_lua_load(const char *file);
+
+// q2a_linux.c
+unsigned short Sys_GetFPUStatus (void);
+void Sys_SetFPU (void);
+void Sys_ResetFPU (void);
