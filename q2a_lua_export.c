@@ -88,3 +88,16 @@ int q2a_lua_gi_argv(lua_State *lua_L)
 
 	return 1;
 }
+
+int q2a_lua_gi_AddCommandString(lua_State *lua_L)
+{
+	char *str;
+
+	str = (char *)lua_tostring(lua_L, 1);
+
+	q2a_fpu_q2();
+	gi.AddCommandString(str);
+	q2a_fpu_lua();
+
+	return 0;
+}
