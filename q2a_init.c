@@ -62,6 +62,12 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 	if(!dllloaded) return FALSE;
 
 	q2a_dump_client(ent);
+	// set the client stuff somewhere
+
+	// if any lua ClientConnect return false, so do we
+	int client_id = 0;
+	if(!q2a_lua_ClientConnect(client_id))
+		return FALSE;
 
 	ret = dllglobals->ClientConnect(ent, userinfo);
 	copyDllInfo();

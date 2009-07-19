@@ -1,30 +1,7 @@
 #include "g_local.h"
-
-#include <lua.h>
-#include <lauxlib.h>
-#include <lualib.h>
-
-/* include the plugin manager code */
-#include "q2a_lua_plugman.h"
+#include "q2a_lua.h"
 
 lua_State *lua_L = NULL;
-
-static int q2a_lua_gi_dprintf(lua_State *lua_L)
-{
-	// FIXME: do things like real printf(fmt, ...)
-	char *str;
-	str = (char *)lua_tostring(lua_L, 1);
-
-	/* careful! always when the engine gets control back use SetFPU! */
-	Sys_SetFPU();
-
-	gi.dprintf("%s", str);
-
-	/* now Lua has the control, reset original state */
-	Sys_ResetFPU();
-
-	return 0;
-}
 
 static void *q2a_lua_alloc(void *ud, void *ptr, size_t osize, size_t nsize)
 {

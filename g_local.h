@@ -527,6 +527,8 @@ void q2a_lua_init(void);
 void q2a_lua_shutdown(void);
 void q2a_lua_load(const char *file);
 
+qboolean q2a_lua_ClientConnect(int client_id);
+
 // q2a_linux.c
 unsigned short Sys_GetFPUStatus (void);
 void Sys_SetFPU (void);

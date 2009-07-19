@@ -24,16 +24,28 @@ local function q2a_plugin_call(plugin, func, ...)
 		if not plugin.unloading then
 			q2a_unload(plugin.file)
 		end
+
+		return false
 	end
+
+	return err
 end
 
 cfg = {}
-local globals = copy_table(_G)
+local globals = {}
 local plugins = {}
 
 function q2a_init()
 	gi.dprintf("Q2A Lua: Plugin Manager\n")
 	gi.dprintf("Q2A Lua: Loading configuration config.lua\n");
+
+	globals = copy_table(_G)
+	globals.q2a_init = nil
+	globals.q2a_shutdown = nil
+	globals.q2a_load = nil
+	globals.q2a_unload = nil
+	globals.q2a_reload = nil
+	globals.q2a_call = nil
 
 	chunk, err = loadfile("config.lua")
 	if chunk == nil then
@@ -115,4 +127,17 @@ function q2a_call(func, ...)
 	for i,plugin in pairs(plugins) do
 		q2a_plugin_call(plugin, func, ...)
 	end
+end
+
+function q2a_call_bool(func, def, ...)
+	gi.dprintf("q2a_call_bool("..tostring(func)..", "..tostring(def)..", ...)\n");
+
+	for i,plugin in pairs(plugins) do
+		local ret = q2a_plugin_call(plugin, func, ...)
+		if ret ~= def then
+			return ret
+		end
+	end
+
+	return def
 end
