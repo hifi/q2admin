@@ -1,49 +1,31 @@
-# this makefile is for x64 linux systems!
-# adjust for your own system if needed
-# -- MDVz0r
-
 LUA_CFLAGS = $(shell pkg-config --cflags lua5.1)
 LUA_LDFLAGS = $(shell pkg-config --libs lua5.1)
-CFLAGS = -O -g -Wall -DLINUX -fPIC $(LUA_CFLAGS)
-#CFLAGS = -ffast-math -O3 -Wall -DLINUX -fPIC $(LUA_CFLAGS)
-LDFLAGS = -lcurl $(LUA_LDFLAGS)
-ORIGDIR=src
+LDFLAGS = -lm -lcurl $(LUA_LDFLAGS)
 CC=gcc
 
-OBJS = g_main.o q2a_cmd.o q2a_init.o q2a_util.o q2a_run.o q2a_http.o q2a_lua.o q2a_lua_import.o q2a_lua_export.o
+CFLAGS = -O -g -Wall -DLINUX -fPIC $(LUA_CFLAGS)
+#CFLAGS = -ffast-math -O3 -Wall -DLINUX -fPIC $(LUA_CFLAGS)
 
-gamei386.so: q2a_lua_plugman.h $(OBJS)
-	$(CC) -shared -o $@ $(OBJS) $(LDFLAGS)
-	#ldd $@
+PLATFORM=$(shell uname -s|tr A-Z a-z)
 
-clean: 
-	/bin/rm -f $(OBJS) gamei386.so q2a_lua_plugman.h
+ifneq ($(PLATFORM),linux)
+ifneq ($(PLATFORM),freebsd)
+ifneq ($(PLATFORM),darwin)
+	$(error OS $(PLATFORM) is currently not supported)
+endif
+endif
+endif
 
-install: gamei386.so
-	cp gamei386.so /home/hifi/q2serv/baseq2/
+ARCH:=$(shell uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc/ -e s/sparc64/sparc/ -e s/arm.*/arm/ -e s/sa110/arm/ -e s/alpha/axp/)
 
-$*.o: $*.c
-	$(CC) $(CFLAGS) -c $*.c
+SHLIBEXT=so
+GAME_NAME=game$(ARCH).$(SHLIBEXT)
 
-$*.c: $(ORIGDIR)/$*.c
-	tr -d '\015' < $(ORIGDIR)/$*.c > $*.c
+MAKE_FLAGS = CC=$(CC) CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" GAME_NAME=$(GAME_NAME)
 
-$*.h: $(ORIGDIR)/$*.h
-	tr -d '\015' < $(ORIGDIR)/$*.h > $*.h
+all:
+	(cd src && make all $(MAKE_FLAGS))
+	(cd src && cp $(GAME_NAME) ../)
 
-q2a_lua_plugman.h: q2a_lua_plugman.lua
-	@# this is not the best way to "trim" Lua, but with some care it works just fine
-	echo "#define LUA_PLUGMAN \"`sed 's/--.*$$//g' q2a_lua_plugman.lua | tr -s '\t' '\0' | tr '\n' ' ' | sed 's/\\\/\\\\\\\\\\\\\\\\/g' | sed 's/"/\\\\"/g'`\"" > q2a_lua_plugman.h
-
-# DO NOT DELETE
-
-g_main.o: g_local.h q_shared.h game.h
-q2a_cmd.o: g_local.h q_shared.h game.h
-q2a_init.o: g_local.h q_shared.h game.h
-q2a_util.o: g_local.h q_shared.h game.h
-q2a_run.o: g_local.h q_shared.h game.h
-q2a_http.o: g_local.h q_shared.h game.h
-q2a_lua.o: g_local.h q_shared.h game.h q2a_lua_plugman.h
-q2a_lua_import.o: g_local.h q_shared.h game.h q2a_lua_plugman.h
-q2a_lua_export.o: g_local.h q_shared.h game.h q2a_lua_plugman.h
-q2a_lua_plugman.h: q2a_lua_plugman.lua
+clean:
+	(cd src && make clean $(MAKE_FLAGS))
