@@ -24,8 +24,8 @@ GAME_NAME=game$(ARCH).$(SHLIBEXT)
 MAKE_FLAGS = CC=$(CC) CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" GAME_NAME=$(GAME_NAME)
 
 all:
-	(cd src && make all $(MAKE_FLAGS))
-	(cd src && cp $(GAME_NAME) ../)
+	cd src && make all $(MAKE_FLAGS)
 
 clean:
-	(cd src && make clean $(MAKE_FLAGS))
+	cd src && make clean $(MAKE_FLAGS)
+	rm -f $(GAME_NAME)
