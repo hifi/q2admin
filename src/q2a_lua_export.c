@@ -9,11 +9,11 @@
 #include "g_local.h"
 #include "q2a_lua.h"
 
-int q2a_lua_gi_dprintf(lua_State *lua_L)
+int q2a_lua_gi_dprintf(lua_State *L)
 {
 	// FIXME: do things like real printf(fmt, ...)
 	char *str;
-	str = (char *)lua_tostring(lua_L, 1);
+	str = (char *)lua_tostring(L, 1);
 
 	q2a_fpu_q2();
 
@@ -24,7 +24,7 @@ int q2a_lua_gi_dprintf(lua_State *lua_L)
 	return 0;
 }
 
-int q2a_lua_gi_cprintf(lua_State *lua_L)
+int q2a_lua_gi_cprintf(lua_State *L)
 {
 	// FIXME: do things like real printf(fmt, ...)
 	edict_t *ent;
@@ -32,9 +32,9 @@ int q2a_lua_gi_cprintf(lua_State *lua_L)
 	int lvl;
 	char *str;
 
-	client = lua_tointeger(lua_L, 1);
-	lvl = lua_tointeger(lua_L, 2);
-	str = (char *)lua_tostring(lua_L, 3);
+	client = lua_tointeger(L, 1);
+	lvl = lua_tointeger(L, 2);
+	str = (char *)lua_tostring(L, 3);
 
 	ent = getEnt((client + 1));
 
@@ -47,15 +47,15 @@ int q2a_lua_gi_cprintf(lua_State *lua_L)
 	return 0;
 }
 
-int q2a_lua_gi_centerprintf(lua_State *lua_L)
+int q2a_lua_gi_centerprintf(lua_State *L)
 {
 	// FIXME: do things like real printf(fmt, ...)
 	edict_t *ent;
 	int client;
 	char *str;
 
-	client = lua_tointeger(lua_L, 1);
-	str = (char *)lua_tostring(lua_L, 2);
+	client = lua_tointeger(L, 1);
+	str = (char *)lua_tostring(L, 2);
 
 	ent = getEnt((client + 1));
 
@@ -68,7 +68,7 @@ int q2a_lua_gi_centerprintf(lua_State *lua_L)
 	return 0;
 }
 
-int q2a_lua_gi_argc(lua_State *lua_L)
+int q2a_lua_gi_argc(lua_State *L)
 {
 	int argc;
 
@@ -76,32 +76,32 @@ int q2a_lua_gi_argc(lua_State *lua_L)
 	argc = gi.argc();
 	q2a_fpu_lua();
 
-	lua_pushinteger(lua_L, gi.argc());
+	lua_pushinteger(L, gi.argc());
 
 	return 1;
 }
 
-int q2a_lua_gi_argv(lua_State *lua_L)
+int q2a_lua_gi_argv(lua_State *L)
 {
 	int num;
 	char *str;
 
-	num = lua_tointeger(lua_L, 1);
+	num = lua_tointeger(L, 1);
 
 	q2a_fpu_q2();
 	str = gi.argv(num);
 	q2a_fpu_lua();
 
-	lua_pushstring(lua_L, str);
+	lua_pushstring(L, str);
 
 	return 1;
 }
 
-int q2a_lua_gi_AddCommandString(lua_State *lua_L)
+int q2a_lua_gi_AddCommandString(lua_State *L)
 {
 	char *str;
 
-	str = (char *)lua_tostring(lua_L, 1);
+	str = (char *)lua_tostring(L, 1);
 
 	q2a_fpu_q2();
 	gi.AddCommandString(str);

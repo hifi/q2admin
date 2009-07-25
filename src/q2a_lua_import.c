@@ -14,19 +14,19 @@ qboolean q2a_lua_ClientConnect(int client)
 	char *err_msg;
 	qboolean ret = TRUE;
 
-	if(!lua_L) return ret;
+	if(!L) return ret;
 
 	q2a_fpu_lua();
 
-	lua_getglobal(lua_L, "q2a_call_bool");
-	lua_pushstring(lua_L, "ClientConnect");
-	lua_pushboolean(lua_L, 1); // default status is 1, accept connection
-	lua_pushnumber(lua_L, client);
+	lua_getglobal(L, "q2a_call_bool");
+	lua_pushstring(L, "ClientConnect");
+	lua_pushboolean(L, 1); // default status is 1, accept connection
+	lua_pushnumber(L, client);
 
-	if(lua_pcall(lua_L, 3, 1, 0) == 0) {
-		ret = lua_toboolean(lua_L, -1);
+	if(lua_pcall(L, 3, 1, 0) == 0) {
+		ret = lua_toboolean(L, -1);
 	} else {
-		err_msg = (char *)lua_tostring(lua_L, -1);
+		err_msg = (char *)lua_tostring(L, -1);
 		gi.dprintf("Lua: ClientConnect returned error: %s\n", err_msg);
 	}
 
@@ -38,16 +38,16 @@ qboolean q2a_lua_ClientConnect(int client)
 void q2a_lua_ClientBegin(int client)
 {
 	char *err_msg;
-	if(!lua_L) return;
+	if(!L) return;
 
 	q2a_fpu_lua();
 
-	lua_getglobal(lua_L, "q2a_call");
-	lua_pushstring(lua_L, "ClientBegin");
-	lua_pushnumber(lua_L, client);
+	lua_getglobal(L, "q2a_call");
+	lua_pushstring(L, "ClientBegin");
+	lua_pushnumber(L, client);
 
-	if(lua_pcall(lua_L, 2, 1, 0) != 0) {
-		err_msg = (char *)lua_tostring(lua_L, -1);
+	if(lua_pcall(L, 2, 1, 0) != 0) {
+		err_msg = (char *)lua_tostring(L, -1);
 		gi.dprintf("Lua: ClientBegin returned error: %s\n", err_msg);
 	}
 
@@ -57,16 +57,16 @@ void q2a_lua_ClientBegin(int client)
 void q2a_lua_ClientDisconnect(int client)
 {
 	char *err_msg;
-	if(!lua_L) return;
+	if(!L) return;
 
 	q2a_fpu_lua();
 
-	lua_getglobal(lua_L, "q2a_call");
-	lua_pushstring(lua_L, "ClientDisconnect");
-	lua_pushnumber(lua_L, client);
+	lua_getglobal(L, "q2a_call");
+	lua_pushstring(L, "ClientDisconnect");
+	lua_pushnumber(L, client);
 
-	if(lua_pcall(lua_L, 2, 1, 0) != 0) {
-		err_msg = (char *)lua_tostring(lua_L, -1);
+	if(lua_pcall(L, 2, 1, 0) != 0) {
+		err_msg = (char *)lua_tostring(L, -1);
 		gi.dprintf("Lua: ClientDisconnect returned error: %s\n", err_msg);
 	}
 
@@ -76,16 +76,16 @@ void q2a_lua_ClientDisconnect(int client)
 void q2a_lua_ClientThink(int client)
 {
 	char *err_msg;
-	if(!lua_L) return;
+	if(!L) return;
 
 	q2a_fpu_lua();
 
-	lua_getglobal(lua_L, "q2a_call");
-	lua_pushstring(lua_L, "ClientThink");
-	lua_pushnumber(lua_L, client);
+	lua_getglobal(L, "q2a_call");
+	lua_pushstring(L, "ClientThink");
+	lua_pushnumber(L, client);
 
-	if(lua_pcall(lua_L, 2, 1, 0) != 0) {
-		err_msg = (char *)lua_tostring(lua_L, -1);
+	if(lua_pcall(L, 2, 1, 0) != 0) {
+		err_msg = (char *)lua_tostring(L, -1);
 		gi.dprintf("Lua: ClientThink returned error: %s\n", err_msg);
 	}
 
@@ -95,15 +95,15 @@ void q2a_lua_ClientThink(int client)
 void q2a_lua_RunFrame(void)
 {
 	char *err_msg;
-	if(!lua_L) return;
+	if(!L) return;
 
 	q2a_fpu_lua();
 
-	lua_getglobal(lua_L, "q2a_call");
-	lua_pushstring(lua_L, "RunFrame");
+	lua_getglobal(L, "q2a_call");
+	lua_pushstring(L, "RunFrame");
 
-	if(lua_pcall(lua_L, 1, 1, 0) != 0) {
-		err_msg = (char *)lua_tostring(lua_L, -1);
+	if(lua_pcall(L, 1, 1, 0) != 0) {
+		err_msg = (char *)lua_tostring(L, -1);
 		gi.dprintf("Lua: RunFrame returned error: %s\n", err_msg);
 	}
 
@@ -115,20 +115,20 @@ qboolean q2a_lua_ClientCommand(int client, const char *cmd)
 	char *err_msg;
 	qboolean ret = FALSE;
 
-	if(!lua_L) return ret;
+	if(!L) return ret;
 
 	q2a_fpu_lua();
 
-	lua_getglobal(lua_L, "q2a_call_bool");
-	lua_pushstring(lua_L, "ClientCommand");
-	lua_pushboolean(lua_L, 0); // default status is 0, don't capture
-	lua_pushnumber(lua_L, client);
-	lua_pushstring(lua_L, cmd);
+	lua_getglobal(L, "q2a_call_bool");
+	lua_pushstring(L, "ClientCommand");
+	lua_pushboolean(L, 0); // default status is 0, don't capture
+	lua_pushnumber(L, client);
+	lua_pushstring(L, cmd);
 
-	if(lua_pcall(lua_L, 4, 1, 0) == 0) {
-		ret = lua_toboolean(lua_L, -1);
+	if(lua_pcall(L, 4, 1, 0) == 0) {
+		ret = lua_toboolean(L, -1);
 	} else {
-		err_msg = (char *)lua_tostring(lua_L, -1);
+		err_msg = (char *)lua_tostring(L, -1);
 		gi.dprintf("Lua: ClientCommand returned error: %s\n", err_msg);
 	}
 
@@ -142,19 +142,19 @@ qboolean q2a_lua_ServerCommand(const char *cmd)
 	char *err_msg;
 	qboolean ret = FALSE;
 
-	if(!lua_L) return ret;
+	if(!L) return ret;
 
 	q2a_fpu_lua();
 
-	lua_getglobal(lua_L, "q2a_call_bool");
-	lua_pushstring(lua_L, "ServerCommand");
-	lua_pushboolean(lua_L, 0); // default status is 0, don't capture
-	lua_pushstring(lua_L, cmd);
+	lua_getglobal(L, "q2a_call_bool");
+	lua_pushstring(L, "ServerCommand");
+	lua_pushboolean(L, 0); // default status is 0, don't capture
+	lua_pushstring(L, cmd);
 
-	if(lua_pcall(lua_L, 3, 1, 0) == 0) {
-		ret = lua_toboolean(lua_L, -1);
+	if(lua_pcall(L, 3, 1, 0) == 0) {
+		ret = lua_toboolean(L, -1);
 	} else {
-		err_msg = (char *)lua_tostring(lua_L, -1);
+		err_msg = (char *)lua_tostring(L, -1);
 		gi.dprintf("Lua: ServerCommand returned error: %s\n", err_msg);
 	}
 
