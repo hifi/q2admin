@@ -82,6 +82,9 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 	if(!q2a_lua_ClientConnect(client))
 		return FALSE;
 
+	// mark this client to be in use
+	playerinfo[client].inuse = TRUE;
+
 	ret = dllglobals->ClientConnect(ent, userinfo);
 	copyDllInfo();
 	return ret;
@@ -120,7 +123,7 @@ void ClientDisconnect (edict_t *ent)
 
 	q2a_lua_ClientDisconnect(client);
 
-	// reset playerinfo
+	// reset playerinfo (also resets inuse automagically)
 	q2a_memset(playerinfo+client, 0, sizeof(playerinfo_t));
 	
 	dllglobals->ClientDisconnect(ent);

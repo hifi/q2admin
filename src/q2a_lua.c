@@ -37,17 +37,19 @@ void q2a_lua_init(void)
 	/* load plugin manager code */
 	if(luaL_loadstring(lua_L, LUA_PLUGMAN) != 0) {
 		gi.dprintf("q2a_lua_init: Plugin manager code load failed, disabling Lua support\n");
+		q2a_fpu_q2();
 		q2a_lua_shutdown();
 		return;
 	}
 	if(lua_pcall(lua_L, 0, 0, 0) != 0) {
 		char *err_msg = (char *)lua_tostring(lua_L, -1);
 		gi.dprintf("q2a_lua_init: Plugin manager code execution failed, disabling Lua support: %s\n", err_msg);
+		q2a_fpu_q2();
 		q2a_lua_shutdown();
 		return;
 	}
 
-	/* register constants */
+	/* register "constants" */
 	lua_pushnumber(lua_L, 0);
 	lua_setglobal(lua_L, "PRINT_LOW");
 	lua_pushnumber(lua_L, 1);
@@ -58,38 +60,34 @@ void q2a_lua_init(void)
 	lua_setglobal(lua_L, "PRINT_CHAT");
 
 	/* register gi functions */
-	lua_newtable(lua_L);
-	lua_setglobal(lua_L, "gi");
+	lua_newtable(lua_L); // gi table
 
-	lua_getglobal(lua_L, "gi");
 	lua_pushcfunction(lua_L, q2a_lua_gi_dprintf);
 	lua_setfield(lua_L, 1, "dprintf");
 
-	lua_getglobal(lua_L, "gi");
 	lua_pushcfunction(lua_L, q2a_lua_gi_cprintf);
 	lua_setfield(lua_L, 1, "cprintf");
 
-	lua_getglobal(lua_L, "gi");
 	lua_pushcfunction(lua_L, q2a_lua_gi_centerprintf);
 	lua_setfield(lua_L, 1, "centerprintf");
 
-	lua_getglobal(lua_L, "gi");
 	lua_pushcfunction(lua_L, q2a_lua_gi_argc);
 	lua_setfield(lua_L, 1, "argc");
 
-	lua_getglobal(lua_L, "gi");
 	lua_pushcfunction(lua_L, q2a_lua_gi_argv);
 	lua_setfield(lua_L, 1, "argv");
 
-	lua_getglobal(lua_L, "gi");
 	lua_pushcfunction(lua_L, q2a_lua_gi_AddCommandString);
 	lua_setfield(lua_L, 1, "AddCommandString");
+
+	lua_setglobal(lua_L, "gi");
 
 	/* run the initialization Lua routine */
 	lua_getglobal(lua_L, "q2a_init");
 	if(lua_pcall(lua_L, 0, 0, 0) != 0) {
 		char *err_msg = (char *)lua_tostring(lua_L, -1);
 		gi.dprintf("q2a_lua_init: calling q2a_init failed: %s\n", err_msg);
+		q2a_fpu_q2();
 		q2a_lua_shutdown();
 		return;
 	}
