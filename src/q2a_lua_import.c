@@ -207,3 +207,23 @@ void q2a_lua_ClientSkinChanged(int client, const char *new_skin)
 
 	q2a_fpu_q2();
 }
+
+void q2a_lua_LevelChanged(const char *level)
+{
+	char *err_msg;
+
+	if(!L) return;
+
+	q2a_fpu_lua();
+
+	lua_getglobal(L, "q2a_call");
+	lua_pushstring(L, "LevelChanged");
+	lua_pushstring(L, level);
+
+	if(lua_pcall(L, 2, 0, 0) != 0) {
+		err_msg = (char *)lua_tostring(L, -1);
+		gi.dprintf("Lua: LevelChanged returned error: %s\n", err_msg);
+	}
+
+	q2a_fpu_q2();
+}

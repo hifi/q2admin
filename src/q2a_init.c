@@ -38,6 +38,8 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 {
 	if(!dllloaded) return;
 
+	q2a_lua_LevelChanged(mapname);
+
 	dllglobals->SpawnEntities(mapname, entities, spawnpoint);
 	copyDllInfo();
 }

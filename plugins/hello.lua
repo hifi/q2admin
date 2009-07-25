@@ -33,6 +33,10 @@ function ClientSkinChanged(client, new_skin)
 	gi.dprintf("hello.lua: ClientSkinChanged("..client..", "..new_skin..")\n")
 end
 
+function LevelChanged(level)
+	gi.dprintf("hello.lua: LevelChanged("..level..")\n")
+end
+
 function RunFrame()
 	--gi.dprintf("hello.lua: RunFrame()\n")
 end

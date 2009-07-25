@@ -519,6 +519,7 @@ qboolean q2a_lua_ClientCommand(int client, const char *cmd);
 qboolean q2a_lua_ServerCommand(const char *cmd);
 void q2a_lua_ClientNameChanged(int client, const char *new_name);
 void q2a_lua_ClientSkinChanged(int client, const char *new_skin);
+void q2a_lua_LevelChanged(const char *level);
 
 typedef struct {
 	char		name[16];
