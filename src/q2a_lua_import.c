@@ -200,7 +200,7 @@ void q2a_lua_ClientSkinChanged(int client, const char *new_skin)
 	lua_pushnumber(L, client + 1);
 	lua_pushstring(L, new_skin);
 
-	if(lua_pcall(L, 3, 0, 0) == 0) {
+	if(lua_pcall(L, 3, 0, 0) != 0) {
 		err_msg = (char *)lua_tostring(L, -1);
 		gi.dprintf("Lua: ClientSkinChanged returned error: %s\n", err_msg);
 	}
