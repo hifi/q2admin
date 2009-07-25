@@ -58,7 +58,7 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 		}
 
 		// find the end of ip, copy it already
-		q2a_strncpy(playerinfo[client].ip, s, sizeof(playerinfo[client].ip)-1);
+		q2a_strncpy(playerinfo[client].ip_str, s, sizeof(playerinfo[client].ip_str)-1);
 	}
 
 	/* save clients name */
@@ -100,17 +100,21 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 
 	/* save clients name */
 	s = Info_ValueForKey(userinfo, "name");
-	if(*s != 0)
+	if(*s != 0) {
+		q2a_lua_ClientNameChanged(client, s);
 		q2a_strncpy(playerinfo[client].name, s, sizeof(playerinfo[client].name)-1);
+	}
 
 	/* save clients current skin */
 	s = Info_ValueForKey(userinfo, "skin");
-	if(*s != 0 && strlen(s) < 39)
+	if(*s != 0 && strlen(s) < 39) {
+		q2a_lua_ClientSkinChanged(client, s);
 		q2a_strncpy(playerinfo[client].skin, s, sizeof(playerinfo[client].name)-1);
+	}
 
 	// copy whole userinfo
 	q2a_strncpy(playerinfo[client].userinfo, userinfo, sizeof(playerinfo[client].userinfo)-1);
-	
+
 	dllglobals->ClientUserinfoChanged(ent, userinfo);
 	copyDllInfo();
 }

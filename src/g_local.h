@@ -517,12 +517,14 @@ void q2a_lua_ClientThink(int client);
 void q2a_lua_RunFrame(void);
 qboolean q2a_lua_ClientCommand(int client, const char *cmd);
 qboolean q2a_lua_ServerCommand(const char *cmd);
+void q2a_lua_ClientNameChanged(int client, const char *new_name);
+void q2a_lua_ClientSkinChanged(int client, const char *new_skin);
 
 typedef struct {
 	char		name[16];
 	char		skin[40];
-	char		ip[40];
-	uint32_t	ip_bin;
+	char		ip_str[40];
+	uint32_t	ip;
 	char		userinfo[MAX_INFO_STRING];
 	qboolean	inuse;
 } playerinfo_t;

@@ -1,5 +1,3 @@
--- example dummy Lua script that tries to use every available feature somehow
-
 function q2a_load()
 	gi.dprintf("hello.lua: q2a_load()\n")
 end
@@ -9,16 +7,30 @@ function q2a_unload()
 end
 
 function ClientConnect(client)
+	local plr = players[client]
 	gi.dprintf("hello.lua: ClientConnect("..client..")\n")
+	gi.dprintf("hello.lua: "..plr.name.."@"..plr.ip_str.." is connecting\n")
 	return true
 end
 
 function ClientBegin(client)
+	local plr = players[client]
 	gi.dprintf("hello.lua: ClientBegin("..client..")\n")
+	gi.dprintf("hello.lua: "..plr.name.."@"..plr.ip_str.." joined the game\n")
 end
 
 function ClientDisconnect(client)
+	local plr = players[client]
 	gi.dprintf("hello.lua: ClientDisconnect("..client..")\n")
+	gi.dprintf("hello.lua: "..plr.name.."@"..plr.ip_str.." disconnected\n")
+end
+
+function ClientNameChanged(client, new_name)
+	gi.dprintf("hello.lua: ClientNameChanged("..client..", "..new_name..")\n")
+end
+
+function ClientSkinChanged(client, new_skin)
+	gi.dprintf("hello.lua: ClientSkinChanged("..client..", "..new_skin..")\n")
 end
 
 function RunFrame()

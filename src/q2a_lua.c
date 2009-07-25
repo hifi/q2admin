@@ -9,6 +9,8 @@
 #include "g_local.h"
 #include "q2a_lua.h"
 
+#define MAX_PLAYERS maxclients->value
+
 lua_State *L = NULL;
 
 static void *q2a_lua_alloc(void *ud, void *ptr, size_t osize, size_t nsize)
@@ -21,6 +23,59 @@ static void *q2a_lua_alloc(void *ud, void *ptr, size_t osize, size_t nsize)
 	} else {
 		return q2a_realloc(ptr, nsize);
 	}
+}
+
+static int lua_players_index(lua_State *L)
+{
+	void *ptr = lua_touserdata(L, 1); // can be ignored really
+	ptr = NULL;
+	int index = luaL_checkint(L, 2);
+
+	luaL_argcheck(L, 1 <= index && index <= MAX_PLAYERS, 2, "index out of range");
+
+	uint16_t *tmp = (uint16_t *)lua_newuserdata(L, sizeof(uint16_t));
+	lua_pushstring(L, "player_meta");
+	lua_gettable(L, LUA_REGISTRYINDEX);
+	lua_setmetatable(L, -2);
+
+	*tmp = (uint16_t)index;
+
+	return 1;
+}
+
+static int lua_player_index(lua_State *L)
+{
+	uint16_t *index = (uint16_t *)lua_touserdata(L, 1);
+	char *key = (char *)lua_tostring(L, 2);
+
+	luaL_argcheck(L, 1 <= *index && *index <= MAX_PLAYERS, 1, "client index expected");
+
+	if(!strncmp(key, "name", 4)) {
+		lua_pushstring(L, playerinfo[*index - 1].name);
+		return 1;
+	}
+
+	if(!strncmp(key, "skin", 4)) {
+		lua_pushstring(L, playerinfo[*index - 1].skin);
+		return 1;
+	}
+
+	if(!strncmp(key, "ip_str", 6)) {
+		lua_pushstring(L, playerinfo[*index - 1].ip_str);
+		return 1;
+	}
+
+	if(!strncmp(key, "ip", 2)) {
+		lua_pushnumber(L, playerinfo[*index - 1].ip);
+		return 1;
+	}
+
+	if(!strncmp(key, "inuse", 5)) {
+		lua_pushboolean(L, playerinfo[*index - 1].inuse);
+		return 1;
+	}
+
+	return 0;
 }
 
 void q2a_lua_init(void)
@@ -48,6 +103,21 @@ void q2a_lua_init(void)
 		q2a_lua_shutdown();
 		return;
 	}
+
+	/* create players userdata */
+	void *ptr = lua_newuserdata(L, 0); ptr = NULL;
+	lua_newtable(L);
+	lua_pushcfunction(L, lua_players_index);
+	lua_setfield(L, -2, "__index");
+	lua_setmetatable(L, -2);
+	lua_setglobal(L, "players");
+
+	/* create player meta table to registry, not using a real unique name for now */
+	lua_pushstring(L, "player_meta");
+	lua_newtable(L);
+	lua_pushcfunction(L, lua_player_index);
+	lua_setfield(L, -2, "__index");
+	lua_settable(L, LUA_REGISTRYINDEX);
 
 	/* register "constants" */
 	lua_pushnumber(L, 0);

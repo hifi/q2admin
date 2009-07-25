@@ -36,7 +36,7 @@ int q2a_lua_gi_cprintf(lua_State *L)
 	lvl = lua_tointeger(L, 2);
 	str = (char *)lua_tostring(L, 3);
 
-	ent = getEnt((client + 1));
+	ent = getEnt(client);
 
 	q2a_fpu_q2();
 
@@ -57,7 +57,7 @@ int q2a_lua_gi_centerprintf(lua_State *L)
 	client = lua_tointeger(L, 1);
 	str = (char *)lua_tostring(L, 2);
 
-	ent = getEnt((client + 1));
+	ent = getEnt(client);
 
 	q2a_fpu_q2();
 
