@@ -23,10 +23,10 @@ end
 
 local function q2a_plugin_call(plugin, func, ...)
 	if type(plugin.env[func]) ~= 'function' then
-		return
+		return nil
 	end
 
-	success, err = pcall(plugin.env[func], ...)
+	success, err, arg = pcall(plugin.env[func], ...)
 	if not success then
 		gi.dprintf("Q2A Lua: failed to call '"..func.."' in '"..plugin.file.."': "..err.."\n")
 		if not plugin.unloading then
@@ -36,7 +36,7 @@ local function q2a_plugin_call(plugin, func, ...)
 		return false
 	end
 
-	return err
+	return err, arg
 end
 
 cfg = {}
@@ -139,11 +139,11 @@ end
 
 function q2a_call_bool(func, def, ...)
 	for i,plugin in pairs(plugins) do
-		local ret = q2a_plugin_call(plugin, func, ...)
-		if ret ~= def then
-			return ret
+		local ret,arg = q2a_plugin_call(plugin, func, ...)
+		if ret ~= nil and ret ~= def then
+			return ret, arg
 		end
 	end
 
-	return def
+	return def, nil
 end

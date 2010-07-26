@@ -109,3 +109,42 @@ int q2a_lua_gi_AddCommandString(lua_State *L)
 
 	return 0;
 }
+
+int q2a_lua_stuffcmd(lua_State *L)
+{
+	edict_t *ent;
+	int client;
+	char *str;
+
+	client = lua_tointeger(L, 1);
+	str = (char *)lua_tostring(L, 2);
+
+	ent = getEnt(client);
+
+	q2a_fpu_q2();
+
+	stuffcmd(ent, str);
+
+	q2a_fpu_lua();
+
+	return 0;
+}
+
+int q2a_lua_cvar(lua_State *L)
+{
+	cvar_t *tmp;
+
+	char *str;
+
+	str = (char *)lua_tostring(L, 1);
+
+	q2a_fpu_q2();
+
+	tmp = gi.cvar(str, NULL, 0);
+
+	q2a_fpu_lua();
+
+	if(tmp) lua_pushstring(L, tmp->string);
+
+	return 1;
+}

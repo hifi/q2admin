@@ -176,3 +176,113 @@ void q_strupr(char *c)
 		c++;
 	}
 }
+
+void Info_RemoveKey (char *s, char *key)
+{
+	char	*start;
+	char	pkey[MAX_INFO_STRING];
+	char	value[MAX_INFO_STRING];
+	char	*o;
+
+	if (strchr (key, '\\'))
+	{
+		gi.dprintf("Info_RemoveKey: Tried to remove illegal key '%s'\n", key);
+		return;
+	}
+
+	while (1)
+	{
+		start = s;
+		if (*s == '\\')
+			s++;
+		o = pkey;
+		while (*s != '\\')
+		{
+			if (!*s)
+				return;
+			*o++ = *s++;
+		}
+		*o = 0;
+
+		s++;
+
+		o = value;
+		while (*s != '\\' && *s)
+		{
+			if (!*s)
+				return;
+			*o++ = *s++;
+		}
+		*o = 0;
+
+		if (!strcmp (key, pkey) )
+		{
+			//strcpy (start, s);	// remove this part
+			size_t memlen;
+
+			memlen = strlen(s);
+			memmove (start, s, memlen);
+			*(start+memlen) = 0;
+			return;
+		}
+
+		if (!*s)
+			return;
+	}
+}
+
+void Info_SetValueForKey (char *s, char *key, char *value)
+{
+	char	newi[MAX_INFO_STRING], *v;
+	int		c;
+
+	if (strchr (key, '\\') || strchr (value, '\\') )
+	{
+		gi.dprintf("Can't use keys or values with a \\ (attempted to set key '%s')\n", key);
+		return;
+	}
+
+	if (strchr (key, ';') )
+	{
+		gi.dprintf("Can't use keys or values with a semicolon (attempted to set key '%s')\n", key);
+		return;
+	}
+
+	if (strchr (key, '"') || strchr (value, '"') )
+	{
+		gi.dprintf("Can't use keys or values with a \" (attempted to set key '%s')\n", key);
+		return;
+	}
+
+	if (strlen(key) > MAX_INFO_KEY-1 || strlen(value) > MAX_INFO_KEY-1)
+	{
+		gi.dprintf("Keys and values must be < 64 characters (attempted to set key '%s')\n", key);
+		return;
+	}
+
+	Info_RemoveKey (s, key);
+
+	if (!value || !value[0])
+		return;
+
+	snprintf (newi, sizeof(newi), "\\%s\\%s", key, value);
+
+	if (strlen(newi) + strlen(s) > MAX_INFO_STRING)
+	{
+		gi.dprintf ("Info string length exceeded while trying to set '%s'\n", newi);
+		return;
+	}
+
+	// only copy ascii values
+	s += strlen(s);
+	v = newi;
+	while (*v)
+	{
+		c = *v++;
+		c &= 127;		// strip high bits
+		if (c >= 32 && c < 127)
+			*s++ = c;
+	}
+	*s = 0;
+}
+

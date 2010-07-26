@@ -150,7 +150,13 @@ void q2a_lua_init(void)
 	lua_pushcfunction(L, q2a_lua_gi_AddCommandString);
 	lua_setfield(L, 1, "AddCommandString");
 
+	lua_pushcfunction(L, q2a_lua_cvar);
+	lua_setfield(L, 1, "cvar");
+
 	lua_setglobal(L, "gi");
+
+	lua_pushcfunction(L, q2a_lua_stuffcmd);
+	lua_setglobal(L, "stuffcmd");
 
 	/* run the initialization Lua routine */
 	lua_getglobal(L, "q2a_init");

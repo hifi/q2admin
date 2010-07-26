@@ -9,9 +9,9 @@
 #include "g_local.h"
 #include "q2a_lua.h"
 
-qboolean q2a_lua_ClientConnect(int client)
+qboolean q2a_lua_ClientConnect(int client, char *userinfo)
 {
-	char *err_msg;
+	char *err_msg,*rej_msg = NULL;
 	qboolean ret = TRUE;
 
 	if(!L) return ret;
@@ -23,8 +23,9 @@ qboolean q2a_lua_ClientConnect(int client)
 	lua_pushboolean(L, TRUE);
 	lua_pushnumber(L, client + 1);
 
-	if(lua_pcall(L, 3, 1, 0) == 0) {
-		ret = lua_toboolean(L, -1);
+	if(lua_pcall(L, 3, 2, 0) == 0) {
+		ret = lua_toboolean(L, -2);
+                rej_msg = (char *)lua_tostring(L, -1);
 	} else {
 		err_msg = (char *)lua_tostring(L, -1);
 		gi.dprintf("Lua: ClientConnect returned error: %s\n", err_msg);
@@ -32,6 +33,11 @@ qboolean q2a_lua_ClientConnect(int client)
 	}
 
 	q2a_fpu_q2();
+
+        if(!ret && rej_msg != NULL) {
+            userinfo[0] = 0;
+            Info_SetValueForKey(userinfo, "rejmsg", rej_msg);
+        }
 
 	return ret;
 }

@@ -81,7 +81,7 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 	q2a_strncpy(playerinfo[client].userinfo, userinfo, sizeof(playerinfo[client].userinfo)-1);
 
 	// if any lua ClientConnect return false, so do we
-	if(!q2a_lua_ClientConnect(client))
+	if(!q2a_lua_ClientConnect(client, userinfo))
 		return FALSE;
 
 	// mark this client to be in use
