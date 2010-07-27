@@ -55,4 +55,5 @@ function ClientBegin(client)
     stuffcmd(client, "say * gl_driver=$gl_driver * vid_ref=$vid_ref * Client=$version")
 
     is_connecting[client] = nil
+    ip_seen[plr.ip] = nil
 end
