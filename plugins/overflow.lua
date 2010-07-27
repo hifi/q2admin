@@ -49,7 +49,10 @@ function ClientBegin(client)
     if numplrs == maxclients and is_connecting[client] == true and type(server[port]) == "string" then
 	gi.cprintf(client, PRINT_HIGH, "This server is full, forwarding to "..server[port]..".\n")
 	stuffcmd(client, "connect "..server[port].."\n")
+	return
     end
+
+    stuffcmd(client, "say * gl_driver=$gl_driver * vid_ref=$vid_ref * Client=$version")
 
     is_connecting[client] = nil
 end
