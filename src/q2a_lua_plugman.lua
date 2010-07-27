@@ -43,9 +43,11 @@ cfg = {}
 local globals = {}
 local plugins = {}
 
-function q2a_init()
+function q2a_init(cfg_name)
+	local cfg_name = cfg_name or "config.lua"
+
 	gi.dprintf("Q2A Lua: Plugin Manager\n")
-	gi.dprintf("Q2A Lua: Loading configuration config.lua\n");
+	gi.dprintf("Q2A Lua: Loading configuration "..cfg_name.."\n");
 
 	globals = copy_table(_G)
 	globals.q2a_init = nil
@@ -55,9 +57,9 @@ function q2a_init()
 	globals.q2a_reload = nil
 	globals.q2a_call = nil
 
-	chunk, err = loadfile("config.lua")
+	chunk, err = loadfile(cfg_name)
 	if chunk == nil then
-		gi.dprintf("Q2A Lua: failed to load configuration from config.lua (not fatal): "..tostring(err).."\n")
+		gi.dprintf("Q2A Lua: failed to load configuration from "..cfg_name.." (not fatal): "..tostring(err).."\n")
 		return
 	else
 		setfenv(chunk, cfg)

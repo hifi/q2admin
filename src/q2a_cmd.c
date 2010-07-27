@@ -130,6 +130,11 @@ void ServerCommand (void)
 			cmd = cmdbuf;
 			cmd++;
 
+			if(!q2a_strcmp(cmd, "lua_reload")) {
+				q2a_lua_shutdown();
+				q2a_lua_init();
+			}
+
 			// cmd now contains the command, argv 2+ contains the parameters
 			// handle all server commands here, return when command is captured
 			if(!q2a_strcmp(cmd, "curl_reload")) {

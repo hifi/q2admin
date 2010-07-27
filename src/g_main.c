@@ -48,7 +48,7 @@ game_import_t  gi;
 game_export_t  globals;
 game_export_t  *dllglobals;
 
-cvar_t *gamedir, *maxclients, *gamename;
+cvar_t *gamedir, *q2a_config, *maxclients, *gamename;
 
 qboolean quake2dirsupport = TRUE;
 

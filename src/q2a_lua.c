@@ -160,7 +160,8 @@ void q2a_lua_init(void)
 
 	/* run the initialization Lua routine */
 	lua_getglobal(L, "q2a_init");
-	if(lua_pcall(L, 0, 0, 0) != 0) {
+	lua_pushstring(L, q2a_config->string);
+	if(lua_pcall(L, 1, 0, 0) != 0) {
 		char *err_msg = (char *)lua_tostring(L, -1);
 		gi.dprintf("q2a_lua_init: calling q2a_init failed: %s\n", err_msg);
 		q2a_fpu_q2();

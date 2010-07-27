@@ -401,7 +401,7 @@ struct edict_s
 extern game_import_t gi;
 extern game_export_t globals;
 extern game_export_t *dllglobals;
-extern cvar_t   *rcon_password, *gamedir, *maxclients, *port, *serverbindip;
+extern cvar_t   *rcon_password, *gamedir, *q2a_config, *maxclients, *port, *serverbindip;
 
 extern char    dllname[256];
 extern char    moddir[256];
