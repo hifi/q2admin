@@ -133,6 +133,7 @@ void ServerCommand (void)
 			if(!q2a_strcmp(cmd, "lua_reload")) {
 				q2a_lua_shutdown();
 				q2a_lua_init();
+				return;
 			}
 
 			// cmd now contains the command, argv 2+ contains the parameters
