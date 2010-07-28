@@ -10,18 +10,19 @@ local ip_seen = { }
 local ip_ban = { }
 function ClientConnect(client)
     local plr = players[client]
+    local now = os.time()
 
     -- check for reconnect loop
-    if ip_seen[plr.ip] ~= nil and os.time() - ip_seen[plr.ip] < 10 and (ip_ban[plr.ip] == nil or ip_ban[plr.ip] < os.time()) then
-	ip_ban[plr.ip] = os.time() + bantime
+    if ip_seen[plr.ip] ~= nil and now - ip_seen[plr.ip] < 10 and (ip_ban[plr.ip] == nil or ip_ban[plr.ip] < now) then
+	ip_ban[plr.ip] = now + bantime
     end
 
-    if ip_ban[plr.ip] ~= nil and ip_ban[plr.ip] > os.time() then
-	return false, "Reconnect loop detected. Continuing in "..(ip_ban[plr.ip] - os.time()).. " seconds"
+    if ip_ban[plr.ip] ~= nil and ip_ban[plr.ip] > now then
+	return false, "Reconnect loop detected. Continuing in "..(ip_ban[plr.ip] - now).. " seconds"
     end
 
     is_connecting[client] = true
-    ip_seen[plr.ip] = os.time()
+    ip_seen[plr.ip] = now
 end
 
 function ClientDisconnect(client)
