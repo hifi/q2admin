@@ -24,6 +24,23 @@ int q2a_lua_gi_dprintf(lua_State *L)
 	return 0;
 }
 
+int q2a_lua_gi_bprintf(lua_State *L)
+{
+	// FIXME: do things like real printf(fmt, ...)
+	int lvl;
+	char *str;
+	lvl = lua_tointeger(L, 1);
+	str = (char *)lua_tostring(L, 2);
+
+	q2a_fpu_q2();
+
+	gi.bprintf(lvl, str);
+
+	q2a_fpu_lua();
+
+	return 0;
+}
+
 int q2a_lua_gi_cprintf(lua_State *L)
 {
 	// FIXME: do things like real printf(fmt, ...)
@@ -145,6 +162,27 @@ int q2a_lua_cvar(lua_State *L)
 	q2a_fpu_lua();
 
 	if(tmp) lua_pushstring(L, tmp->string);
+
+	return 1;
+}
+
+int q2a_lua_cvar_set(lua_State *L)
+{
+	cvar_t *tmp;
+
+	char *key, *value;
+
+	key = (char *)lua_tostring(L, 1);
+	value = (char *)lua_tostring(L, 2);
+
+	q2a_fpu_q2();
+
+	tmp = gi.cvar_set(key, value);
+
+	q2a_fpu_lua();
+
+	if(tmp)
+		lua_pushboolean(L, !q2a_strcmp(tmp->string, value));
 
 	return 1;
 }

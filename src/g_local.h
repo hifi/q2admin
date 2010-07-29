@@ -515,7 +515,7 @@ void q2a_lua_ClientBegin(int client);
 void q2a_lua_ClientDisconnect(int client);
 void q2a_lua_ClientThink(int client);
 void q2a_lua_RunFrame(void);
-qboolean q2a_lua_ClientCommand(int client, const char *cmd);
+qboolean q2a_lua_ClientCommand(int client);
 qboolean q2a_lua_ServerCommand(const char *cmd);
 void q2a_lua_ClientNameChanged(int client, const char *new_name);
 void q2a_lua_ClientSkinChanged(int client, const char *new_skin);

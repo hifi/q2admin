@@ -89,23 +89,8 @@ void ClientCommand (edict_t *ent)
 	
 	if(!dllloaded) return;
 
-	cmd = gi.argv(0);
-
-	if(q2a_strlen(cmd) > 0) {
-		if(cmd[0] == '!') {
-			q2a_strcpy(cmdbuf, cmd);
-			cmd = cmdbuf;
-			cmd++;
-
-			// cmd now contains the command, argv 1+ contains the parameters
-			// handle all client commands here, return when command is captured
-			if(q2a_lua_ClientCommand(client, cmd))
-				return;
-
-			gi.cprintf(ent, PRINT_HIGH, "Q2A: Unknown client command: %s\n", cmd);
-			return;
-		}
-	}
+	if(q2a_lua_ClientCommand(client))
+		return;
 
 	dllglobals->ClientCommand(ent);
 	copyDllInfo();

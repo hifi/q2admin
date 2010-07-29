@@ -60,12 +60,12 @@ static int lua_player_index(lua_State *L)
 		return 1;
 	}
 
-	if(!strncmp(key, "ip_str", 6)) {
+	if(!strncmp(key, "ip", 2)) {
 		lua_pushstring(L, playerinfo[*index - 1].ip_str);
 		return 1;
 	}
 
-	if(!strncmp(key, "ip", 2)) {
+	if(!strncmp(key, "ip_bin", 6)) {
 		lua_pushnumber(L, playerinfo[*index - 1].ip);
 		return 1;
 	}
@@ -135,6 +135,9 @@ void q2a_lua_init(void)
 	lua_pushcfunction(L, q2a_lua_gi_dprintf);
 	lua_setfield(L, 1, "dprintf");
 
+	lua_pushcfunction(L, q2a_lua_gi_bprintf);
+	lua_setfield(L, 1, "bprintf");
+
 	lua_pushcfunction(L, q2a_lua_gi_cprintf);
 	lua_setfield(L, 1, "cprintf");
 
@@ -152,6 +155,9 @@ void q2a_lua_init(void)
 
 	lua_pushcfunction(L, q2a_lua_cvar);
 	lua_setfield(L, 1, "cvar");
+
+	lua_pushcfunction(L, q2a_lua_cvar_set);
+	lua_setfield(L, 1, "cvar_set");
 
 	lua_setglobal(L, "gi");
 

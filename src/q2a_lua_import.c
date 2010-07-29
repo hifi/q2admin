@@ -117,7 +117,7 @@ void q2a_lua_RunFrame(void)
 	q2a_fpu_q2();
 }
 
-qboolean q2a_lua_ClientCommand(int client, const char *cmd)
+qboolean q2a_lua_ClientCommand(int client)
 {
 	char *err_msg;
 	qboolean ret = FALSE;
@@ -130,9 +130,8 @@ qboolean q2a_lua_ClientCommand(int client, const char *cmd)
 	lua_pushstring(L, "ClientCommand");
 	lua_pushboolean(L, FALSE);
 	lua_pushnumber(L, client + 1);
-	lua_pushstring(L, cmd);
 
-	if(lua_pcall(L, 4, 1, 0) == 0) {
+	if(lua_pcall(L, 3, 1, 0) == 0) {
 		ret = lua_toboolean(L, -1);
 	} else {
 		err_msg = (char *)lua_tostring(L, -1);
