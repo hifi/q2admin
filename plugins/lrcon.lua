@@ -2,6 +2,8 @@
 -- a very limited rcon by hifi <3
 --
 
+local quit_on_empty = true
+
 local cvars = {
     -- server
     "password", "maxclients", "timelimit", "dmflags", "sv_gravity", "sv_iplimit", "fraglimit",
@@ -11,10 +13,6 @@ local cvars = {
     "teamplay", "ctf", "matchmode", "roundtimelimit", "tgren", "limchasecam", "forcedteamtalk",
     "mm_forceteamtalk", "ir", "wp_flags", "itm_flags", "hc_single", "use_punch",  "darkmatch",
     "allitem", "allweapon", "use_3teams"
-}
-
-local commands = {
-    "map", "gamemap"
 }
 
 local claimer = nil
@@ -102,6 +100,16 @@ function ClientCommand(client)
                     end
 
                     if cmd == 'status' then
+			local maxclients = tonumber(gi.cvar("maxclients"))
+
+			gi.cprintf(client, PRINT_HIGH, "num  name             address\n")
+			gi.cprintf(client, PRINT_HIGH, "---  ---------------  ---------------\n")
+
+			for i=1,maxclients do
+			    if players[i].inuse then
+				gi.cprintf(client, PRINT_HIGH, string.format("%3d  %-15s  %s\n", i-1, players[i].name, string.match(players[i].ip, '^([^:]+)')))
+			    end
+			end
                         return true
                     end
 
@@ -151,6 +159,11 @@ function ClientCommand(client)
                     end
 
                     if cmd == 'kick' then
+			if param == nil then
+                            gi.cprintf(client, PRINT_HIGH, "Usage: kick <id>\n")
+			else
+			    gi.AddCommandString("kick "..tonumber(param))
+			end
                         return true
                     end
                 else
@@ -179,13 +192,16 @@ end
 
 -- quit server after a match to reset state
 function ClientDisconnect(client)
-    local plr = players[client]
-    local ip = string.match(plr.ip, '^([^:]+)')
     local numplrs = 0
     local maxclients = tonumber(gi.cvar("maxclients"))
-    local reset_lrcon = true
 
-    if numplrs == 1 and claimer ~= nil then
+    for i=1,maxclients do
+	if players[i].inuse then
+	    numplrs = numplrs + 1
+	end
+    end
+
+    if quit_on_empty and numplrs == 1 then
         gi.AddCommandString("quit")
     end
 
