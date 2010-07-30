@@ -129,6 +129,17 @@ void q2a_lua_init(void)
 	lua_pushnumber(L, 3);
 	lua_setglobal(L, "PRINT_CHAT");
 
+	lua_pushnumber(L, CVAR_ARCHIVE);
+	lua_setglobal(L, "CVAR_ARCHIVE");
+	lua_pushnumber(L, CVAR_USERINFO);
+	lua_setglobal(L, "CVAR_USERINFO");
+	lua_pushnumber(L, CVAR_SERVERINFO);
+	lua_setglobal(L, "CVAR_SERVERINFO");
+	lua_pushnumber(L, CVAR_NOSET);
+	lua_setglobal(L, "CVAR_NOSET");
+	lua_pushnumber(L, CVAR_LATCH);
+	lua_setglobal(L, "CVAR_LATCH");
+
 	/* register gi functions */
 	lua_newtable(L); // gi table
 

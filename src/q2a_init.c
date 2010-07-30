@@ -18,7 +18,7 @@ void InitGame (void)
 	gi.dprintf ("%s running %s\n", q2a_version, moddir);
 
 	q2a_config = gi.cvar ("q2a_config", "config.lua", 0);
-
+	gi.cvar ("*Q2Admin", Q2A_VERSION, CVAR_SERVERINFO|CVAR_NOSET);
 	q2a_lua_init();
 
 	if(!dllloaded) return;
@@ -85,9 +85,6 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 	if(!q2a_lua_ClientConnect(client, userinfo))
 		return FALSE;
 
-	// mark this client to be in use
-	playerinfo[client].inuse = TRUE;
-
 	ret = dllglobals->ClientConnect(ent, userinfo);
 	copyDllInfo();
 	return ret;
@@ -143,6 +140,9 @@ void ClientBegin (edict_t *ent)
 	int client = getEntOffset(ent) - 1;
 
 	if(!dllloaded) return;
+
+	// mark this client to be in use
+	playerinfo[client].inuse = TRUE;
 
 	q2a_lua_ClientBegin(client);
 

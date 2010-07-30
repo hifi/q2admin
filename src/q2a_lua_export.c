@@ -171,13 +171,15 @@ int q2a_lua_cvar_set(lua_State *L)
 	cvar_t *tmp;
 
 	char *key, *value;
+	int mask;
 
 	key = (char *)lua_tostring(L, 1);
 	value = (char *)lua_tostring(L, 2);
+	mask = (int)lua_tointeger(L, 3);
 
 	q2a_fpu_q2();
 
-	tmp = gi.cvar_set(key, value);
+	tmp = gi.cvar(key, value, mask);
 
 	q2a_fpu_lua();
 
