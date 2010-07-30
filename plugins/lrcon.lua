@@ -52,6 +52,7 @@ function ClientCommand(client)
                 return true
             elseif cmd == 'release' then
                 if client == claimer then
+		    claimer = nil
                     gi.cprintf(client, PRINT_HIGH, "You released the server.\n")
                     gi.bprintf(PRINT_HIGH, players[client].name.." relesed the server, use \"lrcon claim\" to re-claim\n")
                 else
