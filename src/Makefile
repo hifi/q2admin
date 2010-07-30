@@ -13,8 +13,7 @@ bin2hex:
 	$(CC) -o bin2hex bin2hex.c
 
 q2a_lua_plugman.h: bin2hex
-	luac -o q2a_lua_plugman.o q2a_lua_plugman.lua
-	./bin2hex q2a_lua_plugman.o q2a_lua_plugman > q2a_lua_plugman.h
+	cat q2a_lua_plugman.lua | ./bin2hex q2a_lua_plugman > q2a_lua_plugman.h
 
 all: $(GAME_NAME)
 
