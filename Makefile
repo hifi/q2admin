@@ -1,9 +1,7 @@
 LUA_CFLAGS = $(shell pkg-config --cflags lua5.1)
 LUA_LDFLAGS = $(shell pkg-config --libs lua5.1)
-CURL_CFLAGS = $(shell pkg-config --cflags libcurl)
-CURL_LDFLAGS = $(shell pkg-config --libs libcurl)
 
-LDFLAGS = -lm $(LUA_LDFLAGS) $(CURL_LDFLAGS)
+LDFLAGS = -lm $(LUA_LDFLAGS)
 
 CC=gcc
 

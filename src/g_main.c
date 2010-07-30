@@ -60,7 +60,6 @@ char moddir[256];
 
 void ShutdownGame (void)
 {
-	q2a_http_shutdown();
 	q2a_lua_shutdown();
 
 	if(!dllloaded) return;

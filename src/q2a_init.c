@@ -19,7 +19,6 @@ void InitGame (void)
 
 	q2a_config = gi.cvar ("q2a_config", "config.lua", 0);
 
-	q2a_http_init();
 	q2a_lua_init();
 
 	if(!dllloaded) return;

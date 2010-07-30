@@ -489,19 +489,6 @@ void  G_RunFrame (void);
 
 #define Q2ADMINVERSION   "1.99.99"
 
-// q2a_http.c
-enum {
-	Q2A_HTTP_NOT_READY,
-	Q2A_HTTP_IDLE,
-	Q2A_HTTP_WORKING
-} _q2a_http_status;
-
-void q2a_http_init();
-int q2a_http_status();
-void q2a_http_shutdown();
-qboolean q2a_http_get(char *url, void *ready_cb, char *username, char *password);
-void q2a_http_tick();
-
 // q2a_lua.c
 void q2a_fpu_lua (void);
 void q2a_fpu_q2 (void);
