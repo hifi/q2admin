@@ -26,6 +26,7 @@ int q2a_lua_gi_AddCommandString(lua_State *L);
 int q2a_lua_stuffcmd(lua_State *L);
 int q2a_lua_cvar(lua_State *L);
 int q2a_lua_cvar_set(lua_State *L);
+int q2a_lua_cvar_forceset(lua_State *L);
 
 #define Q2A_LUA_H
 #endif

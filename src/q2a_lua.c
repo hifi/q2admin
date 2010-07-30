@@ -173,6 +173,9 @@ void q2a_lua_init(void)
 	lua_pushcfunction(L, q2a_lua_cvar_set);
 	lua_setfield(L, 1, "cvar_set");
 
+	lua_pushcfunction(L, q2a_lua_cvar_forceset);
+	lua_setfield(L, 1, "cvar_forceset");
+
 	lua_setglobal(L, "gi");
 
 	lua_pushcfunction(L, q2a_lua_stuffcmd);

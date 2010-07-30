@@ -171,20 +171,41 @@ int q2a_lua_cvar_set(lua_State *L)
 	cvar_t *tmp;
 
 	char *key, *value;
-	int mask;
 
 	key = (char *)lua_tostring(L, 1);
 	value = (char *)lua_tostring(L, 2);
-	mask = (int)lua_tointeger(L, 3);
 
 	q2a_fpu_q2();
 
-	tmp = gi.cvar(key, value, mask);
+	tmp = gi.cvar_set(key, value);
 
 	q2a_fpu_lua();
 
-	if(tmp)
-		lua_pushboolean(L, !q2a_strcmp(tmp->string, value));
+	if(!tmp)
+		return 0;
 
+	lua_pushboolean(L, !q2a_strcmp(tmp->string, value));
+	return 1;
+}
+
+int q2a_lua_cvar_forceset(lua_State *L)
+{
+	cvar_t *tmp;
+
+	char *key, *value;
+
+	key = (char *)lua_tostring(L, 1);
+	value = (char *)lua_tostring(L, 2);
+
+	q2a_fpu_q2();
+
+	tmp = gi.cvar_forceset(key, value);
+
+	q2a_fpu_lua();
+
+	if(!tmp)
+		return 0;
+
+	lua_pushboolean(L, !q2a_strcmp(tmp->string, value));
 	return 1;
 }
