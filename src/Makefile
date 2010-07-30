@@ -4,14 +4,17 @@ $(GAME_NAME): q2a_lua_plugman.h $(OBJS)
 	$(CC) -shared -o ../$@ $(OBJS) $(LDFLAGS)
 
 clean: 
-	/bin/rm -f $(OBJS) q2a_lua_plugman.h
+	/bin/rm -f $(OBJS) q2a_lua_plugman.h q2a_lua_plugman.o bin2hex
 
 $*.o: $*.c
 	$(CC) $(CFLAGS) -c $*.c
 
-q2a_lua_plugman.h: q2a_lua_plugman.lua
-	@# this is not the best way to "trim" Lua, but with some care it works just fine
-	echo "#define LUA_PLUGMAN \"`sed 's/--.*$$//g' q2a_lua_plugman.lua | tr -s '\t' '\0' | tr '\n' ' ' | sed 's/\\\/\\\\\\\\\\\\\\\\/g' | sed 's/"/\\\\"/g'`\"" > q2a_lua_plugman.h
+bin2hex:
+	$(CC) -o bin2hex bin2hex.c
+
+q2a_lua_plugman.h: bin2hex
+	luac -o q2a_lua_plugman.o q2a_lua_plugman.lua
+	./bin2hex q2a_lua_plugman.o q2a_lua_plugman > q2a_lua_plugman.h
 
 all: $(GAME_NAME)
 

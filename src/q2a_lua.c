@@ -9,6 +9,9 @@
 #include "g_local.h"
 #include "q2a_lua.h"
 
+/* include the compiled plugin manager code */
+#include "q2a_lua_plugman.h"
+
 #define MAX_PLAYERS maxclients->value
 
 lua_State *L = NULL;
@@ -87,10 +90,10 @@ void q2a_lua_init(void)
 	L = lua_newstate(q2a_lua_alloc, NULL);
 	luaL_openlibs(L);
 
-	gi.dprintf("q2a_lua_init: loading stored Lua code, %d bytes\n", strlen(LUA_PLUGMAN));
+	gi.dprintf("q2a_lua_init: loading stored Lua code, %d bytes\n", sizeof(q2a_lua_plugman));
 
 	/* load plugin manager code */
-	if(luaL_loadstring(L, LUA_PLUGMAN) != 0) {
+	if(luaL_loadbuffer(L, (const char *)q2a_lua_plugman, sizeof(q2a_lua_plugman), "q2a_lua_plugman") != 0) {
 		gi.dprintf("q2a_lua_init: Plugin manager code load failed, disabling Lua support\n");
 		q2a_fpu_q2();
 		q2a_lua_shutdown();

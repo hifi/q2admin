@@ -13,9 +13,6 @@
 #include <lauxlib.h>
 #include <lualib.h>
 
-/* include the plugin manager code */
-#include "q2a_lua_plugman.h"
-
 extern lua_State *L;
 
 /* functions exported to Lua */
