@@ -19,6 +19,7 @@ all: $(GAME_NAME)
 
 # DO NOT DELETE
 
+bin2hex: bin2hex.c
 g_main.o: g_local.h q_shared.h game.h
 q2a_cmd.o: g_local.h q_shared.h game.h
 q2a_init.o: g_local.h q_shared.h game.h
@@ -27,4 +28,4 @@ q2a_run.o: g_local.h q_shared.h game.h
 q2a_lua.o: g_local.h q_shared.h game.h q2a_lua_plugman.h
 q2a_lua_import.o: g_local.h q_shared.h game.h q2a_lua_plugman.h
 q2a_lua_export.o: g_local.h q_shared.h game.h q2a_lua_plugman.h
-q2a_lua_plugman.h: q2a_lua_plugman.lua
+q2a_lua_plugman.h: q2a_lua_plugman.lua bin2hex.c
