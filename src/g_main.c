@@ -54,7 +54,6 @@ qboolean quake2dirsupport = TRUE;
 
 qboolean dllloaded = FALSE;
 
-char *q2a_version = "Q2Admin Version " Q2ADMINVERSION;
 char dllname[256];
 char moddir[256];
 

@@ -15,7 +15,7 @@ void InitGame (void)
 {
 	playerinfo = NULL;
 
-	gi.dprintf ("%s running %s\n", q2a_version, moddir);
+	gi.dprintf ("Q2Admin %s running %s\n", Q2A_VERSION, moddir);
 
 	q2a_config = gi.cvar ("q2a_config", "config.lua", 0);
 	gi.cvar ("*Q2Admin", Q2A_VERSION, CVAR_SERVERINFO|CVAR_NOSET);
