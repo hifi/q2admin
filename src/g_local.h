@@ -504,8 +504,7 @@ void q2a_lua_ClientThink(int client);
 void q2a_lua_RunFrame(void);
 qboolean q2a_lua_ClientCommand(int client);
 qboolean q2a_lua_ServerCommand(const char *cmd);
-void q2a_lua_ClientNameChanged(int client, const char *new_name);
-void q2a_lua_ClientSkinChanged(int client, const char *new_skin);
+void q2a_lua_ClientUserinfoChanged(int client, char *userinfo);
 void q2a_lua_LevelChanged(const char *level);
 
 typedef struct {

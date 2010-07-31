@@ -23,11 +23,13 @@ int q2a_lua_gi_centerprintf(lua_State *L);
 int q2a_lua_gi_argc(lua_State *L);
 int q2a_lua_gi_argv(lua_State *L);
 int q2a_lua_gi_AddCommandString(lua_State *L);
-int q2a_lua_stuffcmd(lua_State *L);
 void q2a_lua_cvar_register(lua_State *L);
-int q2a_lua_cvar(lua_State *L);
-int q2a_lua_cvar_set(lua_State *L);
-int q2a_lua_cvar_forceset(lua_State *L);
+int q2a_lua_gi_cvar(lua_State *L);
+int q2a_lua_gi_cvar_set(lua_State *L);
+int q2a_lua_gi_cvar_forceset(lua_State *L);
+int q2a_lua_stuffcmd(lua_State *L);
+int q2a_lua_Info_ValueForKey(lua_State *L);
+int q2a_lua_Info_SetValueForKey(lua_State *L);
 
 #define Q2A_LUA_H
 #endif

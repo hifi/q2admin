@@ -127,26 +127,6 @@ int q2a_lua_gi_AddCommandString(lua_State *L)
 	return 0;
 }
 
-int q2a_lua_stuffcmd(lua_State *L)
-{
-	edict_t *ent;
-	int client;
-	char *str;
-
-	client = lua_tointeger(L, 1);
-	str = (char *)lua_tostring(L, 2);
-
-	ent = getEnt(client);
-
-	q2a_fpu_q2();
-
-	stuffcmd(ent, str);
-
-	q2a_fpu_lua();
-
-	return 0;
-}
-
 static int q2a_lua_cvar_index(lua_State *L)
 {
 	cvar_t *cvar = *(cvar_t **)lua_touserdata(L, 1);
@@ -193,7 +173,7 @@ void q2a_lua_cvar_register(lua_State *L)
 	lua_pop(L, 1);
 }
 
-int q2a_lua_cvar(lua_State *L)
+int q2a_lua_gi_cvar(lua_State *L)
 {
 	cvar_t *cvar;
 
@@ -216,7 +196,7 @@ int q2a_lua_cvar(lua_State *L)
 	return 1;
 }
 
-int q2a_lua_cvar_set(lua_State *L)
+int q2a_lua_gi_cvar_set(lua_State *L)
 {
 	cvar_t *cvar;
 
@@ -238,7 +218,7 @@ int q2a_lua_cvar_set(lua_State *L)
 	return 1;
 }
 
-int q2a_lua_cvar_forceset(lua_State *L)
+int q2a_lua_gi_cvar_forceset(lua_State *L)
 {
 	cvar_t *cvar;
 
@@ -258,4 +238,43 @@ int q2a_lua_cvar_forceset(lua_State *L)
 	lua_setmetatable(L, -2);
 
 	return 1;
+}
+
+int q2a_lua_stuffcmd(lua_State *L)
+{
+	edict_t *ent;
+	int client;
+	char *str;
+
+	client = lua_tointeger(L, 1);
+	str = (char *)lua_tostring(L, 2);
+
+	ent = getEnt(client);
+
+	q2a_fpu_q2();
+
+	stuffcmd(ent, str);
+
+	q2a_fpu_lua();
+
+	return 0;
+}
+
+int q2a_lua_Info_ValueForKey(lua_State *L)
+{
+	char *userinfo = lua_touserdata(L, 1);
+	char *key = (char *)luaL_checkstring(L, 2);
+
+	lua_pushstring(L, Info_ValueForKey(userinfo, key));
+	return 1;
+}
+
+int q2a_lua_Info_SetValueForKey(lua_State *L)
+{
+	char *userinfo = lua_touserdata(L, 1);
+	char *key = (char *)luaL_checkstring(L, 2);
+	char *value = (char *)luaL_checkstring(L, 3);
+
+	Info_SetValueForKey(userinfo, key, value);
+	return 0;
 }

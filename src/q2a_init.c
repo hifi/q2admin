@@ -98,17 +98,17 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 
 	if(!dllloaded) return;
 
+	q2a_lua_ClientUserinfoChanged(client, userinfo);
+
 	/* save clients name */
 	s = Info_ValueForKey(userinfo, "name");
 	if(*s != 0) {
-		q2a_lua_ClientNameChanged(client, s);
 		q2a_strncpy(playerinfo[client].name, s, sizeof(playerinfo[client].name)-1);
 	}
 
 	/* save clients current skin */
 	s = Info_ValueForKey(userinfo, "skin");
 	if(*s != 0 && strlen(s) < 39) {
-		q2a_lua_ClientSkinChanged(client, s);
 		q2a_strncpy(playerinfo[client].skin, s, sizeof(playerinfo[client].name)-1);
 	}
 

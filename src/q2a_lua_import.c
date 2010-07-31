@@ -11,7 +11,7 @@
 
 qboolean q2a_lua_ClientConnect(int client, char *userinfo)
 {
-	char *err_msg,*rej_msg = NULL;
+	char *err_msg = NULL;
 	qboolean ret = TRUE;
 
 	if(!L) return ret;
@@ -22,22 +22,16 @@ qboolean q2a_lua_ClientConnect(int client, char *userinfo)
 	lua_pushstring(L, "ClientConnect");
 	lua_pushboolean(L, TRUE);
 	lua_pushnumber(L, client + 1);
+	lua_pushlightuserdata(L, userinfo);
 
-	if(lua_pcall(L, 3, 2, 0) == 0) {
-		ret = lua_toboolean(L, -2);
-                rej_msg = (char *)lua_tostring(L, -1);
+	if(lua_pcall(L, 4, 1, 0) == 0) {
+		ret = lua_toboolean(L, -1);
 	} else {
 		err_msg = (char *)lua_tostring(L, -1);
-		gi.dprintf("Lua: ClientConnect returned error: %s\n", err_msg);
-		ret = TRUE;
+		//gi.dprintf("Lua: ClientConnect returned error: %s\n", err_msg);
 	}
 
 	q2a_fpu_q2();
-
-        if(!ret && rej_msg != NULL) {
-            userinfo[0] = 0;
-            Info_SetValueForKey(userinfo, "rejmsg", rej_msg);
-        }
 
 	return ret;
 }
@@ -171,7 +165,7 @@ qboolean q2a_lua_ServerCommand(const char *cmd)
 	return ret;
 }
 
-void q2a_lua_ClientNameChanged(int client, const char *new_name)
+void q2a_lua_ClientUserinfoChanged(int client, char *userinfo)
 {
 	char *err_msg;
 
@@ -180,34 +174,13 @@ void q2a_lua_ClientNameChanged(int client, const char *new_name)
 	q2a_fpu_lua();
 
 	lua_getglobal(L, "q2a_call");
-	lua_pushstring(L, "ClientNameChanged");
+	lua_pushstring(L, "ClientUserinfoChanged");
 	lua_pushnumber(L, client + 1);
-	lua_pushstring(L, new_name);
+	lua_pushlightuserdata(L, userinfo);
 
 	if(lua_pcall(L, 3, 0, 0) != 0) {
 		err_msg = (char *)lua_tostring(L, -1);
-		gi.dprintf("Lua: ClientNameChanged returned error: %s\n", err_msg);
-	}
-
-	q2a_fpu_q2();
-}
-
-void q2a_lua_ClientSkinChanged(int client, const char *new_skin)
-{
-	char *err_msg;
-
-	if(!L) return;
-
-	q2a_fpu_lua();
-
-	lua_getglobal(L, "q2a_call");
-	lua_pushstring(L, "ClientSkinChanged");
-	lua_pushnumber(L, client + 1);
-	lua_pushstring(L, new_skin);
-
-	if(lua_pcall(L, 3, 0, 0) != 0) {
-		err_msg = (char *)lua_tostring(L, -1);
-		gi.dprintf("Lua: ClientSkinChanged returned error: %s\n", err_msg);
+		gi.dprintf("Lua: ClientUserinfoChanged returned error: %s\n", err_msg);
 	}
 
 	q2a_fpu_q2();

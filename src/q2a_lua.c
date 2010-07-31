@@ -16,28 +16,30 @@
 
 lua_State *L = NULL;
 
+/* this isn't working.. why? */
 static void *q2a_lua_alloc(void *ud, void *ptr, size_t osize, size_t nsize)
 {
-	//gi.dprintf("q2a_lua_alloc(ud=%p, ptr=%p, osize=%ld, nsize=%ld)\n");
+	void *ret = NULL;
 	(void)ud; (void)osize;
+	q2a_fpu_q2();
 	if(nsize == 0) {
 		q2a_free(ptr);
-		return NULL;
 	} else {
-		return q2a_realloc(ptr, nsize);
+		ret = q2a_realloc(ptr, nsize);
 	}
+	q2a_fpu_lua();
+	return ret;
 }
 
 static int lua_players_index(lua_State *L)
 {
-	void *ptr = lua_touserdata(L, 1); // can be ignored really
-	ptr = NULL;
+	lua_touserdata(L, 1);
 	int index = luaL_checkint(L, 2);
 
 	luaL_argcheck(L, 1 <= index && index <= MAX_PLAYERS, 2, "index out of range");
 
 	uint16_t *tmp = (uint16_t *)lua_newuserdata(L, sizeof(uint16_t));
-	luaL_getmetatable(L, "player");
+	luaL_getmetatable(L, "Player");
 	lua_setmetatable(L, -2);
 
 	*tmp = (uint16_t)index;
@@ -77,6 +79,11 @@ static int lua_player_index(lua_State *L)
 		return 1;
 	}
 
+	if(!strncmp(key, "userinfo", 2)) {
+		lua_pushstring(L, playerinfo[*index - 1].userinfo);
+		return 1;
+	}
+
 	return 0;
 }
 
@@ -86,7 +93,8 @@ void q2a_lua_init(void)
 
 	q2a_fpu_lua();
 
-	L = lua_newstate(q2a_lua_alloc, NULL);
+	//L = lua_newstate(q2a_lua_alloc, NULL);
+	L = lua_open();
 	luaL_openlibs(L);
 
 	gi.dprintf("q2a_lua_init: loading stored Lua code, %d bytes\n", sizeof(q2a_lua_plugman));
@@ -108,16 +116,14 @@ void q2a_lua_init(void)
 
 	q2a_lua_cvar_register(L);
 
-	/* create players userdata */
-	void *ptr = lua_newuserdata(L, 0); ptr = NULL;
-	lua_newtable(L);
+	lua_newuserdata(L, 0);
+	luaL_newmetatable(L, "Players");
 	lua_pushcfunction(L, lua_players_index);
-	lua_setfield(L, -2, "__index");
+	lua_setfield(L, -2, "__index");	
 	lua_setmetatable(L, -2);
 	lua_setglobal(L, "players");
 
-	/* create player meta table to registry, not using a real unique name for now */
-	luaL_newmetatable(L, "player");
+	luaL_newmetatable(L, "Player");
 	lua_pushcfunction(L, lua_player_index);
 	lua_setfield(L, -2, "__index");
 	lua_pop(L, 1);
@@ -167,19 +173,25 @@ void q2a_lua_init(void)
 	lua_pushcfunction(L, q2a_lua_gi_AddCommandString);
 	lua_setfield(L, 1, "AddCommandString");
 
-	lua_pushcfunction(L, q2a_lua_cvar);
+	lua_pushcfunction(L, q2a_lua_gi_cvar);
 	lua_setfield(L, 1, "cvar");
 
-	lua_pushcfunction(L, q2a_lua_cvar_set);
+	lua_pushcfunction(L, q2a_lua_gi_cvar_set);
 	lua_setfield(L, 1, "cvar_set");
 
-	lua_pushcfunction(L, q2a_lua_cvar_forceset);
+	lua_pushcfunction(L, q2a_lua_gi_cvar_forceset);
 	lua_setfield(L, 1, "cvar_forceset");
 
 	lua_setglobal(L, "gi");
 
 	lua_pushcfunction(L, q2a_lua_stuffcmd);
 	lua_setglobal(L, "stuffcmd");
+
+	lua_pushcfunction(L, q2a_lua_Info_ValueForKey);
+	lua_setglobal(L, "Info_ValueForKey");
+
+	lua_pushcfunction(L, q2a_lua_Info_SetValueForKey);
+	lua_setglobal(L, "Info_SetValueForKey");
 
 	/* run the initialization Lua routine */
 	lua_getglobal(L, "q2a_init");

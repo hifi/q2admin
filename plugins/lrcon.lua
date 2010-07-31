@@ -193,6 +193,8 @@ function ClientConnect(client)
         gi.cvar_forceset("lua_q2a_lrcon_storage", "");
         claimer = client
     end
+
+    return true
 end
 
 -- quit server after a match to reset state
