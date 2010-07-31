@@ -49,6 +49,30 @@ function q2a_init(cfg_name)
 	gi.dprintf("Q2A Lua: Plugin Manager\n")
 	gi.dprintf("Q2A Lua: Loading configuration "..cfg_name.."\n");
 
+	-- quick implementation of *printf family functions
+	do
+		local dprintf = gi.dprintf
+		local cprintf = gi.cprintf
+		local bprintf = gi.bprintf
+		local centerprintf = gi.centerprintf
+
+		function gi.dprintf(fmt, ...)
+			return dprintf(string.format(fmt, ...))
+		end
+
+		function gi.cprintf(client, level, fmt, ...)
+			return cprintf(client, level, string.format(fmt, ...))
+		end
+
+		function gi.bprintf(level, fmt, ...)
+			return bprintf(level, string.format(fmt, ...))
+		end
+
+		function gi.centerprintf(level, fmt, ...)
+			return centerprintf(level, string.format(fmt, ...))
+		end
+	end
+
 	globals = copy_table(_G)
 	globals.q2a_init = nil
 	globals.q2a_shutdown = nil
