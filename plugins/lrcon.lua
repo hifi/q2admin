@@ -99,7 +99,7 @@ function ClientCommand(client)
                                     gi.bprintf(PRINT_HIGH, '%s changed server settings: %s -> "%s" (latched)\n', players[client].name, cvar.name, cvar.latched_string)
                                 else
                                     gi.cprintf(client, PRINT_HIGH, '%s -> "%s"\n', cvar.name, cvar.string)
-                                    gi.bprintf(PRINT_HIGH, '%s changed server settings: %s -> "%s"\n', players[client].name, cvar.name, cvar.latched_string)
+                                    gi.bprintf(PRINT_HIGH, '%s changed server settings: %s -> "%s"\n', players[client].name, cvar.name, cvar.string)
                                 end
                             end
                             return true
