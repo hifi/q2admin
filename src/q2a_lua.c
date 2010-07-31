@@ -37,8 +37,7 @@ static int lua_players_index(lua_State *L)
 	luaL_argcheck(L, 1 <= index && index <= MAX_PLAYERS, 2, "index out of range");
 
 	uint16_t *tmp = (uint16_t *)lua_newuserdata(L, sizeof(uint16_t));
-	lua_pushstring(L, "player_meta");
-	lua_gettable(L, LUA_REGISTRYINDEX);
+	luaL_getmetatable(L, "player");
 	lua_setmetatable(L, -2);
 
 	*tmp = (uint16_t)index;
@@ -107,6 +106,8 @@ void q2a_lua_init(void)
 		return;
 	}
 
+	q2a_lua_cvar_register(L);
+
 	/* create players userdata */
 	void *ptr = lua_newuserdata(L, 0); ptr = NULL;
 	lua_newtable(L);
@@ -116,11 +117,10 @@ void q2a_lua_init(void)
 	lua_setglobal(L, "players");
 
 	/* create player meta table to registry, not using a real unique name for now */
-	lua_pushstring(L, "player_meta");
-	lua_newtable(L);
+	luaL_newmetatable(L, "player");
 	lua_pushcfunction(L, lua_player_index);
 	lua_setfield(L, -2, "__index");
-	lua_settable(L, LUA_REGISTRYINDEX);
+	lua_pop(L, 1);
 
 	/* register "constants" */
 	lua_pushnumber(L, 0);

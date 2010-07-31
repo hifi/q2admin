@@ -15,12 +15,6 @@ void InitGame (void)
 {
 	playerinfo = NULL;
 
-	gi.dprintf ("Q2Admin %s running %s\n", Q2A_VERSION, moddir);
-
-	q2a_config = gi.cvar ("q2a_config", "config.lua", 0);
-	gi.cvar ("*Q2Admin", Q2A_VERSION, CVAR_SERVERINFO|CVAR_NOSET);
-	q2a_lua_init();
-
 	if(!dllloaded) return;
 	
 	// be careful with all functions called from this one (like dprintf_internal) to not use
@@ -28,6 +22,12 @@ void InitGame (void)
 	dllglobals->Init();
 	
 	copyDllInfo();
+
+	gi.dprintf ("Q2Admin %s running %s\n", Q2A_VERSION, moddir);
+
+	q2a_config = gi.cvar ("q2a_config", "config.lua", 0);
+	gi.cvar ("*Q2Admin", Q2A_VERSION, CVAR_SERVERINFO|CVAR_NOSET);
+	q2a_lua_init();
 
 	maxclients = gi.cvar ("maxclients", "4", 0);
 	playerinfo = gi.TagMalloc ((maxclients->value + 1) * sizeof(playerinfo_t), TAG_GAME);

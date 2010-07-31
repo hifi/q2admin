@@ -147,28 +147,78 @@ int q2a_lua_stuffcmd(lua_State *L)
 	return 0;
 }
 
+static int q2a_lua_cvar_index(lua_State *L)
+{
+	cvar_t *cvar = *(cvar_t **)lua_touserdata(L, 1);
+	char *key = (char *)luaL_checkstring(L, 2);
+
+	if(!strcmp(key, "name")) {
+		lua_pushstring(L, cvar->name);
+		return 1;
+	}
+
+	if(!strcmp(key, "string")) {
+		lua_pushstring(L, cvar->string);
+		return 1;
+	}
+
+	if(!strcmp(key, "latched_string")) {
+		lua_pushstring(L, cvar->latched_string);
+		return 1;
+	}
+
+	if(!strcmp(key, "flags")) {
+		lua_pushnumber(L, cvar->flags);
+		return 1;
+	}
+
+	if(!strcmp(key, "modified")) {
+		lua_pushboolean(L, cvar->modified);
+		return 1;
+	}
+
+	if(!strcmp(key, "value")) {
+		lua_pushnumber(L, cvar->value);
+		return 1;
+	}
+
+	return 0;
+}
+
+void q2a_lua_cvar_register(lua_State *L)
+{
+	luaL_newmetatable(L, "Cvar");
+	lua_pushcfunction(L, q2a_lua_cvar_index);
+	lua_setfield(L, -2, "__index");
+	lua_pop(L, 1);
+}
+
 int q2a_lua_cvar(lua_State *L)
 {
-	cvar_t *tmp;
+	cvar_t *cvar;
 
-	char *str;
+	char *key,*value;
+	int flags;
 
-	str = (char *)lua_tostring(L, 1);
+	key = (char *)luaL_checkstring(L, 1);
+	value = (char *)luaL_checkstring(L, 2);
+	flags = (int)lua_tointeger(L, 3);
 
 	q2a_fpu_q2();
 
-	tmp = gi.cvar(str, NULL, 0);
+	cvar = gi.cvar(key, value, flags);
 
 	q2a_fpu_lua();
 
-	if(tmp) lua_pushstring(L, tmp->string);
-
+	*(cvar_t **)lua_newuserdata(L, sizeof(cvar_t *)) = cvar;
+	luaL_getmetatable(L, "Cvar");
+	lua_setmetatable(L, -2);
 	return 1;
 }
 
 int q2a_lua_cvar_set(lua_State *L)
 {
-	cvar_t *tmp;
+	cvar_t *cvar;
 
 	char *key, *value;
 
@@ -177,20 +227,20 @@ int q2a_lua_cvar_set(lua_State *L)
 
 	q2a_fpu_q2();
 
-	tmp = gi.cvar_set(key, value);
+	cvar = gi.cvar_set(key, value);
 
 	q2a_fpu_lua();
 
-	if(!tmp)
-		return 0;
+	*(cvar_t **)lua_newuserdata(L, sizeof(cvar_t *)) = cvar;
+	luaL_getmetatable(L, "Cvar");
+	lua_setmetatable(L, -2);
 
-	lua_pushboolean(L, !q2a_strcmp(tmp->string, value));
 	return 1;
 }
 
 int q2a_lua_cvar_forceset(lua_State *L)
 {
-	cvar_t *tmp;
+	cvar_t *cvar;
 
 	char *key, *value;
 
@@ -199,13 +249,13 @@ int q2a_lua_cvar_forceset(lua_State *L)
 
 	q2a_fpu_q2();
 
-	tmp = gi.cvar_forceset(key, value);
+	cvar = gi.cvar_forceset(key, value);
 
 	q2a_fpu_lua();
 
-	if(!tmp)
-		return 0;
+	*(cvar_t **)lua_newuserdata(L, sizeof(cvar_t *)) = cvar;
+	luaL_getmetatable(L, "Cvar");
+	lua_setmetatable(L, -2);
 
-	lua_pushboolean(L, !q2a_strcmp(tmp->string, value));
 	return 1;
 }

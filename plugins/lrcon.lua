@@ -17,16 +17,18 @@ local cvars = {
 
 local claimer = nil
 local claimer_store = nil
+local maxclients
 
 function q2a_load()
-    claimer_store = gi.cvar("lua_q2a_lrcon_storage")
+    claimer_store = gi.cvar("lua_q2a_lrcon_storage", "")
+    maxclients = gi.cvar("maxclients", "")
 end
 
 function q2a_unload()
     if claimer then
-        gi.cvar_set("lua_q2a_lrcon_storage", players[claimer].name..players[claimer].ip)
+        gi.cvar_forceset("lua_q2a_lrcon_storage", players[claimer].name..players[claimer].ip)
     else
-        gi.cvar_set("lua_q2a_lrcon_storage", "")
+        gi.cvar_forceset("lua_q2a_lrcon_storage", "")
     end
 end
 
@@ -54,7 +56,7 @@ function ClientCommand(client)
                 if client == claimer then
 		    claimer = nil
                     gi.cprintf(client, PRINT_HIGH, "You released the server.\n")
-                    gi.bprintf(PRINT_HIGH, players[client].name.." relesed the server, use \"lrcon claim\" to re-claim\n")
+                    gi.bprintf(PRINT_HIGH, players[client].name.." released the server, use \"lrcon claim\" to re-claim\n")
                 else
                     gi.cprintf(client, PRINT_HIGH, "You have not claimed this server.\n")
                 end
@@ -86,27 +88,29 @@ function ClientCommand(client)
 
                     for k,v in ipairs(cvars) do
                         if v == cmd then
+                            local cvar = gi.cvar(cmd, "")
                             if param == nil then
-                                gi.cprintf(client, PRINT_HIGH, cmd.." = \""..gi.cvar(cmd).."\"\n")
+                                gi.cprintf(client, PRINT_HIGH, cvar.name.." = \""..cvar.string.."\"\n")
                             else
-                                if(gi.cvar_set(cmd, param)) then
-                                    gi.cprintf(client, PRINT_HIGH, cmd.." -> \""..param.."\"\n")
+                                gi.cvar_set(cvar.name, param)
+
+                                if cvar.latched_string == param then
+                                    gi.cprintf(client, PRINT_HIGH, cvar.name.." -> \""..cvar.latched_string.."\" (latched)\n")
+                                    gi.bprintf(PRINT_HIGH, players[client].name.." changed server settings: "..cvar.name.." -> \""..cvar.latched_string.."\"\n")
                                 else
-                                    gi.cprintf(client, PRINT_HIGH, cmd.." -> \""..param.."\" (latched)\n")
+                                    gi.cprintf(client, PRINT_HIGH, cvar.name.." -> \""..cvar.string.."\"\n")
+                                    gi.bprintf(PRINT_HIGH, players[client].name.." changed server settings: "..cvar.name.." -> \""..cvar.string.."\"\n")
                                 end
-                                gi.bprintf(PRINT_HIGH, players[client].name.." changed server settings: "..cmd.." -> \""..param.."\"\n")
                             end
                             return true
                         end
                     end
 
                     if cmd == 'status' then
-			local maxclients = tonumber(gi.cvar("maxclients"))
-
 			gi.cprintf(client, PRINT_HIGH, "num  name             address\n")
 			gi.cprintf(client, PRINT_HIGH, "---  ---------------  ---------------\n")
 
-			for i=1,maxclients do
+			for i=1,maxclients.value do
 			    if players[i].inuse then
 				gi.cprintf(client, PRINT_HIGH, string.format("%3d  %-15s  %s\n", i-1, players[i].name, string.match(players[i].ip, '^([^:]+)')))
 			    end
@@ -185,8 +189,8 @@ end
 function ClientConnect(client)
     local plr = players[client]
 
-    if players[client].name..players[client].ip == claimer_store then
-        claimer_store = nil
+    if players[client].name..players[client].ip == claimer_store.string then
+        gi.cvar_forceset("lua_q2a_lrcon_storage", "");
         claimer = client
     end
 end
@@ -194,9 +198,8 @@ end
 -- quit server after a match to reset state
 function ClientDisconnect(client)
     local numplrs = 0
-    local maxclients = tonumber(gi.cvar("maxclients"))
 
-    for i=1,maxclients do
+    for i=1,maxclients.value do
 	if players[i].inuse then
 	    numplrs = numplrs + 1
 	end
