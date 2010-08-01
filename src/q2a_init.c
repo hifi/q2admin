@@ -128,7 +128,7 @@ void ClientDisconnect (edict_t *ent)
 	q2a_lua_ClientDisconnect(client);
 
 	// reset playerinfo (also resets inuse automagically)
-	q2a_memset(playerinfo+client, 0, sizeof(playerinfo_t));
+	q2a_memset(&playerinfo[client], 0, sizeof(playerinfo_t));
 	
 	dllglobals->ClientDisconnect(ent);
 	copyDllInfo();
