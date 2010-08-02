@@ -14,7 +14,8 @@ VERSION=$(REL_VERSION)
 endif
 
 LUA_CFLAGS = $(shell pkg-config --cflags lua5.1)
-LUA_LDFLAGS = $(shell pkg-config --libs lua5.1)
+#LUA_LDFLAGS = $(shell pkg-config --libs lua5.1)
+LUA_LDFLAGS =
 
 LDFLAGS = -lm $(LUA_LDFLAGS)
 

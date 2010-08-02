@@ -1,7 +1,7 @@
 OBJS = g_main.o q2a_cmd.o q2a_init.o q2a_util.o q2a_run.o q2a_lua.o q2a_lua_import.o q2a_lua_export.o
 
 $(GAME_NAME): q2a_lua_plugman.h $(OBJS)
-	$(CC) -shared -o ../$@ $(OBJS) $(LDFLAGS)
+	$(CC) $(CFLAGS) -rdynamic -shared -o ../$@ $(OBJS) $(LDFLAGS)
 
 clean: 
 	/bin/rm -f $(OBJS) q2a_lua_plugman.h q2a_lua_plugman.o bin2hex

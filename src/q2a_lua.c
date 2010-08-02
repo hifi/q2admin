@@ -7,6 +7,7 @@
 //
 
 #include "g_local.h"
+#include <dlfcn.h>
 #include "q2a_lua.h"
 
 /* include the compiled plugin manager code */
@@ -15,6 +16,7 @@
 #define MAX_PLAYERS maxclients->value
 
 lua_State *L = NULL;
+void *lua_dll = NULL;
 
 /* this isn't working.. why? */
 static void *q2a_lua_alloc(void *ud, void *ptr, size_t osize, size_t nsize)
@@ -90,6 +92,12 @@ static int lua_player_index(lua_State *L)
 void q2a_lua_init(void)
 {
 	if(L) return;
+
+	lua_dll = dlopen("liblua5.1.so", RTLD_NOW|RTLD_GLOBAL);
+        if(!lua_dll) {
+            gi.dprintf("q2a_lua_init: loading Lua shared object failed\n");
+            return;
+        }
 
 	q2a_fpu_lua();
 
@@ -221,6 +229,8 @@ void q2a_lua_shutdown(void)
 	L = NULL;
 
 	q2a_fpu_q2();
+
+	dlclose(lua_dll);
 }
 
 void q2a_lua_load(const char *file)
