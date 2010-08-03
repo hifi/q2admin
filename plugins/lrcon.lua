@@ -164,10 +164,10 @@ function ClientCommand(client)
                     end
 
                     if cmd == 'kick' then
-			if param == nil then
+			if param == nil or tonumber(param) == nil then
                             gi.cprintf(client, PRINT_HIGH, 'Usage: kick <id>\n')
 			else
-			    gi.AddCommandString('kick '..tonumber(param))
+			    gi.AddCommandString('kick '..tostring(param))
 			end
                         return true
                     end
