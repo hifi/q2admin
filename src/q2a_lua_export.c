@@ -240,6 +240,123 @@ int q2a_lua_gi_cvar_forceset(lua_State *L)
 	return 1;
 }
 
+int q2a_lua_gi_multicast(lua_State *L)
+{
+	qboolean realible;
+	vec3_t orig;
+
+	if(!lua_istable(L, 1))
+		return 0;
+
+	lua_rawgeti(L, 1, 1);
+	lua_rawgeti(L, 1, 2);
+	lua_rawgeti(L, 1, 3);
+
+	if(!lua_isnumber(L, -3))
+		return 0;
+	if(!lua_isnumber(L, -2))
+		return 0;
+	if(!lua_isnumber(L, -1))
+		return 0;
+
+	orig[0] = lua_tonumber(L, -3);
+	orig[1] = lua_tonumber(L, -2);
+	orig[2] = lua_tonumber(L, -1);
+
+	realible = lua_tointeger(L, 2) ? TRUE : FALSE;
+
+	q2a_fpu_q2();
+
+	gi.multicast(orig, realible);
+
+	q2a_fpu_lua();
+
+        return 0;
+}
+
+int q2a_lua_gi_unicast(lua_State *L)
+{
+	edict_t *ent;
+	int client;
+	qboolean realible;
+
+	client = luaL_checkinteger(L, 1);
+	realible = lua_tointeger(L, 2) ? TRUE : FALSE;
+
+	ent = getEnt(client);
+
+	q2a_fpu_q2();
+
+	gi.unicast(ent, realible);
+
+	q2a_fpu_lua();
+
+        return 0;
+}
+
+int q2a_lua_gi_WriteChar(lua_State *L)
+{
+	int num = luaL_checkinteger(L, 1);
+	q2a_fpu_q2();
+	gi.WriteChar(num);
+	q2a_fpu_lua();
+	return 0;
+}
+
+int q2a_lua_gi_WriteByte(lua_State *L)
+{
+	int num = luaL_checkinteger(L, 1);
+	q2a_fpu_q2();
+	gi.WriteByte(num);
+	q2a_fpu_lua();
+	return 0;
+}
+
+int q2a_lua_gi_WriteShort(lua_State *L)
+{
+	int num = luaL_checkinteger(L, 1);
+	q2a_fpu_q2();
+	gi.WriteShort(num);
+	q2a_fpu_lua();
+	return 0;
+}
+
+int q2a_lua_gi_WriteLong(lua_State *L)
+{
+	int num = luaL_checkinteger(L, 1);
+	q2a_fpu_q2();
+	gi.WriteLong(num);
+	q2a_fpu_lua();
+	return 0;
+}
+
+int q2a_lua_gi_WriteFloat(lua_State *L)
+{
+	float num = luaL_checknumber(L, 1);
+	q2a_fpu_q2();
+	gi.WriteFloat(num);
+	q2a_fpu_lua();
+	return 0;
+}
+
+int q2a_lua_gi_WriteString(lua_State *L)
+{
+	char *str = (char *)luaL_checkstring(L, 1);
+	q2a_fpu_q2();
+	gi.WriteString(str);
+	q2a_fpu_lua();
+	return 0;
+}
+
+int q2a_lua_gi_WriteAngle(lua_State *L)
+{
+	float num = luaL_checknumber(L, 1);
+	q2a_fpu_q2();
+	gi.WriteAngle(num);
+	q2a_fpu_lua();
+	return 0;
+}
+
 int q2a_lua_stuffcmd(lua_State *L)
 {
 	edict_t *ent;

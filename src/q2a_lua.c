@@ -190,6 +190,33 @@ void q2a_lua_init(void)
 	lua_pushcfunction(L, q2a_lua_gi_cvar_forceset);
 	lua_setfield(L, 1, "cvar_forceset");
 
+	lua_pushcfunction(L, q2a_lua_gi_multicast);
+	lua_setfield(L, 1, "multicast");
+
+	lua_pushcfunction(L, q2a_lua_gi_unicast);
+	lua_setfield(L, 1, "unicast");
+
+	lua_pushcfunction(L, q2a_lua_gi_WriteChar);
+	lua_setfield(L, 1, "WriteChar");
+
+	lua_pushcfunction(L, q2a_lua_gi_WriteByte);
+	lua_setfield(L, 1, "WriteByte");
+
+	lua_pushcfunction(L, q2a_lua_gi_WriteShort);
+	lua_setfield(L, 1, "WriteShort");
+
+	lua_pushcfunction(L, q2a_lua_gi_WriteLong);
+	lua_setfield(L, 1, "WriteLong");
+
+	lua_pushcfunction(L, q2a_lua_gi_WriteFloat);
+	lua_setfield(L, 1, "WriteFloat");
+
+	lua_pushcfunction(L, q2a_lua_gi_WriteString);
+	lua_setfield(L, 1, "WriteString");
+
+	lua_pushcfunction(L, q2a_lua_gi_WriteAngle);
+	lua_setfield(L, 1, "WriteAngle");
+
 	lua_setglobal(L, "gi");
 
 	lua_pushcfunction(L, q2a_lua_stuffcmd);
