@@ -265,6 +265,22 @@ void q2a_lua_load(const char *file)
 	if(!L) return;
 }
 
+void lua_tovec3(lua_State *L, int index, vec3_t dst)
+{
+	if( !lua_istable(L, index) ) {
+		gi.dprintf("nope\n");
+		return;
+	}
+
+	lua_rawgeti(L, index, 1);
+	lua_rawgeti(L, index, 2);
+	lua_rawgeti(L, index, 3);
+
+	dst[0] = (vec_t)lua_tonumber(L, -3);
+	dst[1] = (vec_t)lua_tonumber(L, -2);
+	dst[2] = (vec_t)lua_tonumber(L, -1);
+}
+
 /* x86 workaround for Lua, fsck you Carmack! */
 unsigned short q2a_fpuword = 0;
 void q2a_fpu_q2 (void)

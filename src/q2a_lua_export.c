@@ -11,7 +11,6 @@
 
 int q2a_lua_gi_dprintf(lua_State *L)
 {
-	// FIXME: do things like real printf(fmt, ...)
 	char *str;
 	str = (char *)lua_tostring(L, 1);
 
@@ -26,7 +25,6 @@ int q2a_lua_gi_dprintf(lua_State *L)
 
 int q2a_lua_gi_bprintf(lua_State *L)
 {
-	// FIXME: do things like real printf(fmt, ...)
 	int lvl;
 	char *str;
 	lvl = lua_tointeger(L, 1);
@@ -43,7 +41,6 @@ int q2a_lua_gi_bprintf(lua_State *L)
 
 int q2a_lua_gi_cprintf(lua_State *L)
 {
-	// FIXME: do things like real printf(fmt, ...)
 	edict_t *ent;
 	int client;
 	int lvl;
@@ -66,7 +63,6 @@ int q2a_lua_gi_cprintf(lua_State *L)
 
 int q2a_lua_gi_centerprintf(lua_State *L)
 {
-	// FIXME: do things like real printf(fmt, ...)
 	edict_t *ent;
 	int client;
 	char *str;
@@ -243,26 +239,9 @@ int q2a_lua_gi_cvar_forceset(lua_State *L)
 int q2a_lua_gi_multicast(lua_State *L)
 {
 	qboolean realible;
-	vec3_t orig;
+	vec3_t orig = { 0.00, 0.00, 0.00 };
 
-	if(!lua_istable(L, 1))
-		return 0;
-
-	lua_rawgeti(L, 1, 1);
-	lua_rawgeti(L, 1, 2);
-	lua_rawgeti(L, 1, 3);
-
-	if(!lua_isnumber(L, -3))
-		return 0;
-	if(!lua_isnumber(L, -2))
-		return 0;
-	if(!lua_isnumber(L, -1))
-		return 0;
-
-	orig[0] = lua_tonumber(L, -3);
-	orig[1] = lua_tonumber(L, -2);
-	orig[2] = lua_tonumber(L, -1);
-
+	lua_tovec3(L, 1, orig);
 	realible = lua_tointeger(L, 2) ? TRUE : FALSE;
 
 	q2a_fpu_q2();

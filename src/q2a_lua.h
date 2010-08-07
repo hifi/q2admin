@@ -15,6 +15,9 @@
 
 extern lua_State *L;
 
+/* utility functions */
+void lua_tovec3(lua_State *L, int index, vec3_t dst);
+
 /* functions exported to Lua */
 int q2a_lua_gi_dprintf(lua_State *L);
 int q2a_lua_gi_bprintf(lua_State *L);
