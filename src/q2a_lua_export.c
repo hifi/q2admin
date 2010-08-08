@@ -91,7 +91,7 @@ int q2a_lua_gi_argc(lua_State *L)
 
 	q2a_fpu_lua();
 
-	lua_pushinteger(L, argc + 1);
+	lua_pushinteger(L, argc);
 
 	return 1;
 }
