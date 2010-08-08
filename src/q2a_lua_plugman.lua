@@ -10,6 +10,76 @@
 -- Q2Admin Lua plugin manager
 --
 
+-- ex table consists of extra functionality
+ex = { }
+ex.players = { }
+local players_tmp = { }
+
+function ex.stuffcmd(client, str)
+	gi.WriteByte(11)
+	gi.WriteString(str)
+	if client == nil then
+		gi.multicast({})
+	else
+		gi.unicast(client, true)
+	end
+end
+
+-- changes the text color to alternative (green by default)
+function ex.hilight(str)
+	local t = { }
+
+	for i=1,string.len(str) do
+		local b = string.byte(str, i)
+		if (b >= 0x1B and b <= 0x7F) or ((b > 0x0A and b <= 0x11) and b ~= 0x0D) then
+			b = b + 0x80
+		end
+		table.insert(t, string.char(b))
+	end
+
+	return table.concat(t)
+end
+
+-- get command arguments as a single string
+function ex.args(index, glue)
+	local t = { }
+
+	if index == nil then
+		index = 1
+	end
+
+	if glue == nil then
+		glue = ' '
+	end
+
+	for i=index,gi.argc() do
+		table.insert(t, gi.argv(i))
+	end
+
+	return table.concat(t, glue)
+end
+
+local function ClientConnect_Before(client, userinfo)
+	ex.players[client] = { }
+	for k, v in string.gmatch(userinfo, "\\([^\\]+)\\([^\\]+)") do
+		ex.players[client][k] = v
+	end
+end
+
+local function ClientConnect_After(client, userinfo)
+	players_tmp[client] = ex.players[client]
+	ex.players[client] = nil
+end
+
+local function ClientUserinfoChanged(client, userinfo)
+	if ex.players[client] == nil then
+		return
+	end
+	for k, v in string.gmatch(userinfo, "\\([^\\]+)\\([^\\]+)") do
+		ex.players[client][k] = v
+	end
+end
+
 -- not a complete deep copy, metatables are ignored
 local function copy_table(orig)
 	local new = {}
@@ -39,7 +109,7 @@ local function q2a_plugin_call(plugin, func, ...)
 	return err
 end
 
-cfg = {}
+local cfg = {}
 local globals = {}
 local plugins = {}
 
@@ -74,6 +144,7 @@ function q2a_init(cfg_name)
 	end
 
 	globals = copy_table(_G)
+	globals.ex = ex
 	globals.q2a_init = nil
 	globals.q2a_shutdown = nil
 	globals.q2a_load = nil
@@ -158,17 +229,47 @@ function q2a_reload(file)
 end
 
 function q2a_call(func, ...)
+
+	if func == 'ClientBegin' then
+		local arg = {...}
+		local client = arg[1]
+		ex.players[client] = players_tmp[client]
+		players_tmp[client] = nil
+	end
+
+	if func == 'ClientUserinfoChanged' then
+		ClientUserinfoChanged(...)
+	end
+
 	for i,plugin in pairs(plugins) do
 		q2a_plugin_call(plugin, func, ...)
+	end
+
+	if func == 'ClientDisconnect' then
+		local arg = {...}
+		local client = arg[1]
+		ex.players[client] = nil
 	end
 end
 
 function q2a_call_bool(func, def, ...)
+
+	if func == 'ClientConnect' then
+		ClientConnect_Before(...)
+	end
+
 	for i,plugin in pairs(plugins) do
 		local ret = q2a_plugin_call(plugin, func, ...)
 		if ret ~= nil and ret ~= def then
+			if func == 'ClientConnect' then
+				ClientConnect_After(...)
+			end
 			return ret
 		end
+	end
+
+	if func == 'ClientConnect' then
+		ClientConnect_After(...)
 	end
 
 	return def

@@ -22,13 +22,13 @@ qboolean q2a_lua_ClientConnect(int client, char *userinfo)
 	lua_pushstring(L, "ClientConnect");
 	lua_pushboolean(L, TRUE);
 	lua_pushnumber(L, client + 1);
-	lua_pushlightuserdata(L, userinfo);
+	lua_pushstring(L, userinfo);
 
 	if(lua_pcall(L, 4, 1, 0) == 0) {
 		ret = lua_toboolean(L, -1);
 	} else {
 		err_msg = (char *)lua_tostring(L, -1);
-		//gi.dprintf("Lua: ClientConnect returned error: %s\n", err_msg);
+		gi.dprintf("Lua: ClientConnect returned error: %s\n", err_msg);
 	}
 
 	q2a_fpu_q2();
@@ -176,7 +176,7 @@ void q2a_lua_ClientUserinfoChanged(int client, char *userinfo)
 	lua_getglobal(L, "q2a_call");
 	lua_pushstring(L, "ClientUserinfoChanged");
 	lua_pushnumber(L, client + 1);
-	lua_pushlightuserdata(L, userinfo);
+	lua_pushstring(L, userinfo);
 
 	if(lua_pcall(L, 3, 0, 0) != 0) {
 		err_msg = (char *)lua_tostring(L, -1);
@@ -186,7 +186,7 @@ void q2a_lua_ClientUserinfoChanged(int client, char *userinfo)
 	q2a_fpu_q2();
 }
 
-void q2a_lua_LevelChanged(const char *level)
+void q2a_lua_SpawnEntities(char *mapname, char *entities, char *spawnpoint)
 {
 	char *err_msg;
 
@@ -196,9 +196,11 @@ void q2a_lua_LevelChanged(const char *level)
 
 	lua_getglobal(L, "q2a_call");
 	lua_pushstring(L, "LevelChanged");
-	lua_pushstring(L, level);
+	lua_pushstring(L, mapname);
+	lua_pushstring(L, entities);
+	lua_pushstring(L, spawnpoint);
 
-	if(lua_pcall(L, 2, 0, 0) != 0) {
+	if(lua_pcall(L, 4, 0, 0) != 0) {
 		err_msg = (char *)lua_tostring(L, -1);
 		gi.dprintf("Lua: LevelChanged returned error: %s\n", err_msg);
 	}

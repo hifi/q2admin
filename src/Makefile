@@ -1,4 +1,4 @@
-OBJS = g_main.o q2a_cmd.o q2a_init.o q2a_util.o q2a_run.o q2a_lua.o q2a_lua_import.o q2a_lua_export.o
+OBJS = q2a_main.o q2a_util.o q2a_lua.o q2a_lua_import.o q2a_lua_export.o
 
 $(GAME_NAME): q2a_lua_plugman.h $(OBJS)
 	$(CC) $(CFLAGS) -rdynamic -shared -o ../$@ $(OBJS) $(LDFLAGS)
@@ -20,11 +20,8 @@ all: $(GAME_NAME)
 # DO NOT DELETE
 
 bin2hex: bin2hex.c
-g_main.o: g_local.h q_shared.h game.h
-q2a_cmd.o: g_local.h q_shared.h game.h
-q2a_init.o: g_local.h q_shared.h game.h
+q2a_main.o: g_local.h q_shared.h game.h
 q2a_util.o: g_local.h q_shared.h game.h
-q2a_run.o: g_local.h q_shared.h game.h
 q2a_lua.o: g_local.h q_shared.h game.h q2a_lua_plugman.h
 q2a_lua_import.o: g_local.h q_shared.h game.h q2a_lua_plugman.h
 q2a_lua_export.o: g_local.h q_shared.h game.h q2a_lua_plugman.h

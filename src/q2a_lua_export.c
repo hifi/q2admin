@@ -50,7 +50,7 @@ int q2a_lua_gi_cprintf(lua_State *L)
 	lvl = lua_tointeger(L, 2);
 	str = (char *)lua_tostring(L, 3);
 
-	ent = getEnt(client);
+	ent = getClient(client);
 
 	q2a_fpu_q2();
 
@@ -70,7 +70,7 @@ int q2a_lua_gi_centerprintf(lua_State *L)
 	client = lua_tointeger(L, 1);
 	str = (char *)lua_tostring(L, 2);
 
-	ent = getEnt(client);
+	ent = getClient(client);
 
 	q2a_fpu_q2();
 
@@ -86,10 +86,12 @@ int q2a_lua_gi_argc(lua_State *L)
 	int argc;
 
 	q2a_fpu_q2();
+
 	argc = gi.argc();
+
 	q2a_fpu_lua();
 
-	lua_pushinteger(L, gi.argc());
+	lua_pushinteger(L, argc + 1);
 
 	return 1;
 }
@@ -99,7 +101,7 @@ int q2a_lua_gi_argv(lua_State *L)
 	int num;
 	char *str;
 
-	num = lua_tointeger(L, 1);
+	num = lua_tointeger(L, 1) - 1;
 
 	q2a_fpu_q2();
 	str = gi.argv(num);
@@ -121,52 +123,6 @@ int q2a_lua_gi_AddCommandString(lua_State *L)
 	q2a_fpu_lua();
 
 	return 0;
-}
-
-static int q2a_lua_cvar_index(lua_State *L)
-{
-	cvar_t *cvar = *(cvar_t **)lua_touserdata(L, 1);
-	char *key = (char *)luaL_checkstring(L, 2);
-
-	if(!strcmp(key, "name")) {
-		lua_pushstring(L, cvar->name);
-		return 1;
-	}
-
-	if(!strcmp(key, "string")) {
-		lua_pushstring(L, cvar->string);
-		return 1;
-	}
-
-	if(!strcmp(key, "latched_string")) {
-		lua_pushstring(L, cvar->latched_string);
-		return 1;
-	}
-
-	if(!strcmp(key, "flags")) {
-		lua_pushnumber(L, cvar->flags);
-		return 1;
-	}
-
-	if(!strcmp(key, "modified")) {
-		lua_pushboolean(L, cvar->modified);
-		return 1;
-	}
-
-	if(!strcmp(key, "value")) {
-		lua_pushnumber(L, cvar->value);
-		return 1;
-	}
-
-	return 0;
-}
-
-void q2a_lua_cvar_register(lua_State *L)
-{
-	luaL_newmetatable(L, "Cvar");
-	lua_pushcfunction(L, q2a_lua_cvar_index);
-	lua_setfield(L, -2, "__index");
-	lua_pop(L, 1);
 }
 
 int q2a_lua_gi_cvar(lua_State *L)
@@ -238,19 +194,18 @@ int q2a_lua_gi_cvar_forceset(lua_State *L)
 
 int q2a_lua_gi_multicast(lua_State *L)
 {
-	qboolean realible;
 	vec3_t orig = { 0.00, 0.00, 0.00 };
 
 	lua_tovec3(L, 1, orig);
-	realible = lua_tointeger(L, 2) ? TRUE : FALSE;
 
 	q2a_fpu_q2();
 
-	gi.multicast(orig, realible);
+	// FIXME: implement second parameter
+	gi.multicast(orig, MULTICAST_ALL);
 
 	q2a_fpu_lua();
 
-        return 0;
+	return 0;
 }
 
 int q2a_lua_gi_unicast(lua_State *L)
@@ -262,7 +217,7 @@ int q2a_lua_gi_unicast(lua_State *L)
 	client = luaL_checkinteger(L, 1);
 	realible = lua_tointeger(L, 2) ? TRUE : FALSE;
 
-	ent = getEnt(client);
+	ent = getClient(client);
 
 	q2a_fpu_q2();
 
@@ -270,7 +225,7 @@ int q2a_lua_gi_unicast(lua_State *L)
 
 	q2a_fpu_lua();
 
-        return 0;
+	return 0;
 }
 
 int q2a_lua_gi_WriteChar(lua_State *L)
@@ -333,44 +288,5 @@ int q2a_lua_gi_WriteAngle(lua_State *L)
 	q2a_fpu_q2();
 	gi.WriteAngle(num);
 	q2a_fpu_lua();
-	return 0;
-}
-
-int q2a_lua_stuffcmd(lua_State *L)
-{
-	edict_t *ent;
-	int client;
-	char *str;
-
-	client = lua_tointeger(L, 1);
-	str = (char *)lua_tostring(L, 2);
-
-	ent = getEnt(client);
-
-	q2a_fpu_q2();
-
-	stuffcmd(ent, str);
-
-	q2a_fpu_lua();
-
-	return 0;
-}
-
-int q2a_lua_Info_ValueForKey(lua_State *L)
-{
-	char *userinfo = lua_touserdata(L, 1);
-	char *key = (char *)luaL_checkstring(L, 2);
-
-	lua_pushstring(L, Info_ValueForKey(userinfo, key));
-	return 1;
-}
-
-int q2a_lua_Info_SetValueForKey(lua_State *L)
-{
-	char *userinfo = lua_touserdata(L, 1);
-	char *key = (char *)luaL_checkstring(L, 2);
-	char *value = (char *)luaL_checkstring(L, 3);
-
-	Info_SetValueForKey(userinfo, key, value);
 	return 0;
 }

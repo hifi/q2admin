@@ -18,15 +18,9 @@
 #ifdef __GNUC__
 void *hdll = NULL;
 
-#ifdef LINUXAXP
-	#define DLLNAME   "gameaxp.real.so"
-#elif defined(SOLARIS_INTEL)
-	#define DLLNAME   "gamei386.real.so"
-#elif defined(SOLARIS_SPARC)
-	#define DLLNAME   "gamesparc.real.so"
-#elif defined (LINUX) && defined (__x86_64__)
+#if defined (__x86_64__)
 	#define DLLNAME "gamex86_64.real.so"
-#elif defined (LINUX) && defined (i386)
+#elif defined (__i386__)
 	#define DLLNAME "gamei386.real.so"
 #else
 	#error Unknown GNUC OS
@@ -57,14 +51,28 @@ qboolean dllloaded = FALSE;
 char dllname[256];
 char moddir[256];
 
-void ShutdownGame (void)
+void Init (void)
+{
+	if(!dllloaded) return;
+	
+	dllglobals->Init();
+	
+	copyDllInfo();
+
+	gi.dprintf ("Q2Admin %s running %s\n", Q2A_VERSION, moddir);
+
+	q2a_config = gi.cvar ("q2a_config", "config.lua", 0);
+	gi.cvar ("*Q2Admin", Q2A_VERSION, CVAR_SERVERINFO|CVAR_NOSET);
+
+	q2a_lua_init();
+}
+
+void Shutdown (void)
 {
 	q2a_lua_shutdown();
 
 	if(!dllloaded) return;
 
-	gi.TagFree(playerinfo);
-		
 	dllglobals->Shutdown();
 	
 #ifdef __GNUC__
@@ -74,6 +82,125 @@ void ShutdownGame (void)
 #endif
 	
 	dllloaded = FALSE;
+}
+
+void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
+{
+	if(!dllloaded) return;
+
+	q2a_lua_SpawnEntities(mapname, entities, spawnpoint);
+
+	dllglobals->SpawnEntities(mapname, entities, spawnpoint);
+	copyDllInfo();
+}
+
+qboolean ClientConnect (edict_t *ent, char *userinfo)
+{
+	qboolean ret;
+	int client = getClientOffset(ent);
+
+	if(!dllloaded) return FALSE;
+
+	// if any lua ClientConnect return false, so do we
+	if(!q2a_lua_ClientConnect(client, userinfo))
+		return FALSE;
+
+	ret = dllglobals->ClientConnect(ent, userinfo);
+	copyDllInfo();
+	return ret;
+}
+
+void ClientBegin (edict_t *ent)
+{
+	int client = getClientOffset(ent);
+
+	if(!dllloaded) return;
+
+	q2a_lua_ClientBegin(client);
+
+	dllglobals->ClientBegin(ent);
+	copyDllInfo();
+}
+
+void ClientUserinfoChanged (edict_t *ent, char *userinfo)
+{
+	int client = getClientOffset(ent);
+
+	if(!dllloaded) return;
+
+	q2a_lua_ClientUserinfoChanged(client, userinfo);
+
+	dllglobals->ClientUserinfoChanged(ent, userinfo);
+	copyDllInfo();
+}
+
+void ClientDisconnect (edict_t *ent)
+{
+	int client = getClientOffset(ent);
+
+	if(!dllloaded) return;
+
+	q2a_lua_ClientDisconnect(client);
+
+	dllglobals->ClientDisconnect(ent);
+	copyDllInfo();
+}
+
+void ClientCommand (edict_t *ent)
+{
+	int client = getClientOffset(ent);
+	
+	if(!dllloaded) return;
+
+	if(q2a_lua_ClientCommand(client))
+		return;
+
+	dllglobals->ClientCommand(ent);
+	copyDllInfo();
+}
+
+void ClientThink (edict_t *ent, usercmd_t *ucmd)
+{
+	int client = getClientOffset(ent);
+	
+	if(!dllloaded) return;
+		
+	q2a_lua_ClientThink(client);
+	
+	dllglobals->ClientThink(ent, ucmd);
+	
+	copyDllInfo();
+}
+
+void RunFrame(void)
+{
+	if(!dllloaded) return;
+
+	q2a_lua_RunFrame();
+
+	dllglobals->RunFrame();
+	copyDllInfo();
+}
+
+void ServerCommand (void)
+{
+	char *cmd;
+
+	if(!dllloaded) return;
+
+	cmd = gi.argv(1);
+
+	if(!q2a_strcmp(cmd, "lua_reload")) {
+		q2a_lua_shutdown();
+		q2a_lua_init();
+		return;
+	}
+
+	if(q2a_lua_ServerCommand(cmd))
+		return;
+		
+	dllglobals->ServerCommand();
+	copyDllInfo();
 }
 
 /*
@@ -94,26 +221,9 @@ game_export_t *GetGameAPI(game_import_t *import)
 	dllloaded = FALSE;
 	gi = *import;
 	
-	import->bprintf = bprintf_internal;
-	import->cprintf = cprintf_internal;
-	import->dprintf = dprintf_internal;
-	import->AddCommandString = AddCommandString_internal;
-
-	//import->Pmove = Pmove_internal;
-	//import->linkentity = linkentity_internal;
-	//import->unlinkentity = unlinkentity_internal;
-	//import->linkentity = linkentity;
-	//import->unlinkentity = unlinkentity;
-	
-	globals.Init = InitGame;
-	globals.Shutdown = ShutdownGame;
+	globals.Init = Init;
+	globals.Shutdown = Shutdown;
 	globals.SpawnEntities = SpawnEntities;
-	
-	// why are we catching these?
-	globals.WriteGame = WriteGame;
-	globals.ReadGame = ReadGame;
-	globals.WriteLevel = WriteLevel;
-	globals.ReadLevel = ReadLevel;
 	
 	globals.ClientThink = ClientThink;
 	globals.ClientConnect = ClientConnect;
@@ -122,7 +232,7 @@ game_export_t *GetGameAPI(game_import_t *import)
 	globals.ClientBegin = ClientBegin;
 	globals.ClientCommand = ClientCommand;
 	
-	globals.RunFrame = G_RunFrame;
+	globals.RunFrame = RunFrame;
 	
 	globals.ServerCommand = ServerCommand;
 	

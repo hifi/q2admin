@@ -25,7 +25,7 @@ CFLAGS ?= -ffast-math -O3
 ifdef DEBUG
  CFLAGS = -O -g
 endif
-CFLAGS+=-Wall -DLINUX -fPIC $(LUA_CFLAGS)
+CFLAGS+=-Wall -Wextra -Werror -Wfatal-errors -fPIC $(LUA_CFLAGS)
 
 PLATFORM=$(shell uname -s|tr A-Z a-z)
 

@@ -18,71 +18,38 @@
 lua_State *L = NULL;
 void *lua_dll = NULL;
 
-/* this isn't working.. why? */
-static void *q2a_lua_alloc(void *ud, void *ptr, size_t osize, size_t nsize)
+static int q2a_lua_cvar_index(lua_State *L)
 {
-	void *ret = NULL;
-	(void)ud; (void)osize;
-	q2a_fpu_q2();
-	if(nsize == 0) {
-		q2a_free(ptr);
-	} else {
-		ret = q2a_realloc(ptr, nsize);
-	}
-	q2a_fpu_lua();
-	return ret;
-}
+	cvar_t *cvar = *(cvar_t **)lua_touserdata(L, 1);
+	char *key = (char *)luaL_checkstring(L, 2);
 
-static int lua_players_index(lua_State *L)
-{
-	lua_touserdata(L, 1);
-	int index = luaL_checkint(L, 2);
-
-	luaL_argcheck(L, 1 <= index && index <= MAX_PLAYERS, 2, "index out of range");
-
-	uint16_t *tmp = (uint16_t *)lua_newuserdata(L, sizeof(uint16_t));
-	luaL_getmetatable(L, "Player");
-	lua_setmetatable(L, -2);
-
-	*tmp = (uint16_t)index;
-
-	return 1;
-}
-
-static int lua_player_index(lua_State *L)
-{
-	uint16_t *index = (uint16_t *)lua_touserdata(L, 1);
-	char *key = (char *)lua_tostring(L, 2);
-
-	luaL_argcheck(L, 1 <= *index && *index <= MAX_PLAYERS, 1, "client index expected");
-
-	if(!strncmp(key, "name", 4)) {
-		lua_pushstring(L, playerinfo[*index - 1].name);
+	if(!strcmp(key, "name")) {
+		lua_pushstring(L, cvar->name);
 		return 1;
 	}
 
-	if(!strncmp(key, "skin", 4)) {
-		lua_pushstring(L, playerinfo[*index - 1].skin);
+	if(!strcmp(key, "string")) {
+		lua_pushstring(L, cvar->string);
 		return 1;
 	}
 
-	if(!strncmp(key, "ip", 2)) {
-		lua_pushstring(L, playerinfo[*index - 1].ip_str);
+	if(!strcmp(key, "latched_string")) {
+		lua_pushstring(L, cvar->latched_string);
 		return 1;
 	}
 
-	if(!strncmp(key, "ip_bin", 6)) {
-		lua_pushnumber(L, playerinfo[*index - 1].ip);
+	if(!strcmp(key, "flags")) {
+		lua_pushnumber(L, cvar->flags);
 		return 1;
 	}
 
-	if(!strncmp(key, "inuse", 5)) {
-		lua_pushboolean(L, playerinfo[*index - 1].inuse);
+	if(!strcmp(key, "modified")) {
+		lua_pushboolean(L, cvar->modified);
 		return 1;
 	}
 
-	if(!strncmp(key, "userinfo", 2)) {
-		lua_pushstring(L, playerinfo[*index - 1].userinfo);
+	if(!strcmp(key, "value")) {
+		lua_pushnumber(L, cvar->value);
 		return 1;
 	}
 
@@ -94,10 +61,10 @@ void q2a_lua_init(void)
 	if(L) return;
 
 	lua_dll = dlopen("liblua5.1.so", RTLD_NOW|RTLD_GLOBAL);
-        if(!lua_dll) {
-            gi.dprintf("q2a_lua_init: loading Lua shared object failed\n");
-            return;
-        }
+	if(!lua_dll) {
+		gi.dprintf("q2a_lua_init: loading Lua shared object failed\n");
+		return;
+	}
 
 	q2a_fpu_lua();
 
@@ -122,17 +89,9 @@ void q2a_lua_init(void)
 		return;
 	}
 
-	q2a_lua_cvar_register(L);
-
-	lua_newuserdata(L, 0);
-	luaL_newmetatable(L, "Players");
-	lua_pushcfunction(L, lua_players_index);
-	lua_setfield(L, -2, "__index");	
-	lua_setmetatable(L, -2);
-	lua_setglobal(L, "players");
-
-	luaL_newmetatable(L, "Player");
-	lua_pushcfunction(L, lua_player_index);
+	/* register cvar stuff */
+	luaL_newmetatable(L, "Cvar");
+	lua_pushcfunction(L, q2a_lua_cvar_index);
 	lua_setfield(L, -2, "__index");
 	lua_pop(L, 1);
 
@@ -219,15 +178,6 @@ void q2a_lua_init(void)
 
 	lua_setglobal(L, "gi");
 
-	lua_pushcfunction(L, q2a_lua_stuffcmd);
-	lua_setglobal(L, "stuffcmd");
-
-	lua_pushcfunction(L, q2a_lua_Info_ValueForKey);
-	lua_setglobal(L, "Info_ValueForKey");
-
-	lua_pushcfunction(L, q2a_lua_Info_SetValueForKey);
-	lua_setglobal(L, "Info_SetValueForKey");
-
 	/* run the initialization Lua routine */
 	lua_getglobal(L, "q2a_init");
 	lua_pushstring(L, q2a_config->string);
@@ -258,11 +208,6 @@ void q2a_lua_shutdown(void)
 	q2a_fpu_q2();
 
 	dlclose(lua_dll);
-}
-
-void q2a_lua_load(const char *file)
-{
-	if(!L) return;
 }
 
 void lua_tovec3(lua_State *L, int index, vec3_t dst)

@@ -23,11 +23,11 @@
 #define GAMEVERSION    "baseq2"
 
 // protocol bytes that can be directly added to messages
-#define svc_muzzleflash   1
-#define svc_muzzleflash2  2
-#define svc_temp_entity   3
-#define svc_layout    4
-#define svc_inventory   5
+#define svc_muzzleflash		1
+#define svc_muzzleflash2	2
+#define svc_temp_entity		3
+#define svc_layout		4
+#define svc_inventory		5
 
 //==================================================================
 
@@ -187,92 +187,85 @@ typedef enum
 	MOVETYPE_TOSS,   // gravity
 	MOVETYPE_FLYMISSILE, // extra size to monsters
 	MOVETYPE_BOUNCE
-}
-
-movetype_t;
+} movetype_t;
 
 // this structure is left intact through an entire game
 // it should be initialized at dll load time, and read/written to
 // the server.ssv file for savegames
 typedef struct
-	{
-		char  helpmessage1[512];
-		char  helpmessage2[512];
-		int   helpchanged; // flash F1 icon if non 0, play sound
-		// and increment only if 1, 2, or 3
-		gclient_t *clients;  // [maxclients]
-		
-		// can't store spawnpoint in level, because
-		// it would get overwritten by the savegame restore
-		char  spawnpoint[512]; // needed for coop respawns
-		
-		// store latched cvars here that we want to get at often
-		int   maxclients;
-		int   maxentities;
-		
-		// cross level triggers
-		int   serverflags;
-		
-		// items
-		int   num_items;
-		
-		qboolean autosaved;
-	}
+{
+	char  helpmessage1[512];
+	char  helpmessage2[512];
+	int   helpchanged; // flash F1 icon if non 0, play sound
+	// and increment only if 1, 2, or 3
+	gclient_t *clients;  // [maxclients]
 	
-game_locals_t;
+	// can't store spawnpoint in level, because
+	// it would get overwritten by the savegame restore
+	char  spawnpoint[512]; // needed for coop respawns
+	
+	// store latched cvars here that we want to get at often
+	int   maxclients;
+	int   maxentities;
+	
+	// cross level triggers
+	int   serverflags;
+	
+	// items
+	int   num_items;
+	
+	qboolean autosaved;
+} game_locals_t;
 
 // this structure is cleared as each map is entered
 // it is read/written to the level.sav file for savegames
 typedef struct
-	{
-		int   framenum;
-		float  time;
-		
-		char  level_name[MAX_QPATH]; // the descriptive name (Outer Base, etc)
-		char  mapname[MAX_QPATH];  // the server name (base1, etc)
-		char  nextmap[MAX_QPATH];  // go here when fraglimit is hit
-		
-		// intermission state
-		float  intermissiontime;  // time the intermission was started
-		char  *changemap;
-		int   exitintermission;
-		vec3_t  intermission_origin;
-		vec3_t  intermission_angle;
-		
-		edict_t  *sight_client; // changed once each frame for coop games
-		
-		edict_t  *sight_entity;
-		int   sight_entity_framenum;
-		edict_t  *sound_entity;
-		int   sound_entity_framenum;
-		edict_t  *sound2_entity;
-		int   sound2_entity_framenum;
-		
-		int   pic_health;
-		
-		int   total_secrets;
-		int   found_secrets;
-		
-		int   total_goals;
-		int   found_goals;
-		
-		int   total_monsters;
-		int   killed_monsters;
-		
-		edict_t  *current_entity; // entity running from G_RunFrame
-		int   body_que;   // dead bodies
-		
-		int   power_cubes;  // ugly necessity for coop
-	}
+{
+	int   framenum;
+	float  time;
 	
+	char  level_name[MAX_QPATH]; // the descriptive name (Outer Base, etc)
+	char  mapname[MAX_QPATH];  // the server name (base1, etc)
+	char  nextmap[MAX_QPATH];  // go here when fraglimit is hit
+	
+	// intermission state
+	float  intermissiontime;  // time the intermission was started
+	char  *changemap;
+	int   exitintermission;
+	vec3_t  intermission_origin;
+	vec3_t  intermission_angle;
+	
+	edict_t  *sight_client; // changed once each frame for coop games
+	
+	edict_t  *sight_entity;
+	int   sight_entity_framenum;
+	edict_t  *sound_entity;
+	int   sound_entity_framenum;
+	edict_t  *sound2_entity;
+	int   sound2_entity_framenum;
+	
+	int   pic_health;
+	
+	int   total_secrets;
+	int   found_secrets;
+	
+	int   total_goals;
+	int   found_goals;
+	
+	int   total_monsters;
+	int   killed_monsters;
+	
+	edict_t  *current_entity; // entity running from G_RunFrame
+	int   body_que;   // dead bodies
+	
+	int   power_cubes;  // ugly necessity for coop
+} 
 level_locals_t;
 
-extern game_locals_t   game;
-extern level_locals_t   level;
-extern game_import_t   gi;
-extern game_export_t   globals;
+extern game_locals_t	game;
+extern level_locals_t	level;
 
-extern edict_t     *g_edicts;
+extern edict_t		*g_edicts;
 
 #define FOFS(x)     (int)&(((edict_t *)0)->x)
 #define STOFS(x)    (int)&(((spawn_temp_t *)0)->x)
@@ -313,14 +306,12 @@ typedef enum {
 fieldtype_t;
 
 typedef struct
-	{
-		char *name;
-		int  ofs;
-		fieldtype_t type;
-		int  flags;
-	}
-	
-field_t;
+{
+	char *name;
+	int  ofs;
+	fieldtype_t type;
+	int  flags;
+} field_t;
 
 // damage flags
 #define DAMAGE_RADIUS      0x00000001 // damage was indirect
@@ -350,76 +341,61 @@ field_t;
 // this structure is cleared on each PutClientInServer(),
 // except for 'client->pers'
 struct gclient_s
-	{
-		// known to server
-		player_state_t ps;    // communicated by server to clients
-		int     ping;
-	};
+{
+	// known to server
+	player_state_t ps;    // communicated by server to clients
+	int     ping;
+};
 	
 struct edict_s
-	{
-		entity_state_t  s;
-		struct gclient_s *client; // NULL if not a player
-		// the server expects the first part
-		// of gclient_s to be a player_state_t
-		// but the rest of it is opaque
-		qboolean inuse;
-		int   linkcount;
-		
-		// FIXME: move these fields to a server private sv_entity_t
-		link_t  area;    // linked to a division node or leaf
-		
-		int   num_clusters;  // if -1, use headnode instead
-		int   clusternums[MAX_ENT_CLUSTERS];
-		int   headnode;   // unused if num_clusters != -1
-		int   areanum, areanum2;
-		
-		//================================
-		
-		int   svflags;
-		vec3_t  mins, maxs;
-		vec3_t  absmin, absmax, size;
-		solid_t  solid;
-		int   clipmask;
-		edict_t  *owner;
-		
-		// DO NOT MODIFY ANYTHING ABOVE THIS, THE SERVER
-		// EXPECTS THE FIELDS IN THAT ORDER!
-		//================================
-	};
+{
+	entity_state_t  s;
+	struct gclient_s *client; // NULL if not a player
+	// the server expects the first part
+	// of gclient_s to be a player_state_t
+	// but the rest of it is opaque
+	qboolean inuse;
+	int   linkcount;
+	
+	// FIXME: move these fields to a server private sv_entity_t
+	link_t  area;    // linked to a division node or leaf
+	
+	int   num_clusters;  // if -1, use headnode instead
+	int   clusternums[MAX_ENT_CLUSTERS];
+	int   headnode;   // unused if num_clusters != -1
+	int   areanum, areanum2;
+	
+	//================================
+	
+	int   svflags;
+	vec3_t  mins, maxs;
+	vec3_t  absmin, absmax, size;
+	solid_t  solid;
+	int   clipmask;
+	edict_t  *owner;
+	
+	// DO NOT MODIFY ANYTHING ABOVE THIS, THE SERVER
+	// EXPECTS THE FIELDS IN THAT ORDER!
+	//================================
+};
 	
 #define MAXIMPULSESTOTEST 256
 	
 #define RANDCHAR()      (random() < 0.3) ? '0' + (int)(9.9 * random()) : 'A' + (int)(26.9 * random())
 
-#define LEVELCHANGE_KEEP   (CCMD_SCSILENCE | CCMD_CSILENCE | CCMD_PCSILENCE | CCMD_ZBOTDETECTED | CCMD_KICKED | CCMD_NITRO2PROXY | CCMD_ZBOTCLEAR | CCMD_RBOTCLEAR | CCMD_BANNED | CCMD_RECONNECT | CCMD_REMEMBERHACK )
-#define BANCHECK     (CCMD_BANNED | CCMD_RECONNECT)
+#define getClientOffset(ent)	(((char *)ent - (char *)globals.edicts) / globals.edict_size) - 1
+#define getClient(entnum)	(edict_t *)((char *)globals.edicts + (globals.edict_size * entnum))
 
-#define getEntOffset(ent)  (((char *)ent - (char *)globals.edicts) / globals.edict_size)
-#define getEnt(entnum)   (edict_t *)((char *)globals.edicts + (globals.edict_size * entnum))
+extern game_import_t	gi;
+extern game_export_t	globals;
+extern game_export_t	*dllglobals;
+extern cvar_t *gamedir, *q2a_config;
 
-extern game_import_t gi;
-extern game_export_t globals;
-extern game_export_t *dllglobals;
-extern cvar_t   *rcon_password, *gamedir, *q2a_config, *maxclients, *port, *serverbindip;
+extern qboolean soloadlazy;
+extern qboolean dllloaded;
+extern qboolean quake2dirsupport;
 
-extern char    dllname[256];
-extern char    moddir[256];
-
-extern qboolean   soloadlazy;
-extern qboolean   dllloaded;
-extern qboolean   quake2dirsupport;
-
-extern char    *q2a_version;
-
-extern char    buffer[0x10000];
-extern char    buffer2[256];
-
-extern int    lframenum;
-extern float   ltime;
-
-extern char    serverip[256];
-extern char    lanip[256];
+extern char *q2a_version;
 
 #define FALSE	0
 #define TRUE	1
@@ -450,15 +426,6 @@ str++; \
 #define q2a_memmove   memmove
 #define q2a_memset   memset
 
-// q2a_cmd.c
-void  ClientCommand (edict_t *ent);
-void  ServerCommand (void);
-void  dprintf_internal (char *fmt, ...);
-void  cprintf_internal(edict_t *ent, int printlevel, char *fmt, ...);
-void  bprintf_internal(int printlevel, char *fmt, ...);
-void  AddCommandString_internal(char *text);
-char  *getArgs(void);
-
 // q2a_util.c
 void  stuffcmd(edict_t *e, char *s);
 int   Q_stricmp (char *s1, char *s2);
@@ -470,24 +437,6 @@ void  q_strupr(char *c);
 char *q2a_malloc (int size);
 char *q2a_realloc (char *oldmem, int newsize);
 void q2a_free (char *mem);
-
-// q2a_init.c
-void  InitGame (void);
-void  SpawnEntities (char *mapname, char *entities, char *spawnpoint);
-qboolean ClientConnect (edict_t *ent, char *userinfo);
-void  ClientUserinfoChanged (edict_t *ent, char *userinfo);
-void  ClientDisconnect (edict_t *ent);
-void  ClientBegin (edict_t *ent);
-void  WriteGame (char *filename, qboolean autosave);
-void  ReadGame (char *filename);
-void  WriteLevel (char *filename);
-void  ReadLevel (char *filename);
-
-// q2a_run.c
-void  ClientThink (edict_t *ent, usercmd_t *ucmd);
-void  G_RunFrame (void);
-
-#define Q2ADMINVERSION   "1.99.99"
 
 // q2a_lua.c
 void q2a_fpu_lua (void);
@@ -505,15 +454,4 @@ void q2a_lua_RunFrame(void);
 qboolean q2a_lua_ClientCommand(int client);
 qboolean q2a_lua_ServerCommand(const char *cmd);
 void q2a_lua_ClientUserinfoChanged(int client, char *userinfo);
-void q2a_lua_LevelChanged(const char *level);
-
-typedef struct {
-	char		name[16];
-	char		skin[40];
-	char		ip_str[40];
-	uint32_t	ip;
-	char		userinfo[MAX_INFO_STRING];
-	qboolean	inuse;
-} playerinfo_t;
-
-extern playerinfo_t *playerinfo;
+void q2a_lua_SpawnEntities(char *mapname, char *entities, char *spawnpoint);
