@@ -17,45 +17,43 @@ local cvars = {
 
 local claimer = nil
 local claimer_store = nil
-local maxclients
 
 function q2a_load()
     claimer_store = gi.cvar('lua_q2a_lrcon_storage', '')
-    maxclients = gi.cvar('maxclients', '')
 end
 
 function q2a_unload()
     if claimer then
-        gi.cvar_forceset('lua_q2a_lrcon_storage', players[claimer].name..players[claimer].ip)
+        gi.cvar_forceset('lua_q2a_lrcon_storage', ex.players[claimer].name..ex.players[claimer].ip)
     else
         gi.cvar_forceset('lua_q2a_lrcon_storage', '')
     end
 end
 
 function ClientCommand(client)
-    if(gi.argv(0) == 'lrcon') then
+    if(gi.argv(1) == 'lrcon') then
         if gi.argc() == 1 then
             gi.cprintf(client, PRINT_HIGH, 'Usage: lrcon <command> [parameters]\n')
             gi.cprintf(client, PRINT_HIGH, 'Type "lrcon help" for more information.\n')
         else
-            local plr = players[client]
+            local plr = ex.players[client]
             local ip = string.match(plr.ip, '^([^:]+)')
             local now = os.time()
-            local cmd = gi.argv(1)
+            local cmd = gi.argv(2)
 
             if cmd == 'claim' then
                 if claimer == nil then
                     claimer = client
                     gi.cprintf(client, PRINT_HIGH, 'You have claimed the server! Type lrcon <command> to set appropriate settings.\n')
-                    gi.bprintf(PRINT_HIGH, '%s claimed the server\n', players[claimer].name)
+                    gi.bprintf(PRINT_HIGH, '%s claimed the server\n', ex.players[claimer].name)
                 else
-                    gi.cprintf(client, PRINT_HIGH, 'This server has already been claimed by %s.\n', players[claimer].name)
+                    gi.cprintf(client, PRINT_HIGH, 'This server has already been claimed by %s.\n', ex.players[claimer].name)
                 end
                 return true
             elseif cmd == 'release' then
                 if client == claimer then
                     gi.cprintf(client, PRINT_HIGH, 'You released the server.\n')
-                    gi.bprintf(PRINT_HIGH, '%s released the server, use "lrcon claim" to re-claim\n', players[claimer].name)
+                    gi.bprintf(PRINT_HIGH, '%s released the server, use "lrcon claim" to re-claim\n', ex.players[claimer].name)
 		    claimer = nil
                 else
                     gi.cprintf(client, PRINT_HIGH, 'You have not claimed this server.\n')
@@ -74,16 +72,16 @@ function ClientCommand(client)
                 return true
             else
                 if client == claimer then
-                    local cmd = gi.argv(1)
+                    local cmd = gi.argv(2)
                     local param
 
                     if gi.argc() > 2 then
-                        param = gi.argv(2)
+                        param = ex.args(3)
                     end
 
-                    if gi.argv(1) == 'set' and gi.argc() > 2 then
-                        cmd = gi.argv(2)
-                        param = gi.argv(3)
+                    if cmd == 'set' and gi.argc() > 2 then
+                        cmd = gi.argv(3)
+                        param = ex.args(4)
                     end
 
                     for k,v in ipairs(cvars) do
@@ -96,10 +94,10 @@ function ClientCommand(client)
 
                                 if cvar.latched_string == param then
                                     gi.cprintf(client, PRINT_HIGH, '%s -> "%s" (latched)\n', cvar.name, cvar.latched_string)
-                                    gi.bprintf(PRINT_HIGH, '%s changed server settings: %s -> "%s" (latched)\n', players[client].name, cvar.name, cvar.latched_string)
+                                    gi.bprintf(PRINT_HIGH, '%s changed server settings: %s -> "%s" (latched)\n', ex.players[client].name, cvar.name, cvar.latched_string)
                                 else
                                     gi.cprintf(client, PRINT_HIGH, '%s -> "%s"\n', cvar.name, cvar.string)
-                                    gi.bprintf(PRINT_HIGH, '%s changed server settings: %s -> "%s"\n', players[client].name, cvar.name, cvar.string)
+                                    gi.bprintf(PRINT_HIGH, '%s changed server settings: %s -> "%s"\n', ex.players[client].name, cvar.name, cvar.string)
                                 end
                             end
                             return true
@@ -110,10 +108,8 @@ function ClientCommand(client)
 			gi.cprintf(client, PRINT_HIGH, 'num  name             address\n')
 			gi.cprintf(client, PRINT_HIGH, '---  ---------------  ---------------\n')
 
-			for i=1,maxclients.value do
-			    if players[i].inuse then
-				gi.cprintf(client, PRINT_HIGH, "%3d  %-15s  %s\n", i-1, players[i].name, string.match(players[i].ip, '^([^:]+)'))
-			    end
+			for i,plr in pairs(ex.players) do
+                            gi.cprintf(client, PRINT_HIGH, "%3d  %-15s  %s\n", i, plr.name, string.match(plr.ip, '^([^:]+)'))
 			end
                         return true
                     end
@@ -167,7 +163,7 @@ function ClientCommand(client)
 			if param == nil or tonumber(param) == nil then
                             gi.cprintf(client, PRINT_HIGH, 'Usage: kick <id>\n')
 			else
-			    gi.AddCommandString('kick '..tostring(param))
+			    gi.AddCommandString('kick '..tostring(param - 1))
 			end
                         return true
                     end
@@ -187,9 +183,9 @@ function ClientCommand(client)
 end
 
 function ClientConnect(client)
-    local plr = players[client]
+    local plr = ex.players[client]
 
-    if players[client].name..players[client].ip == claimer_store.string then
+    if ex.players[client].name..ex.players[client].ip == claimer_store.string then
         gi.cvar_forceset('lua_q2a_lrcon_storage', '');
         claimer = client
     end
@@ -199,13 +195,7 @@ end
 
 -- quit server after a match to reset state
 function ClientDisconnect(client)
-    local numplrs = 0
-
-    for i=1,maxclients.value do
-	if players[i].inuse then
-	    numplrs = numplrs + 1
-	end
-    end
+    local numplrs = #ex.players
 
     if quit_on_empty and numplrs == 1 then
         gi.AddCommandString('quit')
