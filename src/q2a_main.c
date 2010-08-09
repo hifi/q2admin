@@ -42,12 +42,6 @@ void Init (void)
 {
 	if(hdll == NULL) return;
 
-	gi.dprintf ("Q2Admin %s running %s\n", Q2A_VERSION, moddir);
-
-	gi.cvar ("*Q2Admin", Q2A_VERSION, CVAR_SERVERINFO|CVAR_NOSET);
-
-	q2a_lua_init();
-
 	dllglobals->Init();
 	copyDllInfo();
 }
@@ -218,7 +212,18 @@ game_export_t *GetGameAPI(game_import_t *import)
 	GAMEAPI *getapi;
 
 	gi = *import;
+
+	game = gi.cvar ("game", "baseq2", 0);
+	q2a_strcpy(moddir, game->string);
 	
+	if(moddir[0] == 0)
+		q2a_strcpy(moddir, "baseq2");
+
+	gi.dprintf ("Q2Admin %s running %s\n", Q2A_VERSION, moddir);
+	gi.cvar ("*Q2Admin", Q2A_VERSION, CVAR_SERVERINFO|CVAR_NOSET);
+
+	q2a_lua_init();
+
 	globals.Init = Init;
 	globals.Shutdown = Shutdown;
 	globals.SpawnEntities = SpawnEntities;
@@ -234,11 +239,6 @@ game_export_t *GetGameAPI(game_import_t *import)
 	
 	globals.ServerCommand = ServerCommand;
 	
-	game = gi.cvar ("game", "baseq2", 0);
-	q2a_strcpy(moddir, game->string);
-	
-	if(moddir[0] == 0)
-		q2a_strcpy(moddir, "baseq2");
 
 	sprintf(dllname, "%s/%s", moddir, DLLNAME);
 #ifdef _WIN32
@@ -279,6 +279,6 @@ game_export_t *GetGameAPI(game_import_t *import)
 	globals.apiversion = dllglobals->apiversion;
 
 	copyDllInfo();
-	
+
 	return &globals;
 }
