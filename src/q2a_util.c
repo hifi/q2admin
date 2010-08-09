@@ -66,7 +66,6 @@ void q2a_free (char *mem)
 
 void copyDllInfo(void)
 {
-	globals.apiversion = dllglobals->apiversion;
 	globals.edict_size = dllglobals->edict_size;
 	globals.edicts = dllglobals->edicts;
 	globals.num_edicts = dllglobals->num_edicts;

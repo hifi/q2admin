@@ -276,6 +276,8 @@ game_export_t *GetGameAPI(game_import_t *import)
 		
 	dllglobals = (*getapi)(import);
 
+	globals.apiversion = dllglobals->apiversion;
+
 	copyDllInfo();
 	
 	return &globals;
