@@ -58,6 +58,8 @@ static int q2a_lua_cvar_index(lua_State *L)
 
 void q2a_lua_init(void)
 {
+	cvar_t *q2a_config;
+
 	if(L) return;
 
 	lua_dll = dlopen("liblua5.1.so", RTLD_NOW|RTLD_GLOBAL);
@@ -66,9 +68,10 @@ void q2a_lua_init(void)
 		return;
 	}
 
+	q2a_config = gi.cvar ("q2a_config", "config.lua", 0);
+
 	q2a_fpu_lua();
 
-	//L = lua_newstate(q2a_lua_alloc, NULL);
 	L = lua_open();
 	luaL_openlibs(L);
 

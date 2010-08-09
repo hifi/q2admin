@@ -9,84 +9,69 @@
 
 #include "g_local.h"
 
-#ifdef __GNUC__
-#include <dlfcn.h>
-#elif defined(WIN32)
-#include <windows.h>
-#endif
+#ifdef _WIN32
 
-#ifdef __GNUC__
+#include <windows.h>
+HINSTANCE hdll;
+#define DLLNAME		"gamex86.real.dll"
+
+#else // if not win32
+
+#include <dlfcn.h>
 void *hdll = NULL;
 
 #if defined (__x86_64__)
-	#define DLLNAME "gamex86_64.real.so"
+#define DLLNAME		"gamex86_64.real.so"
 #elif defined (__i386__)
-	#define DLLNAME "gamei386.real.so"
+#define DLLNAME		"gamei386.real.so"
 #else
-	#error Unknown GNUC OS
+#error Unknown arch
 #endif
 
-#elif defined(WIN32)
-HINSTANCE hdll;
-#define DLLNAME   "gamex86.dll"
-#define DLLNAMEMODDIR "gamex86.real.dll"
-#else
-#error Unknown OS
 #endif
 
 typedef game_export_t  *GAMEAPI (game_import_t *import);
-
-qboolean soloadlazy;
 
 game_import_t  gi;
 game_export_t  globals;
 game_export_t  *dllglobals;
 
-cvar_t *gamedir, *q2a_config, *maxclients, *gamename;
-
-qboolean quake2dirsupport = TRUE;
-
-qboolean dllloaded = FALSE;
-
-char dllname[256];
 char moddir[256];
 
 void Init (void)
 {
-	if(!dllloaded) return;
-	
-	dllglobals->Init();
-	
-	copyDllInfo();
+	if(hdll == NULL) return;
 
 	gi.dprintf ("Q2Admin %s running %s\n", Q2A_VERSION, moddir);
 
-	q2a_config = gi.cvar ("q2a_config", "config.lua", 0);
 	gi.cvar ("*Q2Admin", Q2A_VERSION, CVAR_SERVERINFO|CVAR_NOSET);
 
 	q2a_lua_init();
+
+	dllglobals->Init();
+	copyDllInfo();
 }
 
 void Shutdown (void)
 {
 	q2a_lua_shutdown();
 
-	if(!dllloaded) return;
+	if(hdll == NULL) return;
 
 	dllglobals->Shutdown();
-	
-#ifdef __GNUC__
-	dlclose(hdll);
-#elif defined(WIN32)
+
+#ifdef _WIN32
 	FreeLibrary(hdll);
+#else
+	dlclose(hdll);
 #endif
-	
-	dllloaded = FALSE;
+
+	hdll = NULL;
 }
 
 void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 {
-	if(!dllloaded) return;
+	if(hdll == NULL) return;
 
 	q2a_lua_SpawnEntities(mapname, entities, spawnpoint);
 
@@ -99,7 +84,7 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 	qboolean ret;
 	int client = getClientOffset(ent);
 
-	if(!dllloaded) return FALSE;
+	if(hdll == NULL) return FALSE;
 
 	// if any lua ClientConnect return false, so do we
 	if(!q2a_lua_ClientConnect(client, userinfo))
@@ -114,7 +99,7 @@ void ClientBegin (edict_t *ent)
 {
 	int client = getClientOffset(ent);
 
-	if(!dllloaded) return;
+	if(hdll == NULL) return;
 
 	q2a_lua_ClientBegin(client);
 
@@ -126,7 +111,7 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 {
 	int client = getClientOffset(ent);
 
-	if(!dllloaded) return;
+	if(hdll == NULL) return;
 
 	q2a_lua_ClientUserinfoChanged(client, userinfo);
 
@@ -138,7 +123,7 @@ void ClientDisconnect (edict_t *ent)
 {
 	int client = getClientOffset(ent);
 
-	if(!dllloaded) return;
+	if(hdll == NULL) return;
 
 	q2a_lua_ClientDisconnect(client);
 
@@ -150,7 +135,7 @@ void ClientCommand (edict_t *ent)
 {
 	int client = getClientOffset(ent);
 	
-	if(!dllloaded) return;
+	if(hdll == NULL) return;
 
 	if(q2a_lua_ClientCommand(client))
 		return;
@@ -163,7 +148,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 {
 	int client = getClientOffset(ent);
 	
-	if(!dllloaded) return;
+	if(hdll == NULL) return;
 		
 	q2a_lua_ClientThink(client);
 	
@@ -174,7 +159,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 
 void RunFrame(void)
 {
-	if(!dllloaded) return;
+	if(hdll == NULL) return;
 
 	q2a_lua_RunFrame();
 
@@ -186,7 +171,7 @@ void ServerCommand (void)
 {
 	char *cmd;
 
-	if(!dllloaded) return;
+	if(hdll == NULL) return;
 
 	cmd = gi.argv(1);
 
@@ -213,12 +198,10 @@ and global variables
 */
 game_export_t *GetGameAPI(game_import_t *import)
 {
+	char dllname[256];
+	cvar_t *game;
 	GAMEAPI *getapi;
-#ifdef __GNUC__
-	int loadtype;
-#endif
 
-	dllloaded = FALSE;
 	gi = *import;
 	
 	globals.Init = Init;
@@ -236,78 +219,49 @@ game_export_t *GetGameAPI(game_import_t *import)
 	
 	globals.ServerCommand = ServerCommand;
 	
-	gamedir = gi.cvar ("game", "baseq2", 0);
-	q2a_strcpy(moddir, gamedir->string);
+	game = gi.cvar ("game", "baseq2", 0);
+	q2a_strcpy(moddir, game->string);
 	
 	if(moddir[0] == 0)
 		q2a_strcpy(moddir, "baseq2");
 
-#ifdef __GNUC__
-	loadtype = soloadlazy ? RTLD_LAZY : RTLD_NOW;
 	sprintf(dllname, "%s/%s", moddir, DLLNAME);
-	hdll = dlopen(dllname, loadtype);
-#elif defined(WIN32)
-	if(quake2dirsupport)
-		sprintf(dllname, "%s/%s", moddir, DLLNAME);
-	else
-		sprintf(dllname, "%s/%s", moddir, DLLNAMEMODDIR);
-	
+#ifdef _WIN32
 	hdll = LoadLibrary(dllname);
+#else
+	hdll = dlopen(dllname, RTLD_NOW);
 #endif
 	
 	if(hdll == NULL)
 	{
-		// try the baseq2 directory...
-		sprintf(dllname, "baseq2/%s", DLLNAME);
-		
-#ifdef __GNUC__
-		hdll = dlopen(dllname, loadtype);
-#elif defined(WIN32)
-		hdll = LoadLibrary(dllname);
-#endif
-		
-#ifdef __GNUC__
-		sprintf(dllname, "%s/%s", moddir, DLLNAME);
-#elif defined(WIN32)
-		if(quake2dirsupport)
-			sprintf(dllname, "%s/%s", moddir, DLLNAME);
-		else
-			sprintf(dllname, "%s/%s", moddir, DLLNAMEMODDIR);
-#endif
-		
-		if(hdll == NULL)
-		{
-			gi.dprintf ("Unable to load DLL %s.\n", dllname);
-			return &globals;
-		} else {
-			gi.dprintf ("Unable to load DLL %s, loading baseq2 DLL.\n", dllname);
-		}
+		gi.dprintf ("Q2A: Unable to load DLL %s.\n", dllname);
+		return &globals;
 	}
 
 	gi.dprintf("Q2A: Loaded game DLL: %s.\n", dllname);
 		
-#ifdef __GNUC__
-	getapi = (GAMEAPI *)dlsym(hdll, "GetGameAPI");
-#elif defined(WIN32)
+#ifdef _WIN32
 	getapi = (GAMEAPI *)GetProcAddress (hdll, "GetGameAPI");
+#else
+	getapi = (GAMEAPI *)dlsym(hdll, "GetGameAPI");
 #endif
 	
 	if(getapi == NULL)
 	{
-#ifdef __GNUC__
-		dlclose(hdll);
-#elif defined(WIN32)
+#ifdef _WIN32
 		FreeLibrary(hdll);
+#else
+		dlclose(hdll);
 #endif
-		
-		gi.dprintf ("No \"GetGameApi\" entry in DLL %s.\n", dllname);
+		hdll = NULL;
+
+		gi.dprintf ("Q2A: No \"GetGameApi\" entry in DLL %s.\n", dllname);
 		return &globals;
 	}
 		
 	dllglobals = (*getapi)(import);
-	dllloaded = TRUE;
+
 	copyDllInfo();
-	import->cprintf = gi.cprintf;
 	
 	return &globals;
 }

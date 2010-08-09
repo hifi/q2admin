@@ -389,13 +389,6 @@ struct edict_s
 extern game_import_t	gi;
 extern game_export_t	globals;
 extern game_export_t	*dllglobals;
-extern cvar_t *gamedir, *q2a_config;
-
-extern qboolean soloadlazy;
-extern qboolean dllloaded;
-extern qboolean quake2dirsupport;
-
-extern char *q2a_version;
 
 #define FALSE	0
 #define TRUE	1
