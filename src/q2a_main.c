@@ -176,6 +176,21 @@ void ServerCommand (void)
 	cmd = gi.argv(1);
 
 	if(!q2a_strcmp(cmd, "lua_reload")) {
+		q2a_lua_reload();
+		return;
+	}
+
+	if(!q2a_strcmp(cmd, "lua_init")) {
+		q2a_lua_init();
+		return;
+	}
+
+	if(!q2a_strcmp(cmd, "lua_shutdown")) {
+		q2a_lua_shutdown();
+		return;
+	}
+
+	if(!q2a_strcmp(cmd, "lua_restart")) {
 		q2a_lua_shutdown();
 		q2a_lua_init();
 		return;

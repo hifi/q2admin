@@ -437,6 +437,7 @@ void q2a_fpu_q2 (void);
 
 void q2a_lua_init(void);
 void q2a_lua_shutdown(void);
+void q2a_lua_reload(void);
 void q2a_lua_load(const char *file);
 
 qboolean q2a_lua_ClientConnect(int client, char *);

@@ -98,7 +98,7 @@ local function q2a_plugin_call(plugin, func, ...)
 
 	success, err = pcall(plugin.env[func], ...)
 	if not success then
-		gi.dprintf("Q2A Lua: failed to call '"..func.."' in '"..plugin.file.."': "..err.."\n")
+		gi.dprintf("Q2A Lua: Failed to call '%s' in '%s': %s\n", func, plugin.file, err)
 		if not plugin.unloading then
 			q2a_unload(plugin.file)
 		end
@@ -112,36 +112,39 @@ end
 local cfg = {}
 local globals = {}
 local plugins = {}
+local q2a_config
 
-function q2a_init(cfg_name)
-	local cfg_name = cfg_name or "config.lua"
+function q2a_init()
+	if q2a_config == nil then
+		-- quick implementation of *printf family functions
+		do
+			local dprintf = gi.dprintf
+			local cprintf = gi.cprintf
+			local bprintf = gi.bprintf
+			local centerprintf = gi.centerprintf
+
+			function gi.dprintf(fmt, ...)
+				return dprintf(string.format(fmt, ...))
+			end
+
+			function gi.cprintf(client, level, fmt, ...)
+				return cprintf(client, level, string.format(fmt, ...))
+			end
+
+			function gi.bprintf(level, fmt, ...)
+				return bprintf(level, string.format(fmt, ...))
+			end
+
+			function gi.centerprintf(level, fmt, ...)
+				return centerprintf(level, string.format(fmt, ...))
+			end
+		end
+
+		q2a_config = gi.cvar("q2a_config", "config.lua")
+	end
 
 	gi.dprintf("Q2A Lua: Plugin Manager\n")
-	gi.dprintf("Q2A Lua: Loading configuration "..cfg_name.."\n");
-
-	-- quick implementation of *printf family functions
-	do
-		local dprintf = gi.dprintf
-		local cprintf = gi.cprintf
-		local bprintf = gi.bprintf
-		local centerprintf = gi.centerprintf
-
-		function gi.dprintf(fmt, ...)
-			return dprintf(string.format(fmt, ...))
-		end
-
-		function gi.cprintf(client, level, fmt, ...)
-			return cprintf(client, level, string.format(fmt, ...))
-		end
-
-		function gi.bprintf(level, fmt, ...)
-			return bprintf(level, string.format(fmt, ...))
-		end
-
-		function gi.centerprintf(level, fmt, ...)
-			return centerprintf(level, string.format(fmt, ...))
-		end
-	end
+	gi.dprintf("Q2A Lua: Loading configuration %s\n", q2a_config.string);
 
 	globals = copy_table(_G)
 	globals.ex = ex
@@ -152,15 +155,15 @@ function q2a_init(cfg_name)
 	globals.q2a_reload = nil
 	globals.q2a_call = nil
 
-	chunk, err = loadfile(cfg_name)
+	chunk, err = loadfile(q2a_config.string)
 	if chunk == nil then
-		gi.dprintf("Q2A Lua: failed to load configuration from "..cfg_name.." (not fatal): "..tostring(err).."\n")
+		gi.dprintf("Q2A Lua: Failed to load configuration from %s (not fatal): %s\n", q2a_config.string, tostring(err))
 		return
 	else
 		setfenv(chunk, cfg)
 		success, err = pcall(chunk)
 		if not success then
-			gi.dprintf("Q2A Lua: syntax error in config:"..tostring(err).."\n")
+			gi.dprintf("Q2A Lua: Syntax error in config: %s\n", tostring(err))
 			return
 		end
 	end
@@ -173,11 +176,11 @@ function q2a_init(cfg_name)
 end
 
 function q2a_shutdown()
-	gi.dprintf("Q2A Lua: shutdown in progress...\n")
+	gi.dprintf("Q2A Lua: Shutdown in progress...\n")
 	for i,plugin in pairs(plugins) do
 		q2a_unload(plugin.file)
 	end
-	gi.dprintf("Q2A Lua: all plugins unloaded!\n")
+	gi.dprintf("Q2A Lua: All plugins unloaded!\n")
 end
 
 function q2a_load(file)
@@ -188,7 +191,7 @@ function q2a_load(file)
 
 	chunk, err = loadfile(plugin.file)
 	if chunk == nil then
-		gi.dprintf("Q2A Lua: failed to load file "..plugin.file..": "..tostring(err).."\n")
+		gi.dprintf("Q2A Lua: Failed to load file %s: %s\n", plugin.file, tostring(err))
 		return false
 	end
 
@@ -197,11 +200,11 @@ function q2a_load(file)
 	success, err = pcall(chunk)
 
 	if not success then
-		gi.dprintf("Q2A Lua: failed to compile file "..plugin.file..": "..tostring(err).."\n")
+		gi.dprintf("Q2A Lua: Failed to compile file %s: %s\n", plugin.file, tostring(err))
 		return false
 	end
 
-	gi.dprintf("Q2A Lua: loaded plugin "..plugin.file.."\n")
+	gi.dprintf("Q2A Lua: Loaded plugin %s\n", plugin.file)
 	q2a_plugin_call(plugin, 'q2a_load')
 
 	table.insert(plugins, plugin)
@@ -211,7 +214,7 @@ end
 function q2a_unload(file)
 	for i,plugin in pairs(plugins) do
 		if plugin.file == file then
-			gi.dprintf("Q2A Lua: unloading "..file.."\n")
+			gi.dprintf("Q2A Lua: unloading %s\n", file)
 			plugin.unloading = true
 			-- let the plugin know we are unloading it
 			q2a_plugin_call(plugin, 'q2a_unload')
@@ -223,9 +226,11 @@ function q2a_unload(file)
 	return false
 end
 
-function q2a_reload(file)
-	q2a_unload(file)
-	q2a_load(file)
+-- reload all plugins
+function q2a_reload()
+	gi.dprintf("Q2a Lua: Reloading...\n")
+	q2a_shutdown()
+	q2a_init()
 end
 
 function q2a_call(func, ...)

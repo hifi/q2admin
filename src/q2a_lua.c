@@ -56,8 +56,6 @@ static int q2a_lua_cvar_index(lua_State *L)
 
 void q2a_lua_init(void)
 {
-	cvar_t *q2a_config;
-
 	if(L) return;
 
 	lua_dll = dlopen("liblua5.1.so", RTLD_NOW|RTLD_GLOBAL);
@@ -65,8 +63,6 @@ void q2a_lua_init(void)
 		gi.dprintf("Q2A Lua: Loading Lua shared object failed\n");
 		return;
 	}
-
-	q2a_config = gi.cvar ("q2a_config", "config.lua", 0);
 
 	q2a_fpu_lua();
 
@@ -181,14 +177,25 @@ void q2a_lua_init(void)
 
 	/* run the initialization Lua routine */
 	lua_getglobal(L, "q2a_init");
-	lua_pushstring(L, q2a_config->string);
-	if(lua_pcall(L, 1, 0, 0) != 0) {
+	if(lua_pcall(L, 0, 0, 0) != 0) {
 		char *err_msg = (char *)lua_tostring(L, -1);
 		gi.dprintf("q2a_lua_init: calling q2a_init failed: %s\n", err_msg);
 		q2a_fpu_q2();
 		q2a_lua_shutdown();
 		return;
 	}
+
+	q2a_fpu_q2();
+}
+
+void q2a_lua_reload(void)
+{
+	if(!L) return;
+
+	q2a_fpu_lua();
+
+	lua_getglobal(L, "q2a_reload");
+	lua_pcall(L, 0, 0, 0);
 
 	q2a_fpu_q2();
 }
