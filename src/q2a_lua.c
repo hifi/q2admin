@@ -13,8 +13,6 @@
 /* include the compiled plugin manager code */
 #include "q2a_lua_plugman.h"
 
-#define MAX_PLAYERS maxclients->value
-
 lua_State *L = NULL;
 void *lua_dll = NULL;
 
@@ -64,7 +62,7 @@ void q2a_lua_init(void)
 
 	lua_dll = dlopen("liblua5.1.so", RTLD_NOW|RTLD_GLOBAL);
 	if(!lua_dll) {
-		gi.dprintf("q2a_lua_init: loading Lua shared object failed\n");
+		gi.dprintf("Q2A Lua: Loading Lua shared object failed\n");
 		return;
 	}
 
@@ -75,11 +73,11 @@ void q2a_lua_init(void)
 	L = lua_open();
 	luaL_openlibs(L);
 
-	gi.dprintf("q2a_lua_init: loading stored Lua code, %d bytes\n", sizeof(q2a_lua_plugman));
+	gi.dprintf("Q2A Lua: Loading stored Lua code, %d bytes\n", sizeof(q2a_lua_plugman));
 
 	/* load plugin manager code */
 	if(luaL_loadbuffer(L, (const char *)q2a_lua_plugman, sizeof(q2a_lua_plugman), "q2a_lua_plugman") != 0) {
-		gi.dprintf("q2a_lua_init: Plugin manager code load failed, disabling Lua support\n");
+		gi.dprintf("Q2A Lua: Plugin manager code load failed, disabling Lua support\n");
 		q2a_fpu_q2();
 		q2a_lua_shutdown();
 		return;
