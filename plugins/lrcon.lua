@@ -2,23 +2,20 @@
 -- a very limited rcon by hifi <3
 --
 
-local quit_on_empty = true
-
-local cvars = {
-    -- server
-    'password', 'maxclients', 'timelimit', 'dmflags', 'sv_gravity', 'sv_iplimit', 'fraglimit',
-    'sv_anticheat_required',
-
-    -- mod
-    'teamplay', 'ctf', 'matchmode', 'roundtimelimit', 'tgren', 'limchasecam', 'forcedteamtalk',
-    'mm_forceteamtalk', 'ir', 'wp_flags', 'itm_flags', 'hc_single', 'use_punch',  'darkmatch',
-    'allitem', 'allweapon', 'use_3teams'
-}
+local quit_on_empty 
+local cvars
 
 local claimer = nil
 local claimer_store = nil
 
-function q2a_load()
+function q2a_load(config)
+    quit_on_empty = config.quit_on_empty
+    cvars = config.cvars
+
+    if quit_on_empty == nil or cvars == nil then
+        gi.dprintf("Warning: lrcon config is invalid\n")
+    end
+
     claimer_store = gi.cvar('lua_q2a_lrcon_storage', '')
 end
 

@@ -170,7 +170,11 @@ function q2a_init()
 
 	if type(cfg.plugins) == 'table' then
 		for k,v in pairs(cfg.plugins) do
-			q2a_load("plugins/"..tostring(v)..".lua")
+			if type(v) == 'table' then
+				q2a_load("plugins/"..tostring(k)..".lua", v)
+                        else
+                            gi.dprintf("Q2A Lua: Invalid configuration for plugin %s, expected a table, got %s\n", tostring(k), type(v))
+			end
 		end
 	end
 end
@@ -183,7 +187,7 @@ function q2a_shutdown()
 	gi.dprintf("Q2A Lua: All plugins unloaded!\n")
 end
 
-function q2a_load(file)
+function q2a_load(file, config)
 	local success, err, chunk
 
 	local plugin = {}
@@ -205,7 +209,7 @@ function q2a_load(file)
 	end
 
 	gi.dprintf("Q2A Lua: Loaded plugin %s\n", plugin.file)
-	q2a_plugin_call(plugin, 'q2a_load')
+	q2a_plugin_call(plugin, 'q2a_load', config)
 
 	table.insert(plugins, plugin)
 	return true
