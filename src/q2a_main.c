@@ -224,22 +224,6 @@ game_export_t *GetGameAPI(game_import_t *import)
 
 	q2a_lua_init();
 
-	globals.Init = Init;
-	globals.Shutdown = Shutdown;
-	globals.SpawnEntities = SpawnEntities;
-	
-	globals.ClientThink = ClientThink;
-	globals.ClientConnect = ClientConnect;
-	globals.ClientUserinfoChanged = ClientUserinfoChanged;
-	globals.ClientDisconnect = ClientDisconnect;
-	globals.ClientBegin = ClientBegin;
-	globals.ClientCommand = ClientCommand;
-	
-	globals.RunFrame = RunFrame;
-	
-	globals.ServerCommand = ServerCommand;
-	
-
 	sprintf(dllname, "%s/%s", moddir, DLLNAME);
 #ifdef _WIN32
 	hdll = LoadLibrary(dllname);
@@ -277,6 +261,27 @@ game_export_t *GetGameAPI(game_import_t *import)
 	dllglobals = (*getapi)(import);
 
 	globals.apiversion = dllglobals->apiversion;
+
+	globals.Init = Init;
+	globals.Shutdown = Shutdown;
+	globals.SpawnEntities = SpawnEntities;
+
+	globals.WriteGame = dllglobals->WriteGame;
+	globals.ReadGame = dllglobals->ReadGame;
+
+	globals.WriteLevel = dllglobals->WriteLevel;
+	globals.ReadLevel = dllglobals->ReadLevel;
+	
+	globals.ClientConnect = ClientConnect;
+	globals.ClientBegin = ClientBegin;
+	globals.ClientUserinfoChanged = ClientUserinfoChanged;
+	globals.ClientDisconnect = ClientDisconnect;
+	globals.ClientCommand = ClientCommand;
+	globals.ClientThink = ClientThink;
+	
+	globals.RunFrame = RunFrame;
+	
+	globals.ServerCommand = ServerCommand;
 
 	copyDllInfo();
 
