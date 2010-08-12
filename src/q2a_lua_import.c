@@ -18,13 +18,11 @@ qboolean q2a_lua_ClientConnect(int client, char *userinfo)
 
 	q2a_fpu_lua();
 
-	lua_getglobal(L, "q2a_call_bool");
-	lua_pushstring(L, "ClientConnect");
-	lua_pushboolean(L, TRUE);
+	lua_getglobal(L, "ClientConnect");
 	lua_pushnumber(L, client + 1);
 	lua_pushstring(L, userinfo);
 
-	if(lua_pcall(L, 4, 1, 0) == 0) {
+	if(lua_pcall(L, 2, 1, 0) == 0) {
 		ret = lua_toboolean(L, -1);
 	} else {
 		err_msg = (char *)lua_tostring(L, -1);
@@ -173,12 +171,11 @@ void q2a_lua_ClientUserinfoChanged(int client, char *userinfo)
 
 	q2a_fpu_lua();
 
-	lua_getglobal(L, "q2a_call");
-	lua_pushstring(L, "ClientUserinfoChanged");
+	lua_getglobal(L, "ClientUserinfoChanged");
 	lua_pushnumber(L, client + 1);
 	lua_pushstring(L, userinfo);
 
-	if(lua_pcall(L, 3, 0, 0) != 0) {
+	if(lua_pcall(L, 2, 0, 0) != 0) {
 		err_msg = (char *)lua_tostring(L, -1);
 		gi.dprintf("Lua: ClientUserinfoChanged returned error: %s\n", err_msg);
 	}

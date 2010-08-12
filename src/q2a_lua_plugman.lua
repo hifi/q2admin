@@ -10,10 +10,33 @@
 -- Q2Admin Lua plugin manager
 --
 
+local cfg = {}
+local globals = {}
+local plugins = {}
+local q2a_config
+
 -- ex table consists of extra functionality
 ex = { }
 ex.players = { }
 local players_tmp = { }
+
+local function q2a_plugin_call(plugin, func, ...)
+	if type(plugin.env[func]) ~= 'function' then
+		return nil
+	end
+
+	success, err = pcall(plugin.env[func], ...)
+	if not success then
+		gi.dprintf("Q2A Lua: Failed to call '%s' in '%s': %s\n", func, plugin.file, err)
+		if not plugin.unloading then
+			q2a_unload(plugin.file)
+		end
+
+		return false
+	end
+
+	return err
+end
 
 function ex.stuffcmd(client, str)
 	gi.WriteByte(11)
@@ -59,24 +82,64 @@ function ex.args(index, glue)
 	return table.concat(t, glue)
 end
 
-local function ClientConnect_Before(client, userinfo)
+function ClientConnect(client, userinfo)
 	ex.players[client] = { }
 	for k, v in string.gmatch(userinfo, "\\([^\\]+)\\([^\\]+)") do
 		ex.players[client][k] = v
 	end
-end
 
-local function ClientConnect_After(client, userinfo)
+	local allow = false
+	for i,plugin in pairs(plugins) do
+		local ret = q2a_plugin_call(plugin, "ClientConnect", client)
+		if ret == false then
+			allow = false
+		end
+	end
+
 	players_tmp[client] = ex.players[client]
 	ex.players[client] = nil
+
+	return true
+	-- FIXME: not able to reject clients currently
+	--[[
+
+	if not allow then
+		if type(players_tmp[client].rejmsg) == "string" then
+			return "\\rejmsg\\"..players_tmp[client].rejmsg
+		else
+			return false
+		end
+	end
+
+	return true
+	--]]
 end
 
-local function ClientUserinfoChanged(client, userinfo)
+function ClientUserinfoChanged(client, userinfo)
 	if ex.players[client] == nil then
 		return
 	end
+
+	local userinfo_t = { }
 	for k, v in string.gmatch(userinfo, "\\([^\\]+)\\([^\\]+)") do
-		ex.players[client][k] = v
+		userinfo_t[k] = v
+	end
+
+	local modified = false
+	for i,plugin in pairs(plugins) do
+		local ret = q2a_plugin_call(plugin, "ClientUserinfoChanged", userinfo_t)
+		if ret == true then
+			modified = true
+		end
+	end
+
+	if modified then
+		local t = { }
+		for k,v in pairs(ex.players[client]) do
+			table.insert(tmp, k);
+			table.insert(tmp, v);
+		end
+		return "\\"..table.concat(t, "\\")
 	end
 end
 
@@ -90,29 +153,6 @@ local function copy_table(orig)
 
 	return new
 end
-
-local function q2a_plugin_call(plugin, func, ...)
-	if type(plugin.env[func]) ~= 'function' then
-		return nil
-	end
-
-	success, err = pcall(plugin.env[func], ...)
-	if not success then
-		gi.dprintf("Q2A Lua: Failed to call '%s' in '%s': %s\n", func, plugin.file, err)
-		if not plugin.unloading then
-			q2a_unload(plugin.file)
-		end
-
-		return false
-	end
-
-	return err
-end
-
-local cfg = {}
-local globals = {}
-local plugins = {}
-local q2a_config
 
 function q2a_init()
 	if q2a_config == nil then
@@ -148,6 +188,8 @@ function q2a_init()
 
 	globals = copy_table(_G)
 	globals.ex = ex
+	globals.ClientConnect = nil
+	globals.ClientUserinfoChanged = nil
 	globals.q2a_init = nil
 	globals.q2a_shutdown = nil
 	globals.q2a_load = nil
@@ -242,12 +284,10 @@ function q2a_call(func, ...)
 	if func == 'ClientBegin' then
 		local arg = {...}
 		local client = arg[1]
-		ex.players[client] = players_tmp[client]
-		players_tmp[client] = nil
-	end
-
-	if func == 'ClientUserinfoChanged' then
-		ClientUserinfoChanged(...)
+		if players_tmp[client] ~= nil then
+			ex.players[client] = players_tmp[client]
+			players_tmp[client] = nil
+		end
 	end
 
 	for i,plugin in pairs(plugins) do
@@ -263,22 +303,11 @@ end
 
 function q2a_call_bool(func, def, ...)
 
-	if func == 'ClientConnect' then
-		ClientConnect_Before(...)
-	end
-
 	for i,plugin in pairs(plugins) do
 		local ret = q2a_plugin_call(plugin, func, ...)
 		if ret ~= nil and ret ~= def then
-			if func == 'ClientConnect' then
-				ClientConnect_After(...)
-			end
 			return ret
 		end
-	end
-
-	if func == 'ClientConnect' then
-		ClientConnect_After(...)
 	end
 
 	return def
