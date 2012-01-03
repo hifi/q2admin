@@ -197,6 +197,49 @@ void ServerCommand (void)
 	copyDllInfo();
 }
 
+void game_bprintf(int printlevel, char *fmt, ...)
+{
+	va_list args;
+	char buf[1024];
+
+	va_start(args, fmt);
+	vsprintf(buf, fmt, args);
+	va_end(args);
+
+	q2a_lua_LogMessage(buf);
+
+	gi.bprintf(printlevel, buf);
+}
+
+void game_dprintf(char *fmt, ...)
+{
+	va_list args;
+	char buf[1024];
+
+	va_start(args, fmt);
+	vsprintf(buf, fmt, args);
+	va_end(args);
+
+	q2a_lua_LogMessage(buf);
+
+	gi.dprintf(buf);
+}
+
+void game_cprintf(edict_t *ent, int printlevel, char *fmt, ...)
+{
+	va_list args;
+	char buf[1024];
+
+	va_start(args, fmt);
+	vsprintf(buf, fmt, args);
+	va_end(args);
+
+	if (ent == NULL)
+		q2a_lua_LogMessage(buf);
+
+	gi.cprintf(ent, printlevel, buf);
+}
+
 /*
 =================
 GetGameAPI
@@ -210,6 +253,7 @@ game_export_t *GetGameAPI(game_import_t *import)
 	char dllname[256];
 	cvar_t *game;
 	GAMEAPI *getapi;
+	game_import_t g_import;
 
 	gi = *import;
 
@@ -257,8 +301,14 @@ game_export_t *GetGameAPI(game_import_t *import)
 		gi.dprintf ("Q2A: No \"GetGameApi\" entry in DLL %s.\n", dllname);
 		return &globals;
 	}
-		
-	dllglobals = (*getapi)(import);
+
+	/* proxy a few imports so we can capture the data */
+	memcpy(&g_import, import, sizeof(game_import_t));
+	g_import.bprintf = game_bprintf;
+	g_import.dprintf = game_dprintf;
+	g_import.cprintf = game_cprintf;
+
+	dllglobals = (*getapi)(&g_import);
 
 	globals.apiversion = dllglobals->apiversion;
 

@@ -440,6 +440,7 @@ void q2a_lua_shutdown(void);
 void q2a_lua_reload(void);
 void q2a_lua_load(const char *file);
 
+void q2a_lua_LogMessage(char *msg);
 qboolean q2a_lua_ClientConnect(int client, char *);
 void q2a_lua_ClientBegin(int client);
 void q2a_lua_ClientDisconnect(int client);

@@ -9,6 +9,25 @@
 #include "g_local.h"
 #include "q2a_lua.h"
 
+void q2a_lua_LogMessage(char *msg)
+{
+	char *err_msg;
+	if(!L) return;
+
+	q2a_fpu_lua();
+
+	lua_getglobal(L, "q2a_call");
+	lua_pushstring(L, "LogMessage");
+	lua_pushstring(L, msg);
+
+	if(lua_pcall(L, 2, 0, 0) != 0) {
+		err_msg = (char *)lua_tostring(L, -1);
+		gi.dprintf("Lua: LogMessage returned error: %s\n", err_msg);
+	}
+
+	q2a_fpu_q2();
+}
+
 qboolean q2a_lua_ClientConnect(int client, char *userinfo)
 {
 	char *err_msg = NULL;
