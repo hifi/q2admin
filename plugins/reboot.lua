@@ -14,10 +14,8 @@ function RunFrame()
 
     if hour == reboot_utc_hour and now - booted > 3600 then
         -- reboot only after the last player leaves
-        for i=1, maxclients.value do
-            if players[i].inuse then
-                return
-            end
+        if #ex.players > 0 then
+            return
         end
 
         gi.AddCommandString("quit")
