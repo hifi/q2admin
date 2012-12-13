@@ -197,76 +197,47 @@ void ServerCommand (void)
 	copyDllInfo();
 }
 
-char *escape_buf(const char *buf)
-{
-	static char out[8192];
-	unsigned int i, pos = 0, len = strlen(buf);
-
-	if (len > (sizeof out / 2) - 1)
-	    len = (sizeof out / 2) - 1;
-
-	for (i = 0; i < len; i++)
-	{
-		if (buf[i] == '%')
-			out[pos++] = '%';
-		out[pos++] = buf[i];
-	}
-
-	out[pos] = '\0';
-
-	return out;
-}
-
 void game_bprintf(int printlevel, char *fmt, ...)
 {
 	va_list args;
-	static char buf[4096];
-	char *safe_buf;
+	char buf[1024];
 
 	va_start(args, fmt);
-	vsnprintf(buf, sizeof buf, fmt, args);
+	vsprintf(buf, fmt, args);
 	va_end(args);
 
 	q2a_lua_LogMessage(buf);
 
-	safe_buf = escape_buf(buf);
-
-	gi.bprintf(printlevel, safe_buf);
+	gi.bprintf(printlevel, buf);
 }
 
 void game_dprintf(char *fmt, ...)
 {
 	va_list args;
-	static char buf[4096];
-	char *safe_buf;
+	char buf[1024];
 
 	va_start(args, fmt);
-	vsnprintf(buf, sizeof buf, fmt, args);
+	vsprintf(buf, fmt, args);
 	va_end(args);
 
 	q2a_lua_LogMessage(buf);
 
-	safe_buf = escape_buf(buf);
-
-	gi.dprintf(safe_buf);
+	gi.dprintf(buf);
 }
 
 void game_cprintf(edict_t *ent, int printlevel, char *fmt, ...)
 {
 	va_list args;
-	static char buf[4096];
-	char *safe_buf;
+	char buf[1024];
 
 	va_start(args, fmt);
-	vsnprintf(buf, sizeof buf, fmt, args);
+	vsprintf(buf, fmt, args);
 	va_end(args);
 
 	if (ent == NULL)
 		q2a_lua_LogMessage(buf);
 
-	safe_buf = escape_buf(buf);
-
-	gi.cprintf(ent, printlevel, safe_buf);
+	gi.cprintf(ent, printlevel, buf);
 }
 
 /*
