@@ -203,7 +203,8 @@ void game_bprintf(int printlevel, char *fmt, ...)
 	char buf[1024];
 
 	va_start(args, fmt);
-	vsprintf(buf, fmt, args);
+	vsnprintf(buf, sizeof buf, fmt, args);
+	buf[sizeof buf - 1] = 0;
 	va_end(args);
 
 	q2a_lua_LogMessage(buf);
@@ -217,7 +218,8 @@ void game_dprintf(char *fmt, ...)
 	char buf[1024];
 
 	va_start(args, fmt);
-	vsprintf(buf, fmt, args);
+	vsnprintf(buf, sizeof buf, fmt, args);
+	buf[sizeof buf - 1] = 0;
 	va_end(args);
 
 	q2a_lua_LogMessage(buf);
@@ -231,7 +233,8 @@ void game_cprintf(edict_t *ent, int printlevel, char *fmt, ...)
 	char buf[1024];
 
 	va_start(args, fmt);
-	vsprintf(buf, fmt, args);
+	vsnprintf(buf, sizeof buf, fmt, args);
+	buf[sizeof buf - 1] = 0;
 	va_end(args);
 
 	if (ent == NULL)
