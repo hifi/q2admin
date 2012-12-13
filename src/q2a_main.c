@@ -208,7 +208,7 @@ void game_bprintf(int printlevel, char *fmt, ...)
 
 	q2a_lua_LogMessage(buf);
 
-	gi.bprintf(printlevel, buf);
+	gi.bprintf(printlevel, "%s", buf);
 }
 
 void game_dprintf(char *fmt, ...)
@@ -222,7 +222,7 @@ void game_dprintf(char *fmt, ...)
 
 	q2a_lua_LogMessage(buf);
 
-	gi.dprintf(buf);
+	gi.dprintf("%s", buf);
 }
 
 void game_cprintf(edict_t *ent, int printlevel, char *fmt, ...)
@@ -237,7 +237,7 @@ void game_cprintf(edict_t *ent, int printlevel, char *fmt, ...)
 	if (ent == NULL)
 		q2a_lua_LogMessage(buf);
 
-	gi.cprintf(ent, printlevel, buf);
+	gi.cprintf(ent, printlevel, "%s", buf);
 }
 
 /*
