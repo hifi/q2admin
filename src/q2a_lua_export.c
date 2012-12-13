@@ -32,7 +32,7 @@ int q2a_lua_gi_bprintf(lua_State *L)
 
 	q2a_fpu_q2();
 
-	gi.bprintf(lvl, str);
+	gi.bprintf(lvl, "%s", str);
 
 	q2a_fpu_lua();
 
@@ -54,7 +54,7 @@ int q2a_lua_gi_cprintf(lua_State *L)
 
 	q2a_fpu_q2();
 
-	gi.cprintf(ent, lvl, str);
+	gi.cprintf(ent, lvl, "%s", str);
 
 	q2a_fpu_lua();
 
@@ -74,7 +74,7 @@ int q2a_lua_gi_centerprintf(lua_State *L)
 
 	q2a_fpu_q2();
 
-	gi.centerprintf(ent, str);
+	gi.centerprintf(ent, "%s", str);
 
 	q2a_fpu_lua();
 
