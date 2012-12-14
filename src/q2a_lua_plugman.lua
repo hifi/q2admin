@@ -25,7 +25,7 @@ local function q2a_plugin_call(plugin, func, ...)
 		return nil
 	end
 
-	success, err = pcall(plugin.env[func], ...)
+	success, err, param = pcall(plugin.env[func], ...)
 	if not success then
 		gi.dprintf("Q2A Lua: Failed to call '%s' in '%s': %s\n", func, plugin.file, err)
 		if not plugin.unloading then
@@ -35,7 +35,7 @@ local function q2a_plugin_call(plugin, func, ...)
 		return false
 	end
 
-	return err
+	return err, param
 end
 
 function ex.stuffcmd(client, str)
@@ -88,31 +88,21 @@ function ClientConnect(client, userinfo)
 		ex.players[client][k] = v
 	end
 
-	local allow = false
+	local rejmsg = ""
+	local success = true
+
 	for i,plugin in pairs(plugins) do
-		local ret = q2a_plugin_call(plugin, "ClientConnect", client)
+		local ret, lrejmsg = q2a_plugin_call(plugin, "ClientConnect", client)
 		if ret == false then
-			allow = false
+			rejmsg = lrejmsg
+			success = false
 		end
 	end
 
 	players_tmp[client] = ex.players[client]
 	ex.players[client] = nil
 
-	return true
-	-- FIXME: not able to reject clients currently
-	--[[
-
-	if not allow then
-		if type(players_tmp[client].rejmsg) == "string" then
-			return "\\rejmsg\\"..players_tmp[client].rejmsg
-		else
-			return false
-		end
-	end
-
-	return true
-	--]]
+	return success, rejmsg
 end
 
 function ClientUserinfoChanged(client, userinfo)

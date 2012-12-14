@@ -30,7 +30,7 @@ void q2a_lua_LogMessage(char *msg)
 
 qboolean q2a_lua_ClientConnect(int client, char *userinfo)
 {
-	char *err_msg = NULL;
+	char *err_msg = NULL, *rej_msg = NULL;
 	qboolean ret = TRUE;
 
 	if(!L) return ret;
@@ -41,14 +41,19 @@ qboolean q2a_lua_ClientConnect(int client, char *userinfo)
 	lua_pushnumber(L, client + 1);
 	lua_pushstring(L, userinfo);
 
-	if(lua_pcall(L, 2, 1, 0) == 0) {
-		ret = lua_toboolean(L, -1);
+	if(lua_pcall(L, 2, 2, 0) == 0) {
+		ret = lua_toboolean(L, -2);
+		rej_msg = (char *)lua_tostring(L, -1);
 	} else {
 		err_msg = (char *)lua_tostring(L, -1);
 		gi.dprintf("Lua: ClientConnect returned error: %s\n", err_msg);
 	}
 
 	q2a_fpu_q2();
+
+	if (!ret && rej_msg != NULL) {
+		sprintf(userinfo, "\\rejmsg\\%s", rej_msg);
+	}
 
 	return ret;
 }
