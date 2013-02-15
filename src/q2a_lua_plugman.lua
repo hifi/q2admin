@@ -115,6 +115,9 @@ function ClientUserinfoChanged(client, userinfo)
 		userinfo_t[k] = v
 	end
 
+	ex.players[client] = userinfo_t
+
+	--[[ needs some adjustment
 	local modified = false
 	for i,plugin in pairs(plugins) do
 		local ret = q2a_plugin_call(plugin, "ClientUserinfoChanged", userinfo_t)
@@ -123,14 +126,18 @@ function ClientUserinfoChanged(client, userinfo)
 		end
 	end
 
+
 	if modified then
 		local t = { }
 		for k,v in pairs(ex.players[client]) do
-			table.insert(tmp, k);
-			table.insert(tmp, v);
+			table.insert(t, k);
+			table.insert(t, v);
 		end
 		return "\\"..table.concat(t, "\\")
 	end
+
+	return false
+	--]]
 end
 
 -- not a complete deep copy, metatables are ignored
