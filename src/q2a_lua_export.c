@@ -290,3 +290,21 @@ int q2a_lua_gi_WriteAngle(lua_State *L)
 	q2a_fpu_lua();
 	return 0;
 }
+
+int q2a_lua_ex_ClientStats(lua_State *L)
+{
+	edict_t *ent;
+	int client, stat;
+
+	client = lua_tointeger(L, 1);
+	stat = lua_tointeger(L, 2);
+
+	ent = getClient(client);
+
+        if (ent && ent->client && stat < MAX_STATS && stat > 0) {
+		lua_pushinteger(L, ent->client->ps.stats[stat]);
+		return 1;
+        }
+
+	return 0;
+}

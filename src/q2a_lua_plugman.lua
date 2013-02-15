@@ -15,8 +15,8 @@ local globals = {}
 local plugins = {}
 local q2a_config
 
--- ex table consists of extra functionality
-ex = { }
+-- ex table consists of extra functionality, declaration moved to q2a_lua.c
+--ex = { }
 ex.players = { }
 local players_tmp = { }
 

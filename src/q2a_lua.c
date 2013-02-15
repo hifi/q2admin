@@ -75,23 +75,6 @@ void q2a_lua_init(void)
 	L = lua_open();
 	luaL_openlibs(L);
 
-	gi.dprintf("Q2A Lua: Loading stored Lua code, %d bytes\n", sizeof(q2a_lua_plugman));
-
-	/* load plugin manager code */
-	if(luaL_loadbuffer(L, (const char *)q2a_lua_plugman, sizeof(q2a_lua_plugman), "q2a_lua_plugman") != 0) {
-		gi.dprintf("Q2A Lua: Plugin manager code load failed, disabling Lua support\n");
-		q2a_fpu_q2();
-		q2a_lua_shutdown();
-		return;
-	}
-	if(lua_pcall(L, 0, 0, 0) != 0) {
-		char *err_msg = (char *)lua_tostring(L, -1);
-		gi.dprintf("q2a_lua_init: Plugin manager code execution failed, disabling Lua support: %s\n", err_msg);
-		q2a_fpu_q2();
-		q2a_lua_shutdown();
-		return;
-	}
-
 	/* register cvar stuff */
 	luaL_newmetatable(L, "Cvar");
 	lua_pushcfunction(L, q2a_lua_cvar_index);
@@ -118,6 +101,9 @@ void q2a_lua_init(void)
 	lua_setglobal(L, "CVAR_NOSET");
 	lua_pushnumber(L, CVAR_LATCH);
 	lua_setglobal(L, "CVAR_LATCH");
+
+	lua_pushnumber(L, STAT_FRAGS);
+	lua_setglobal(L, "STAT_FRAGS");
 
 	/* register gi functions */
 	lua_newtable(L); // gi table
@@ -180,6 +166,31 @@ void q2a_lua_init(void)
 	lua_setfield(L, 1, "WriteAngle");
 
 	lua_setglobal(L, "gi");
+
+	/* register ex functions, these may change without prior notice */
+	lua_newtable(L); // ex table
+
+	lua_pushcfunction(L, q2a_lua_ex_ClientStats);
+	lua_setfield(L, 1, "ClientStats");
+
+	lua_setglobal(L, "ex");
+
+	gi.dprintf("Q2A Lua: Loading stored Lua code, %d bytes\n", sizeof(q2a_lua_plugman));
+
+	/* load plugin manager code */
+	if(luaL_loadbuffer(L, (const char *)q2a_lua_plugman, sizeof(q2a_lua_plugman), "q2a_lua_plugman") != 0) {
+		gi.dprintf("Q2A Lua: Plugin manager code load failed, disabling Lua support\n");
+		q2a_fpu_q2();
+		q2a_lua_shutdown();
+		return;
+	}
+	if(lua_pcall(L, 0, 0, 0) != 0) {
+		char *err_msg = (char *)lua_tostring(L, -1);
+		gi.dprintf("q2a_lua_init: Plugin manager code execution failed, disabling Lua support: %s\n", err_msg);
+		q2a_fpu_q2();
+		q2a_lua_shutdown();
+		return;
+	}
 
 	/* run the initialization Lua routine */
 	lua_getglobal(L, "q2a_init");

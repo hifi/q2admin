@@ -39,5 +39,8 @@ int q2a_lua_gi_WriteFloat(lua_State *L);
 int q2a_lua_gi_WriteString(lua_State *L);
 int q2a_lua_gi_WriteAngle(lua_State *L);
 
+/* very custom, might change without prior notice */
+int q2a_lua_ex_ClientStats(lua_State *L);
+
 #define Q2A_LUA_H
 #endif
