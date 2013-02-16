@@ -51,7 +51,7 @@ function ServerCommand()
 
     if gi.argv(2) == 'q2o_centerprintall' then
 
-	local msg = ex.args(3)
+	local msg = string.gsub(ex.args(3), '\\n', '\n')
         for i,plr in pairs(ex.players) do
             gi.centerprintf(i, msg)
         end 
